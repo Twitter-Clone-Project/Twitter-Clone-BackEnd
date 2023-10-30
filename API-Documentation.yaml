@@ -1,0 +1,3225 @@
+swagger: '2.0'
+info:
+  title: X-Clone APIs
+  version: 1.0.0
+  description: API documentation for X-Clone project. `Hint =  for frontend, the browser will set the cookies for you, so i didn't write it in the request parameters. for flutter, you can sent the token as Bearer token`
+tags:
+  - name: auth
+    description: Authentication Endpoints
+  - name: profile
+    description: User Personal Data Endpoints
+  - name: user interactions
+    description: User Interactions Endpoints
+  - name: tweets
+    description: Operations related to tweets.
+  - name: timeline
+    description: Operations related to timeline.
+  - name: trends
+    description: Operations related to trends.
+  - name: search
+    # description: .
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Sign up to the application
+      description: Endpoint for user registeration on the application.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: User credentials for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the user for sign up
+              username:
+                type: string
+                description: The username of the user for sign up
+              email:
+                type: string
+                description: The email for sign up
+              password:
+                type: string
+                description: The password for sign up
+              passwordConfirm:
+                type: string
+                description: confirm the password
+              dateOfBirth:
+                type: string
+                format: date
+                description: The password for signup
+              g-recaptcha-response:
+                type: string
+                description: >-
+                  g-recaptcha-response is the name of response key or sitekey to
+                  check "I'm not a robot" using google reCAPTCHA
+      responses:
+        '201':
+          description: Successful sign-up
+          headers:
+            Set-Cookie:
+              type: string
+              description: Cookie containing the access token
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name: 
+                        type: string  
+                      username:
+                        type: string  
+                      email:
+                        type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+  /auth/signin:
+    post:
+      tags:
+        - auth
+      summary: Sign in to the application
+      description: Endpoint for user authentication and obtaining an access token.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: User credentials for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                description: The email for login
+              password:
+                type: string
+                description: The password for login
+      responses:
+        '200':
+          description: Successful sign-in
+          headers:
+            Set-Cookie:
+              type: string
+              description: Cookie containing the access token
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name: 
+                        type: string  
+                      username:
+                        type: string  
+                      email:
+                        type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+  /auth/signWithGoogle:
+    post:
+      tags:
+        - auth
+      summary: Sign in/up to the application with google automatically
+      description: Endpoint for user authentication using google. this API will navigate the user to his google emails to choose an email, then will call google APIs to  check the email and return his data from google, then will check if this user registered before? if yes, it will generate an authentication token and send it = `Sign in`. if no, it will add the user to the database and generate an authentication token and send it = `Sign up`
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful sign-in/up
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  authorizeUrl: 
+                    type: string
+                    discription: url that you should navigate to, so that the user can choose from his emails
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong            
+  /auth/resendConfirmEmail:
+    post:
+      tags:
+        - auth
+      summary: Resend the confirmation email to the user
+      description: Endpoint to send email confirmation.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Sending a Confirm-Email
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: true
+              message: A new OTP was sent to the user
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /auth/confirmEmail:
+    post:
+      tags:
+        - auth
+      summary: Confirm the email of the user 
+      description: Endpoint for user email confirmation by the otp sent to the email.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: OTP 8 bit number sent in the email
+          required: true
+          schema:
+            type: object
+            properties:
+              otp:
+                type: string
+                description: the number sent in the verification email
+      responses:
+        '200':
+          description: Successful Confirm-Email
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: true
+              message: confirmed
+
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized -Invalid email or the otp expired
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /auth/updatePassword:
+    patch:
+      tags:
+        - auth
+      summary: Update the user password
+      description: Endpoint for user password changing.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: User new password for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              currentPassword:
+                type: string
+                description: current password of the user
+              newPassword:
+                type: string
+              newPasswordConfirm:
+                type: string
+      responses:
+        '200':
+          description: Successful sign-up
+          headers:
+            Set-Cookie:
+              type: string
+              description: Cookie containing the access token.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name: 
+                        type: string  
+                      username:
+                        type: string  
+                      email:
+                        type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /auth/forgetPassword:
+    post:
+      tags:
+        - auth
+      summary: Send an email requesting change password
+      description: >-
+        Endpoint that take the email of the user and send an email with a
+        One-Time url - has a token to authorize - to change the password, this
+        url expires after 10m.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: User credentials for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+      responses:
+        '200':
+          description: Successful Sending a Password Change Email
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: true
+              message: email sent successfully, check it!
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /auth/resetPassword/{resetToken}:
+    post:
+      tags:
+        - auth
+      summary: Reset the password
+      description: >-
+        Endpoint that take the token  - sent in the password change email - as
+        request parameters and the new password to set it.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: resetToken
+          in: path
+          description: Token for password update
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: User credentials for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              newPassword:
+                type: string
+              newPasswordConfirm:
+                type: string
+      responses:
+        '200':
+          description: Successful Sending a Password Change Email
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: true
+              message: password changed successfully
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /profile/updateUsername:
+    patch:
+      tags:
+        - profile
+      summary: Update the username
+      description: Endpoint for username change.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        # - name: Cookie
+        #   in: header
+        #   description: Cookie containing the access token. browser will set
+        #   required: true
+        #   type: string
+        - name: body
+          in: body
+          description: User new password for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              newUsername:
+                type: string
+      responses:
+        '200':
+          description: Successful Username-Change
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      email:
+                        type: string
+                      username:
+                        type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /profile/updateEmail:
+    patch:
+      tags:
+        - profile
+      summary: Update the user email
+      description: Endpoint for user email change.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              newEmail:
+                type: string
+      responses:
+        '200':
+          description: Successful UserEmail-Change
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      email:
+                        type: string
+                      username:
+                        type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{username}/isFound:
+    get:
+      tags:
+        - auth
+      summary: Is this username registered?
+      description: Endpoint that Checks if a user with this username is registered before.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful UserEmail-Change
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  isFound:
+                    type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+  /users/{email}/isFound:
+    get:
+      tags:
+        - auth
+      summary: Is this email registered?
+      description: Endpoint that Checks if a user with this email is registered before.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful UserEmail-Change
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  isFound:
+                    type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+  /users/{userId}/followers:
+    get:
+      tags:
+        - user interactions
+      summary: Fetch a list of followers for the username
+      description: Endpoint to get the followers of the username.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        email:
+                          type: string
+                        username:
+                          type: string
+                        name:
+                          type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/following:
+    get:
+      tags:
+        - user interactions
+      summary: Fetch a list of users followed by the username
+      description: Endpoint to get the users following the username.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        email:
+                          type: string
+                        username:
+                          type: string
+                        name:
+                          type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/follow:
+    post:
+      tags:
+        - user interactions
+      summary: Follow the username
+      description: >-
+        Endpoint that take the username and make the authenticated username
+        follow him.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '201':
+          description: Successful Follow
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/unfollow:
+    delete:
+      tags:
+        - user interactions
+      summary: UnFollow the username
+      description: >-
+        Endpoint that take the username and make the authenticated username
+        unfollow him - delete the relation.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful UnFollow
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/mute:
+    post:
+      tags:
+        - user interactions
+      summary: Mute the username
+      description: >-
+        Endpoint that take the username and make the authenticated username mute
+        him.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '201':
+          description: Successful Mute
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/unmute:
+    delete:
+      tags:
+        - user interactions
+      summary: UnMute the username
+      description: >-
+        Endpoint that take the username and make the authenticated username mute
+        him.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful UnMute
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/mutedUsers:
+    get:
+      tags:
+        - user interactions
+      summary: Fetch a list of users muted by the username
+      description: Endpoint to get the users following the username.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        email:
+                          type: string
+                        username:
+                          type: string
+                        name:
+                          type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/block:
+    post:
+      tags:
+        - user interactions
+      summary: Block the username
+      description: >-
+        Endpoint that take the username and make the authenticated username
+        block him.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '201':
+          description: Successful Block
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/unblock:
+    delete:
+      tags:
+        - user interactions
+      summary: UnBlock the username
+      description: >-
+        Endpoint that take the username and make the authenticated username
+        unblock him.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Unblock
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/{userId}/blockedUsers:
+    get:
+      tags:
+        - user interactions
+      summary: Fetch a list of users blocked by the username
+      description: Endpoint to get the users blocked by the entered username.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        email:
+                          type: string
+                        username:
+                          type: string
+                        name:
+                          type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  /users/search:
+    get:
+      tags:
+        - search
+      summary: >-
+        Search for matching users using their username or screen name (or part
+        of them).
+      description: Endpoint to search for users by username or screen name.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: query
+          in: query
+          description: The username or screen name to search for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        email:
+                          type: string
+                        name:
+                          type: string
+                        username:
+                          type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '404':
+          description: Not found
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /profile/updateBanner:
+    post:
+      tags:
+        - profile
+      summary: Add a profile banner
+      description: Endpoint to update or add a profile banner.
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: file
+          in: formData
+          description: The banner photo to update.
+          required: true
+          type: file
+      responses:
+        '200':
+          description: Successful Update
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  bannerUrl:
+                    type: string
+        '400':
+          description: >-
+            Either an image was not provided, or the image data could not be
+            processed
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '422':
+          description: The image could not be resized, or is too large.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /profile/deleteBanner:
+    delete:
+      tags:
+        - profile
+      summary: Delete a banner picture.
+      description: Endpoint to delete a banner picture.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Update
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              name:
+                type: string
+                description: The user's name.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /profile/updatePicture:
+    post:
+      tags:
+        - profile
+      summary: Update a profile picture given the new picture.
+      description: Endpoint to update a profile picture.
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: photo
+          in: formData
+          description: The banner photo to update.
+          required: true
+          type: file
+        - name: description
+          in: formData
+          description: The description on profile.
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful Update
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              name:
+                type: string
+                description: The user's name.
+              description:
+                type: string
+                description: The user's description.
+              profileImageUrl:
+                type: string
+                description: The URL of the updated profile picture.
+        '400':
+          description: >-
+            Either an image was not provided, or the image data could not be
+            processed
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '422':
+          description: The image could not be resized, or is too large.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /profile/deletePicture:
+    delete:
+      tags:
+        - profile
+      summary: Delete a profile picture.
+      description: Endpoint to delete a profile picture.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Update
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              name:
+                type: string
+                description: The user's name.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /profile/update:
+    put:
+      tags:
+        - profile
+      summary: Update the profile of a specific user.
+      description: Endpoint to update the profile of a specific user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: The updated profile information.
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The user's name.
+              bio:
+                type: string
+                description: The user's bio.
+              website:
+                type: string
+                description: The user's website.
+              location:
+                type: string
+                description: The user's location.
+      responses:
+        '200':
+          description: Successful Update
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The user's name.
+                  bio:
+                    type: string
+                    description: The user's bio.
+                  website:
+                    type: string
+                    description: The user's website.
+                  location:
+                    type: string
+                    description: The user's location.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /profile/{userId}:
+    get:
+      tags:
+        - profile
+      summary: Get the profile of a specific user.
+      description: Endpoint to get the profile of a specific user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of the user to get the profile of.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The user's ID.
+                  name:
+                    type: string
+                    description: The user's name.
+                  username:
+                    type: string
+                    description: The user's name.
+                  bio:
+                    type: string
+                    description: The user's bio.
+                  website:
+                    type: string
+                    description: The user's website.
+                  location:
+                    type: string
+                    description: The user's location.
+                  profileImageUrl:
+                    type: string
+                    description: The URL of the user's profile picture.
+                  createdAt:
+                    type: string
+                    description: The date and time the user's profile was created.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+###################################################                
+  /profile/{conversationId}/messages:
+    get:
+      tags:
+        - profile
+      summary: Fetch the messages of a conversation
+      description: >-
+        Endpoint that return all the messages of a conversation.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the conversation between the two users.
+          required: true
+          type: string  
+      responses:
+        '200':
+          description: Successful Get Messages
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:  
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        messagesId:
+                          type: string
+                        text:
+                          type: string
+                        isSeen:
+                          type: boolean
+                        time:
+                          type: string  
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+####################################################
+  /profile/{conversationId}/sendMessage:
+    post:
+      tags:
+        - profile
+      summary: Send a message in a conversation
+      description: >-
+        Endpoint that take a message and add it at the conversation attached.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          type: string  
+      responses:
+        '200':
+          description: Successful Send
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user              
+####################################################
+  /profile/conversations:
+    get:
+      tags:
+        - profile
+      summary: List the conversations of the authenticated user
+      description: >-
+        Endpoint that get my conversations with all.
+      consumes:
+        - application/json
+      produces:
+        - application/json 
+      responses:
+        '200':
+          description: Successful Send
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:  
+                  conversations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        conversationId:
+                          type: string 
+                        contact:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: The user's ID.
+                            email:
+                              type: string 
+                            name:
+                              type: string
+                              description: The user's name.
+                            username:
+                              type: string
+                              description: The user's name. 
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user    
+####################################################
+  /profile/unseenChatsCnt:
+    get:
+      tags:
+        - profile
+      summary: Get number of unseen conversations
+      description: >-
+        Endpoint that get my conversations with all.
+      consumes:
+        - application/json
+      produces:
+        - application/json 
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:  
+                  unseenCnt: 
+                    type: integer
+                    example: 10   
+
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+###################################################33              
+  /profile/notifications:
+    post:
+      tags:
+        - profile
+      summary: Get my notifications
+      description: >-
+        Endpoint that return the notifications of the authenticated username.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Mute
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:  
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        notificationId:
+                          type: string
+                        content:
+                          type: string
+                        isSeen:
+                          type: boolean      
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user   
+###################################################              
+  /profile/unseenNotificationsCnt:
+    post:
+      tags:
+        - profile
+      summary: Get the number of unseen notifications  
+      description: >-
+        Endpoint that return the number of notifications of the authenticated user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Mute
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:  
+                  unseenCnt: 
+                    type: integer     
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user  
+  /tweets/add:
+    post:
+      tags:
+        - tweets
+      summary: Add a new tweet.
+      description: Endpoint to add a new tweet. one of the two parameters is required.
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: tweetText
+          type: string
+          in: formData
+          description: The text of the tweet.
+          required: false
+
+        - name: attachments
+          in: formData
+          description: The new tweet attachments of max 4.
+          required: false
+          type: file
+          maxItems: 4
+      responses:
+        '200':
+          description: Successful Add
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the new tweet.
+                  text:
+                    type: string
+                    description: The text of the new tweet.
+                  createdAt:
+                    type: string
+                    description: The date and time the tweet was created.
+                  user:
+                    type: object
+                    properties:
+                      profileImageURL:
+                        type: string
+                        description: The profile of the user that create the tweet.
+                      screenName:
+                        type: string
+                        description: The screen name of the user that create the tweet.
+                      userName:
+                        type: string
+                        description: The username that create the tweet.
+                  attachmentsURL:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+
+  /tweets/{tweetId}/deleteTweet:
+    delete:
+      tags:
+        - tweets
+      summary: Delete a tweet by given a tweetid.
+      description: Endpoint to delete a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to delete.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Delete
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  
+  /tweets/{tweetId}:  ## naming
+    get:
+      tags:
+        - tweets
+      summary: Get tweet info by tweetId  .
+      description: Endpoint to get tweet by tweetId.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to get the tweet for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the new tweet.
+                  text:
+                    type: string
+                    description: The text of the new tweet.
+                  createdAt:
+                    type: string
+                    description: The date and time the tweet was created.
+                  user:
+                    type: object
+                    properties:
+                      profileImageURL:
+                        type: string
+                        description: The profile picture of the user that create the tweet .
+                      screenName:
+                        type: string
+                        description: The screen name of the user that make the tweet.
+                      userName:
+                        type: string
+                        description: The username of the user that create the tweet.
+                  attachmentsURL:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{tweetId}/replies:
+    get:
+      tags:
+        - tweets
+      summary: Get the replies of a certain tweet.
+      description: Endpoint to get the replies of a certain tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to get the replies of.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the reply.
+                    text:
+                      type: string
+                      description: The text of the reply.
+                    userName:
+                      type: string
+                      description: The name of the user that make reply.
+                    bio:
+                      type: string
+                      description: The bio of the user that make reply.
+                    profileImageURL:
+                      type: string
+                      description: The image of the user that make reply.
+                    createdAt:
+                      type: string
+                      description: The date and time the reply was created.
+                    likesCount:
+                      type: integer
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '404':
+          description: No replies for this tweet
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{tweetId}/addReply:  # body object
+    post:
+      tags:
+        - tweets
+      summary: Add a reply to a tweet using the userId in cookie.
+      description: Endpoint to add a reply to a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to reply to.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Reply text.
+          required: false
+          schema:
+            type: object
+            properties:
+              replyText:
+                type: string
+                description: The text of the Reply.
+      responses:
+        '200':
+          description: Successful reply addition.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/deleteReplies/{replyId}:  
+    delete:
+      tags:
+        - tweets
+      summary: Delete a reply from a tweet.
+      description: Endpoint to delete a reply from a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: replyId
+          in: path
+          description: The ID of the reply to delete.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful reply deletion.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{tweetId}/retweet: 
+    post:
+      tags:
+        - tweets
+      summary: Add a retweet.
+      description: Endpoint to add a retweet which takes a tweetId and userId .
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          type: string
+          description: The userId that add retweet.
+          required: true
+        - name: body
+          in: body
+          description: The retweet to add.
+          required: true
+          schema:
+            type: object
+            properties:
+              retweetId:
+                type: string
+                description: The ID of the tweet to retweet.
+      responses:
+        '200':
+          description: Successful Add
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  retweetId:
+                    type: string
+                    description: The ID of the new tweet.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /users/{userId}/retweets:  
+    get:
+      tags:
+        - profile
+      summary: Get a list of retweets for a user.
+      description: Endpoint to get a list of retweets for a user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of the user to get the retweets for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    retweetedUser:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: The ID of the user who retweeted.
+                        userName:
+                          type: string
+                          description: The name of the user who retweeted.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who retweeted.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who retweeted.
+                    user:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: The ID of the user who retweeted.
+                        userName:
+                          type: string
+                          description: The username of the user that create the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user that make the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user that create the tweet .
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{retweetId}/deleteRetweet: 
+    delete:
+      tags:
+        - tweets
+      summary: Delete a retweet.
+      description: Endpoint to delete a retweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: retweetId
+          in: path
+          description: The ID of the retweet to delete.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Delete
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+
+  /tweets/{tweetId}/addLike:
+    post:
+      tags:
+        - tweets
+      summary: Like a tweet.
+      description: Endpoint to like a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to like.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully liked tweet.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{tweetId}/deleteLike:
+    delete:
+      tags:
+        - tweets
+      summary: Remove a like from a tweet.
+      description: Endpoint to remove a like from a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to remove the like from.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully removed like.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{tweetId}/retweeters:
+    get:
+      tags:
+        - tweets
+      summary: Get a list of retweeters of a certain tweet.
+      description: Endpoint to get a list of retweeters of a certain tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to get the retweeters of.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the retweeter.
+                    name:
+                      type: string
+                      description: The name of the retweeter.
+                    screenName:
+                      type: string
+                      description: The screen name of the retweeter.
+                    profileImageURL:
+                        type: string
+                        description: The profile of the user that retweet.
+                    isFollowed: 
+                      type: boolean
+                      description: Is the user follow this user or not.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '404':
+          description: Nolist was found
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string 
+  /tweets/{tweetId}/likers:
+    get:
+      tags:
+        - tweets
+      summary: Get a list of likers for a tweet.
+      description: Endpoint to get a list of likers for a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to get the likers for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the liker.
+                    name:
+                      type: string
+                      description: The name of the liker.
+                    screenName:
+                      type: string
+                      description: The screen name of the liker.
+                    profileImageURL:
+                        type: string
+                        description: The profile of the liker.
+                    isFollowed: 
+                      type: boolean
+                      description: Is the liker follow the user that make tweet
+                      
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/search: 
+    get:
+      tags:
+        - search
+      summary: Get a list of tweets that matches (either fully or partially) the sent string.
+      description: Endpoint to get a list of tweets that matches (either fully or partially) the sent string and get a max 10 objects in array.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: searchString
+          in: query
+          description: The string to search for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    user:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: The ID of the user who posted the tweet.
+                        userName:
+                          type: string
+                          description: The name of the user who posted the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who posted the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who posted the tweet.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '404':
+          description: No tweets found.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string  
+  /tweets/{tweetId}/addMedia:
+    post:
+      tags:
+        - tweets
+      summary: Add media to a tweet.
+      description: Endpoint to add media to a tweet.
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to add media to.
+          required: true
+          type: string
+        - name: media
+          in: formData
+          description: The media to add to the tweet.
+          required: true
+          type: file
+      responses:
+        '200':
+          description: Successful media addition.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /tweets/{tweetId}/media: 
+    get:
+      tags:
+        - tweets
+      summary: Get media from a tweet.
+      description: Endpoint to get media from a tweet.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet to get media from.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful media retrieval.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    mediaURL:
+                      type: string
+                      description: The media url.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+
+#######Timeline#######
+  /users/{userId}/timeline:
+    get:
+      tags:
+        - timeline
+      summary: Get a list of tweets in the home page of the user of max .
+      description: Endpoint to get a list of tweets in the home page of the user differ from the below api in logic in backend and get a max 10 objects in array.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of the user to get the home page timeline for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    user:
+                      type: object
+                      properties:
+                        userid:
+                          type: string
+                          description: The ID of the user who posted the tweet.
+                        userName:
+                          type: string
+                          description: The name of the user who posted the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who posted the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who posted the tweet.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /users/{userId}/tweets:
+    get:
+      tags:
+        -  timeline
+      summary: Get user tweets  .
+      description: Endpoint to get user tweets by user_id for a specific user and get max of 10 objects in data.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of the user to get the tweets for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    user:
+                      type: object
+                      properties:
+                        userid:
+                          type: string
+                          description: The ID of the user who posted the tweet.
+                        userName:
+                          type: string
+                          description: The name of the user who posted the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who posted the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who posted the tweet.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string 
+        '404':
+          description: No tweets found.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string          
+  /users/{userId}/mentions:
+    get:
+      tags:
+        - timeline
+      summary: Get tweets that the user mentioned in it.
+      description: Endpoint to get tweets that the user mentioned in it and of max 10 tweets.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of the user to get the mentions for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    user:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: The ID of the user who posted the tweet.
+                        userName:
+                          type: string
+                          description: The name of the user who posted the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who posted the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who posted the tweet.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+        '404':
+          description: No tweets found.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string          
+  /users/{userId}/likedTweets:
+    get:
+      tags:
+        - timeline
+      summary: Get tweets liked by the user.
+      description: Endpoint to get tweets liked by the user and get a max 10 tweets.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: The ID of the user to get the liked tweets for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    user:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: The ID of the user who posted the tweet.
+                        userName:
+                          type: string
+                          description: The name of the user who posted the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who posted the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who posted the tweet.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string     
+        '404':
+          description: No tweets found.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+  /trends:
+    get:
+      tags:
+        - trends
+      summary: Get a list of available trends.
+      description: Endpoint to get a list of available trends.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the trend.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string        
+  /trends/{trendName}/tweets:
+    get:
+      tags:
+        - trends
+      summary: Get a list of tweets in a given trend.
+      description: Endpoint to get a list of tweets in a given trend  and get a max 10 objects in array.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: trendName
+          in: path
+          description: The name of the trend to get tweets for.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful request.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the tweet.
+                    text:
+                      type: string
+                      description: The text of the tweet.
+                    createdAt:
+                      type: string
+                      description: The date and time the tweet was created.
+                    attachmentsURL:
+                      type: array
+                      items:
+                        type: string
+                    user:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: The ID of the user who posted the tweet.
+                        userName:
+                          type: string
+                          description: The name of the user who posted the tweet.
+                        screenName:
+                          type: string
+                          description: The screen name of the user who posted the tweet.
+                        profileImageURL:
+                          type: string
+                          description: The profile picture of the user who posted the tweet.
+        '400':
+          description: Bad request - something went wrong.
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string                                                               
