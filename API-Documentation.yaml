@@ -2432,7 +2432,7 @@ paths:
   /users/{userId}/retweets:  
     get:
       tags:
-        - profile
+        - tweets
       summary: Get a list of retweets for a user.
       description: Endpoint to get a list of retweets for a user.
       consumes:
