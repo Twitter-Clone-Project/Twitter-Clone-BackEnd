@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: X-Clone APIs
   version: 1.0.0
-  description: API documentation for X-Clone project. `Hint =  for frontend, the browser will set the cookies for you, so i didn't write it in the request parameters. for flutter, you can sent the token as Bearer token`
+  description: API documentation for X-Clone project. `Hint =  for frontend, the browser will set the cookies for you, so i didn't write it in the request parameters. for flutter, you can sent the token as Bearer token`. the api url format is 'protocol://theHOST/api/v[0-9]+/api-path-in-each-one}', examble on first api -suggest localhost- => `'http://localhost:1444/api/v1/auth/signup'`
 tags:
   - name: auth
     description: Authentication Endpoints
@@ -24,7 +24,7 @@ paths:
       tags:
         - auth
       summary: Sign up to the application
-      description: Endpoint for user registeration on the application.
+      description: Endpoint for user registeration on the application. `sitekey is for reCAPTCHA "6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ"`
       consumes:
         - application/json
       produces:
@@ -56,7 +56,7 @@ paths:
                 type: string
                 format: date
                 description: The password for signup
-              g-recaptcha-response:
+              gRecaptchaResponse:
                 type: string
                 description: >-
                   g-recaptcha-response is the name of response key or sitekey to
@@ -76,11 +76,14 @@ paths:
               data:
                 type: object
                 properties:
+                  token: 
+                    type: string
+                    discription: All user data will return
                   user:
                     type: object
                     properties:
                       id:
-                        type: string
+                        type: bigint
                       name: 
                         type: string  
                       username:
@@ -139,11 +142,13 @@ paths:
               data:
                 type: object
                 properties:
+                  token: 
+                    type: string
                   user:
                     type: object
                     properties:
                       id:
-                        type: string
+                        type: bigint
                       name: 
                         type: string  
                       username:
@@ -199,7 +204,59 @@ paths:
           examples:
             application/json:
               status: false
-              message: Something went wrong            
+              message: Something went wrong 
+  /auth/google/callback:
+    post:
+      tags:
+        - auth
+      summary: The callback api where the user can choose his google account 
+      description: Endpoint for user authentication using google. This is the callback api that will redirect you after choosing your google account. the cookie will be sent to browser cookies 
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful sign-in/up
+          headers:
+            Set-Cookie:
+              type: string
+              description: Cookie containing the access token
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  token: 
+                    type: string
+                    discription: All user data will return
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: bigint
+                      name: 
+                        type: string  
+                      username:
+                        type: string  
+                      email:
+                        type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong                       
   /auth/resendConfirmEmail:
     post:
       tags:
@@ -352,11 +409,13 @@ paths:
               data:
                 type: object
                 properties:
+                  token: 
+                    type: string                
                   user:
                     type: object
                     properties:
                       id:
-                        type: string
+                        type: bigint
                       name: 
                         type: string  
                       username:
@@ -561,7 +620,7 @@ paths:
                     type: object
                     properties:
                       id:
-                        type: string
+                        type: bigint
                       email:
                         type: string
                       username:
@@ -626,7 +685,7 @@ paths:
                     type: object
                     properties:
                       id:
-                        type: string
+                        type: bigint
                       email:
                         type: string
                       username:

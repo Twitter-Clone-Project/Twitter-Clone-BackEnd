@@ -3,18 +3,18 @@ const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const { rateLimit } = require('express-rate-limit');
 const helmet = require('helmet');
-const path = require('path');
 const xss = require('xss-clean');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const globalErrorHandler = require('./controllers/errorController');
+const globalErrorHandler = require('./Controllers/errorController');
+const AppError = require('./services/AppError');
 
 const app = express();
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
+  app.use(morgan('dev'));
 }
 
 // Data sanitization against XSS => prevent XSS attacks
@@ -35,12 +35,12 @@ app.use(compression());
 
 // limit the traffic => prevent DoS attacks
 const limiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 60 minutes
-    limit: 300, // Limit each IP to 300 requests per `window` (here, per 60 minutes)
-    message: {
-        message: 'Too many requests, try again in an hour',
-        status: 'warning',
-    },
+  windowMs: 60 * 60 * 1000, // 60 minutes
+  limit: 300, // Limit each IP to 300 requests per `window` (here, per 60 minutes)
+  message: {
+    message: 'Too many requests, try again in an hour',
+    status: 'warning',
+  },
 });
 
 // Apply the rate limiting middleware to API calls only
@@ -50,19 +50,21 @@ app.use(cors({ origin: true, credentials: true }));
 
 // just a testing middelware
 app.use((req, res, next) => {
-    req.requestTime = new Date().toISOString();
-    // res.locals.jwt = req.cookies.jwt;
-    // console.log(res.locals.jwt);
-    // req.session.isAuth = true;
-    // console.log(req.cookies);
-    next();
+  req.requestTime = new Date().toISOString();
+  // res.locals.jwt = req.cookies.jwt;
+  // console.log(res.locals.jwt);
+  // req.session.isAuth = true;
+  // console.log(req.cookies);
+  next();
 });
 
-// routes here
+const authRoutes = require('./Routes/auth');
 
-app.all('*', (req, res, next) => {});
+app.use('/api/v1/auth', authRoutes);
 
-// Global Error Handler
+app.all('*', (req, res, next) => {
+  next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
+});
+
 app.use(globalErrorHandler);
-
 module.exports = app;

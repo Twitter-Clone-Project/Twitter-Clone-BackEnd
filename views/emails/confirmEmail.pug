@@ -1,0 +1,10 @@
+extends baseEmail
+
+block content
+  p Hi #{firstName},
+  p Welcome to X, we're glad to have you 🎉🙏
+  p We're all a big familiy here, so make sure to upload your user photo so we get to know you a bit better!
+  strong(style='color: blue;') Your OTP is #{data.otp}
+  hr
+  p If you need any help, please don't hesitate to contact us!
+  p X Support Team
