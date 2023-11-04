@@ -13,7 +13,10 @@ X-Clone Backend is a scalable backend repository for building X (tweeter) APIs. 
 
 ## APIs Documentation
 
-File API-Documentation.yaml in the repo, this is a yaml coded-documentation. Untill we upload the documentation on swaagerHub($$), you can see the GUI by opening swagger editor online, then paste the code in it.
+File API-Documentation.yaml in the repo, this is a yaml coded-documentation. Untill we upload the documentation on swaagerHub($$), you can see the GUI by opening [swagger editor](https://editor-next.swagger.io/) online, then paste the code in it.
+
+
+You can also see postman documentation with test exambles [here](https://documenter.getpostman.com/view/23936176/2s9YXe8jiV) 
 ## Project MVC Architecture
  - Model (M):
 The Model represents the data layer and business logic.
