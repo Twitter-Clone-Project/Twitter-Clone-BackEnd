@@ -86,7 +86,7 @@ The Controller interacts with the Model to retrieve or update data, prepares the
 4. Set environment variables
 
 ```
- Look at the file .env.template then Create a file named .env and set your environment variables in it. 
+ Copy file .env.template then Create file .env and set your environment variables in it. 
 ```
 
 Start the server in production env
