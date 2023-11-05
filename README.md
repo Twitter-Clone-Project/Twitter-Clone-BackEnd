@@ -65,22 +65,28 @@ The Controller interacts with the Model to retrieve or update data, prepares the
 
 ## Run Locally
 
-Clone the project
+1. Clone the project
 
 ```bash
   https://github.com/Twitter-Clone-Project/Back-End.git
 ```
 
-Install dependencies. `cd to the project folder that has the package.json file in it.`
+2. Install dependencies. hint: `cd to the project folder that has the package.json file in it.`
 
 ```bash
   npm install
 ```
 
-Start the server in development env
+3. Start the server in development env
 
 ```bash
   npm run start:dev
+```
+
+4. Set environment variables
+
+```
+ Look at the file .env.template then Create a file named .env and set your environment variables in it. 
 ```
 
 Start the server in production env
