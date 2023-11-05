@@ -1,4 +1,5 @@
 const otpGenerator = require('otp-generator');
+const crypto = require('crypto');
 
 class User {
   constructor(username, name, email, password, birthDate) {
@@ -25,8 +26,12 @@ class User {
       specialChars: false,
     });
 
-    this.otp = otp;
-    this.otpExpires = Date.now() + 10 * 60 * 1000;
+    const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
+    this.otp = hashedOTP;
+
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 10);
+    this.otpExpires = currentTime;
 
     return otp;
   }

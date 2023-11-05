@@ -256,7 +256,48 @@ paths:
           examples:
             application/json:
               status: false
-              message: Something went wrong                       
+              message: Something went wrong    
+  /auth/signout:
+    delete:
+      tags:
+        - auth
+      summary: Sign out from the application
+      description: Endpoint to delete the token from cookies.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful sign-out
+          headers:
+            Set-Cookie:
+              type: string
+              description: Cookie containing loggedout expires after 5s
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  token: 
+                    type: string
+                    example: loggedout                  
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong                                 
   /auth/resendConfirmEmail:
     post:
       tags:

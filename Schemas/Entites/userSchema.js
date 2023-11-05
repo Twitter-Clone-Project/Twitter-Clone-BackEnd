@@ -58,7 +58,7 @@ module.exports = new EntitySchema({
     },
     otp: {
       type: 'varchar',
-      length: 8,
+      length: 150,
       nullable: true,
     },
     resetToken: {
@@ -67,11 +67,11 @@ module.exports = new EntitySchema({
       nullable: true,
     },
     otpExpires: {
-      type: 'timestamp',
+      type: 'timestamptz',
       nullable: true,
     },
     resetTokenExpires: {
-      type: 'timestamp',
+      type: 'timestamptz',
       nullable: true,
     },
   },

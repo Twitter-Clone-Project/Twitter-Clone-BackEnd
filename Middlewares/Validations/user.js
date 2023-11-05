@@ -37,3 +37,12 @@ exports.signinValidationRules = [
     .isLength({ min: 6 })
     .withMessage('Invalid Password'),
 ];
+
+exports.validateOTP = [
+  body('otp')
+    .matches(/^[a-z0-9]+$/)
+    .isLength({ min: 8, max: 8 })
+    .not()
+    .isEmpty()
+    .withMessage('Invalid OTP'),
+];
