@@ -7,7 +7,7 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const globalErrorHandler = require('./Controllers/errorController');
+const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./services/AppError');
 
 const app = express();
@@ -58,7 +58,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const authRoutes = require('./Routes/auth');
+const authRoutes = require('./routes/auth');
 
 app.use('/api/v1/auth', authRoutes);
 

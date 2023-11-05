@@ -1,5 +1,5 @@
 const { EntitySchema } = require('typeorm');
-const Trend = require('../../Models/Entites/Trend');
+const Trend = require('../../models/entites/Trend');
 
 module.exports = new EntitySchema({
   name: 'Trend',

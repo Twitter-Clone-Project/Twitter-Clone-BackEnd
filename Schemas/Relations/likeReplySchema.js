@@ -1,5 +1,5 @@
 const { EntitySchema } = require('typeorm');
-const LikeReply = require('../../Models/Relations/LikeReply');
+const LikeReply = require('../../models/relations/LikeReply');
 
 module.exports = new EntitySchema({
   name: 'LikeReply',

@@ -4,11 +4,11 @@ const { promisify } = require('util');
 const crypto = require('crypto');
 
 const { AppDataSource } = require('../dataSource');
-const catchAsync = require('../Middlewares/catchAsync');
-const AppError = require('../Services/AppError');
-const Password = require('../Services/Password');
-const User = require('../Models/Entites/User');
-const Email = require('../Services/Email');
+const catchAsync = require('../middlewares/catchAsync');
+const AppError = require('../services/AppError');
+const Password = require('../services/Password');
+const User = require('../models/entites/User');
+const Email = require('../services/Email');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -172,6 +172,14 @@ exports.oauthGooogleCallback = async (req, res, next) => {
   res.redirect(303, `${req.protocol}://${req.get('host')}/home`);
 };
 
+exports.signout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 5 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.requireAuth = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -260,12 +268,9 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   await AppDataSource.getRepository(User).save(user);
 
   await new Email(user, { otp }).sendConfirmationEmail();
-});
 
-exports.signout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 5 * 1000),
-    httpOnly: true,
+  res.status(200).json({
+    status: true,
+    message: 'Confirmation email reseneded',
   });
-  res.status(200).json({ status: 'success' });
-};
+});

@@ -1,11 +1,11 @@
 const express = require('express');
-const authController = require('../Controllers/authController');
-const validateRequest = require('../Middlewares/validateRequest');
+const authController = require('../controllers/authController');
+const validateRequest = require('../middlewares/validateRequest');
 const {
   signupValidationRules,
   signinValidationRules,
   validateOTP,
-} = require('../Middlewares/Validations/user');
+} = require('../middlewares/validations/user');
 
 const router = express.Router();
 
@@ -29,4 +29,9 @@ router
     validateOTP,
     authController.confirmEmailByOTP,
   );
+
+router
+  .route('/resendConfirmEmail')
+  .post(authController.requireAuth, authController.resendConfirmationEmail);
+
 module.exports = router;

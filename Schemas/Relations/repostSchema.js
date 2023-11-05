@@ -1,6 +1,6 @@
 // Repost.js
 const { EntitySchema } = require('typeorm');
-const Repost = require('../../Models/Relations/Repost');
+const Repost = require('../../models/relations/Repost');
 
 module.exports = new EntitySchema({
   name: 'Repost',

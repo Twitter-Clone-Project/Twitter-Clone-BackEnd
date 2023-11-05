@@ -1,22 +1,22 @@
 const { DataSource } = require('typeorm');
 
-const userSchema = require('./Schemas/Entites/userSchema');
-const tweetSchema = require('./Schemas/Entites/tweetSchema');
-const trendSchema = require('./Schemas/Entites/trendSchema');
-const replySchema = require('./Schemas/Entites/replySchema');
-const notificationSchema = require('./Schemas/Entites/notificationSchema');
-const messageSchema = require('./Schemas/Entites/messageSchema');
-const mediaSchema = require('./Schemas/Entites/mediaSchema');
-const conversationSchema = require('./Schemas/Entites/conversationSchema');
+const userSchema = require('./schemas/entites/userSchema');
+const tweetSchema = require('./schemas/entites/tweetSchema');
+const trendSchema = require('./schemas/entites/trendSchema');
+const replySchema = require('./schemas/entites/replySchema');
+const notificationSchema = require('./schemas/entites/notificationSchema');
+const messageSchema = require('./schemas/entites/messageSchema');
+const mediaSchema = require('./schemas/entites/mediaSchema');
+const conversationSchema = require('./schemas/entites/conversationSchema');
 
-const supportSchema = require('./Schemas/Relations/supportSchema');
-const repostSchema = require('./Schemas/Relations/repostSchema');
-const muteSchema = require('./Schemas/Relations/muteSchema');
-const mentionSchema = require('./Schemas/Relations/mentionSchema');
-const likeSchema = require('./Schemas/Relations/likeSchema');
-const likeReplySchema = require('./Schemas/Relations/likeReplySchema');
-const followSchema = require('./Schemas/Relations/followSchema');
-const blockSchema = require('./Schemas/Relations/blockSchema');
+const supportSchema = require('./schemas/relations/supportSchema');
+const repostSchema = require('./schemas/relations/repostSchema');
+const muteSchema = require('./schemas/relations/muteSchema');
+const mentionSchema = require('./schemas/relations/mentionSchema');
+const likeSchema = require('./schemas/relations/likeSchema');
+const likeReplySchema = require('./schemas/relations/likeReplySchema');
+const followSchema = require('./schemas/relations/followSchema');
+const blockSchema = require('./schemas/relations/blockSchema');
 
 const AppDataSource = new DataSource({
   type: 'postgres',

@@ -1,5 +1,5 @@
 const { EntitySchema } = require('typeorm');
-const Media = require('../../Models/Entites/Media');
+const Media = require('../../models/entites/Media');
 
 module.exports = new EntitySchema({
   name: 'Media',

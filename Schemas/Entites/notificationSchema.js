@@ -1,5 +1,5 @@
 const { EntitySchema } = require('typeorm');
-const Notification = require('../../Models/Entites/Notification');
+const Notification = require('../../models/entites/Notification');
 
 module.exports = new EntitySchema({
   name: 'Notification',
