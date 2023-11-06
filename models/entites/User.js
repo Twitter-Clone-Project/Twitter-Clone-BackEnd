@@ -35,5 +35,65 @@ class User {
 
     return otp;
   }
+
+  setUsername(value) {
+    this.username = value;
+  }
+
+  setName(value) {
+    this.name = value;
+  }
+
+  setEmail(value) {
+    this.email = value;
+  }
+
+  setPassword(value) {
+    this.password = value;
+  }
+
+  setBirthDate(value) {
+    this.birthDate = value;
+  }
+
+  setIsConfirmed(value) {
+    this.isConfirmed = value;
+  }
+
+  setImageUrl(value) {
+    this.imageUrl = value;
+  }
+
+  setBio(value) {
+    this.bio = value;
+  }
+
+  setLocation(value) {
+    this.location = value;
+  }
+
+  setWebsite(value) {
+    this.website = value;
+  }
+
+  setOtp(value) {
+    this.otp = value;
+  }
+
+  setResetToken(value) {
+    this.resetToken = value;
+  }
+
+  setOtpExpires(value) {
+    this.otpExpires = value;
+  }
+
+  setResetTokenExpires(value) {
+    this.resetTokenExpires = value;
+  }
+
+  setUserId(value) {
+    this.userId = value;
+  }
 }
 module.exports = User;

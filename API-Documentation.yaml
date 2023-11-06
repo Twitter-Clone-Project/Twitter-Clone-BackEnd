@@ -82,10 +82,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      id:
+                      userId:
                         type: bigint
-                      name: 
-                        type: string  
+                      isConfirmed: 
+                        type: boolean  
                       username:
                         type: string  
                       email:
@@ -147,10 +147,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      id:
+                      userId:
                         type: bigint
-                      name: 
-                        type: string  
+                      isConfirmed: 
+                        type: boolean  
                       username:
                         type: string  
                       email:
@@ -236,10 +236,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      id:
+                      userId:
                         type: bigint
-                      name: 
-                        type: string  
+                      isConfirmed: 
+                        type: boolean  
                       username:
                         type: string  
                       email:
@@ -455,10 +455,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      id:
+                      userId:
                         type: bigint
-                      name: 
-                        type: string  
+                      isConfirmed: 
+                        type: boolean  
                       username:
                         type: string  
                       email:

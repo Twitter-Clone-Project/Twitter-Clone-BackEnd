@@ -5,6 +5,7 @@ const {
   signupValidationRules,
   signinValidationRules,
   validateOTP,
+  validateChangePassword,
 } = require('../middlewares/validations/user');
 
 const router = express.Router();
@@ -27,11 +28,21 @@ router
   .post(
     authController.requireAuth,
     validateOTP,
+    validateRequest,
     authController.confirmEmailByOTP,
   );
 
 router
   .route('/resendConfirmEmail')
   .post(authController.requireAuth, authController.resendConfirmationEmail);
+
+router
+  .route('/updatePassword')
+  .patch(
+    authController.requireAuth,
+    validateChangePassword,
+    validateRequest,
+    authController.changePassword,
+  );
 
 module.exports = router;

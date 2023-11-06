@@ -10,6 +10,16 @@ const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
 
+const filterObj = (obj, ...fields) => {
+  const filteredObj = {};
+  Object.keys(obj).forEach((key) => {
+    if (fields.includes(key)) {
+      filteredObj[key] = obj[key];
+    }
+  });
+  return filteredObj;
+};
+
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_TOKEN_EXPIRESIN,
@@ -26,9 +36,17 @@ const createAndSendToken = (user, req, res, statusCode) => {
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
+  const filteredUser = filterObj(
+    user,
+    'userId',
+    'isConfirmed',
+    'username',
+    'email',
+  );
+
   res.status(statusCode).json({
     status: true,
-    data: { user, token },
+    data: { user: filteredUser, token },
   });
 };
 
@@ -79,36 +97,23 @@ exports.signup = catchAsync(async (req, res, next) => {
   const user = new User(username, name, email, hashedPassword, dateOfBirth);
 
   const otp = user.createOTP();
-  await AppDataSource.getRepository(User).save(user);
+  await AppDataSource.getRepository(User).insert(user);
 
   await new Email(user, { otp }).sendConfirmationEmail();
 
-  createAndSendToken(
-    {
-      email: user.email,
-      name: user.name,
-      username: user.username,
-      userId: user.userId,
-    },
-    req,
-    res,
-    201,
-  );
+  createAndSendToken(user, req, res, 201);
 });
 
 exports.signin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await AppDataSource.getRepository(User).findOne({
-    where: { email },
-    select: {
-      password: true,
-      username: true,
-      name: true,
-      email: true,
-      userId: true,
-    },
-  });
+  const user = await AppDataSource.getRepository(User)
+    .createQueryBuilder()
+    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .from(User, 'user')
+    .where('user.email = :email', { email })
+    .addSelect('user.password')
+    .getOne();
 
   if (!user) return next(new AppError('No User With Email', 400));
 
@@ -119,7 +124,6 @@ exports.signin = catchAsync(async (req, res, next) => {
 
   if (!isCorrectPassword) return next(new AppError('Wrong Password', 400));
 
-  user.password = undefined;
   createAndSendToken(user, req, res, 200);
 });
 
@@ -145,21 +149,18 @@ exports.oauthGooogleCallback = async (req, res, next) => {
   oAuth2Client.setCredentials(response.tokens);
   const userData = await getUserData(oAuth2Client.credentials.access_token);
 
-  const user = await AppDataSource.getRepository(User).findOne({
-    where: { email: userData.email },
-    select: {
-      username: true,
-      name: true,
-      email: true,
-      userId: true,
-    },
-  });
+  const user = await AppDataSource.getRepository(User)
+    .createQueryBuilder()
+    .select(['user.userId', 'user.isConfirmed'])
+    .from(User, 'user')
+    .where('user.email = :email', { email: userData.email })
+    .getOne();
 
   if (!user) {
     return next(new AppError('User not found. Please go to sign up'));
   }
 
-  const token = signToken(user.id);
+  const token = signToken(user.userId);
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -202,15 +203,12 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
     process.env.JWT_SECRET_KEY,
   );
 
-  const user = await AppDataSource.getRepository(User).findOne({
-    where: { userId: payload.id },
-    select: {
-      username: true,
-      name: true,
-      email: true,
-      userId: true,
-    },
-  });
+  const user = await AppDataSource.getRepository(User)
+    .createQueryBuilder()
+    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .from(User, 'user')
+    .where('user.userId = :userId', { userId: payload.id })
+    .getOne();
 
   if (!user) {
     return next(new AppError('User does no longer exist', 401));
@@ -221,12 +219,11 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
 });
 
 exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
-  const userRepository = AppDataSource.getRepository(User);
-
   const { otp } = req.body;
   const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
 
-  const user = await AppDataSource.getRepository(User).findOne({
+  const userRepository = AppDataSource.getRepository(User);
+  const user = await userRepository.findOne({
     where: {
       email: req.currentUser.email,
       otp: hashedOTP,
@@ -234,7 +231,7 @@ exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
     select: {
       otpExpires: true,
       username: true,
-      name: true,
+      isConfirmed: true,
       email: true,
       userId: true,
     },
@@ -244,16 +241,15 @@ exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect OTP', 400));
   }
 
-  user.otp = null;
-
+  user.setOtp(null);
   if (new Date() > user.otpExpires) {
-    user.otpExpires = null;
+    user.setOtpExpires(null);
     await userRepository.save(user);
     return next(new AppError('OTP expired', 400));
   }
 
-  user.otpExpires = null;
-  user.isConfirmed = true;
+  user.setOtpExpires(null);
+  user.setIsConfirmed(true);
   await userRepository.save(user);
 
   res
@@ -273,4 +269,35 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
     status: true,
     message: 'Confirmation email reseneded',
   });
+});
+
+exports.changePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const userRepository = AppDataSource.getRepository(User);
+
+  const user = await userRepository
+    .createQueryBuilder()
+    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .from(User, 'user')
+    .where('user.userId = :userId', { userId: req.currentUser.userId })
+    .addSelect('user.password')
+    .getOne();
+
+  const checkPassword = await Password.comparePassword(
+    currentPassword,
+    user.password,
+  );
+
+  if (!checkPassword) {
+    return next(new AppError('Your Current Password is Wrong', 400));
+  }
+
+  const hashedPassword = await Password.hashPassword(newPassword);
+  await userRepository.update(
+    { userId: req.currentUser.userId },
+    { password: hashedPassword },
+  );
+
+  createAndSendToken(user, req, res, 200);
 });

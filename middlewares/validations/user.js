@@ -46,3 +46,24 @@ exports.validateOTP = [
     .isEmpty()
     .withMessage('Invalid OTP'),
 ];
+
+exports.validateChangePassword = [
+  body('currentPassword')
+    .not()
+    .isEmpty()
+    .withMessage('Current password is required'),
+  body('newPassword')
+    .not()
+    .isEmpty()
+    .withMessage('New password is required')
+    .isString()
+    .withMessage('New password must be a string')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters long'),
+  body('newPasswordConfirm').custom((value, { req }) => {
+    if (value !== req.body.newPassword) {
+      throw new Error('Passwords do not match');
+    }
+    return true;
+  }),
+];
