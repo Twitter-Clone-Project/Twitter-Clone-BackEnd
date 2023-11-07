@@ -20,14 +20,4 @@ module.exports = new EntitySchema({
       type: 'varchar',
     },
   },
-  relations: {
-    LikeReply: {
-      type: 'many-to-many',
-      target: 'User',
-      joinTable: {
-        name: 'LikeReply',
-      },
-      cascade: true,
-    },
-  },
 });
