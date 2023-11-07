@@ -4,8 +4,10 @@ const validateRequest = require('../middlewares/validateRequest');
 const {
   signupValidationRules,
   signinValidationRules,
-  validateOTP,
-  validateChangePassword,
+  otpValidationRules,
+  changePasswordValidationRules,
+  resetPasswordValidationRules,
+  forgetPasswordValidationRules,
 } = require('../middlewares/validations/user');
 
 const router = express.Router();
@@ -27,7 +29,7 @@ router
   .route('/confirmEmail')
   .post(
     authController.requireAuth,
-    validateOTP,
+    otpValidationRules,
     validateRequest,
     authController.confirmEmailByOTP,
   );
@@ -40,9 +42,25 @@ router
   .route('/updatePassword')
   .patch(
     authController.requireAuth,
-    validateChangePassword,
+    changePasswordValidationRules,
     validateRequest,
     authController.changePassword,
+  );
+
+router
+  .route('/forgetPassword')
+  .post(
+    forgetPasswordValidationRules,
+    validateRequest,
+    authController.forgetPassword,
+  );
+
+router
+  .route('/resetPassword/:resetToken')
+  .patch(
+    resetPasswordValidationRules,
+    validateRequest,
+    authController.resetPassword,
   );
 
 module.exports = router;

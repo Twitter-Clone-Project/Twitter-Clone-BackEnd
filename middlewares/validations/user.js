@@ -38,7 +38,7 @@ exports.signinValidationRules = [
     .withMessage('Invalid Password'),
 ];
 
-exports.validateOTP = [
+exports.otpValidationRules = [
   body('otp')
     .matches(/^[a-z0-9]+$/)
     .isLength({ min: 8, max: 8 })
@@ -47,11 +47,32 @@ exports.validateOTP = [
     .withMessage('Invalid OTP'),
 ];
 
-exports.validateChangePassword = [
+exports.changePasswordValidationRules = [
   body('currentPassword')
     .not()
     .isEmpty()
     .withMessage('Current password is required'),
+  body('newPassword')
+    .not()
+    .isEmpty()
+    .withMessage('New password is required')
+    .isString()
+    .withMessage('New password must be a string')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters long'),
+  body('newPasswordConfirm').custom((value, { req }) => {
+    if (value !== req.body.newPassword) {
+      throw new Error('Passwords do not match');
+    }
+    return true;
+  }),
+];
+
+exports.forgetPasswordValidationRules = [
+  body('email').isEmail().withMessage('Invalid email address'),
+];
+
+exports.resetPasswordValidationRules = [
   body('newPassword')
     .not()
     .isEmpty()

@@ -539,21 +539,9 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-        '401':
-          description: Unauthorized - Should be authorized to complete the request
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Unauthorized user
+
   /auth/resetPassword/{resetToken}:
-    post:
+    patch:
       tags:
         - auth
       summary: Reset the password
@@ -583,7 +571,7 @@ paths:
                 type: string
       responses:
         '200':
-          description: Successful Sending a Password Change Email
+          description: Successful reset password
           schema:
             type: object
             properties:
@@ -608,19 +596,6 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-        '401':
-          description: Unauthorized - Should be authorized to complete the request
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Unauthorized user
   /profile/updateUsername:
     patch:
       tags:

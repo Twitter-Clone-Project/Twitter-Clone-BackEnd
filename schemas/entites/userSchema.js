@@ -61,7 +61,7 @@ module.exports = new EntitySchema({
       length: 150,
       nullable: true,
     },
-    resetToken: {
+    passwordResetToken: {
       type: 'varchar',
       length: 150,
       nullable: true,
@@ -70,7 +70,7 @@ module.exports = new EntitySchema({
       type: 'timestamptz',
       nullable: true,
     },
-    resetTokenExpires: {
+    passwordResetTokenExpires: {
       type: 'timestamptz',
       nullable: true,
     },

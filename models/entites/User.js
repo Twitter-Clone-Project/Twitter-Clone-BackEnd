@@ -14,7 +14,7 @@ class User {
     this.location = undefined;
     this.website = undefined;
     this.otp = undefined;
-    this.resetToken = undefined;
+    this.passwordResetToken = undefined;
     this.otpExpires = undefined;
     this.resetTokenExpires = undefined;
     this.userId = undefined;
@@ -34,6 +34,23 @@ class User {
     this.otpExpires = currentTime;
 
     return otp;
+  }
+
+  createPasswordResetToken() {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    const hashedResetToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    this.setPasswordResetToken(hashedResetToken);
+
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 10);
+    this.setPasswordResetTokenExpires(currentTime);
+
+    return resetToken;
   }
 
   setUsername(value) {
@@ -80,16 +97,16 @@ class User {
     this.otp = value;
   }
 
-  setResetToken(value) {
-    this.resetToken = value;
+  setPasswordResetToken(value) {
+    this.passwordResetToken = value;
   }
 
   setOtpExpires(value) {
     this.otpExpires = value;
   }
 
-  setResetTokenExpires(value) {
-    this.resetTokenExpires = value;
+  setPasswordResetTokenExpires(value) {
+    this.passwordResetTokenExpires = value;
   }
 
   setUserId(value) {

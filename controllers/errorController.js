@@ -9,11 +9,19 @@ const handleDuplicateFieldsDB = (err) => {
   const regex = /Key \(([^)]+)\)=\(([^)]+)\) already exists\./;
   const match = err.detail.match(regex);
 
-  const fieldName = match[1];
-  const value = match[2];
+  if (match) {
+    const fieldName = match[1];
+    const value = match[2];
 
-  const message = `Duplicate field "${fieldName}" with value "${value}". Please use another value!`;
-  return new AppError(message, 400);
+    const message = `A record with the provided ${fieldName} (${value}) already exists. Please use another value.`;
+    return new AppError(message, 400);
+  }
+
+  // If the error doesn't match the expected pattern, you can provide a generic message.
+  return new AppError(
+    'Duplicate field with the given value. Please use another value.',
+    400,
+  );
 };
 
 const handleValidationErrorDB = (err) => {

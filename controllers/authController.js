@@ -178,7 +178,9 @@ exports.signout = (req, res) => {
     expires: new Date(Date.now() + 5 * 1000),
     httpOnly: true,
   });
-  res.status(200).json({ status: 'success' });
+  res
+    .status(200)
+    .json({ status: 'success', message: 'Signed out successfully' });
 };
 
 exports.requireAuth = catchAsync(async (req, res, next) => {
@@ -230,7 +232,6 @@ exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
     },
     select: {
       otpExpires: true,
-      username: true,
       isConfirmed: true,
       email: true,
       userId: true,
@@ -300,4 +301,79 @@ exports.changePassword = catchAsync(async (req, res, next) => {
   );
 
   createAndSendToken(user, req, res, 200);
+});
+
+exports.forgetPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const userRepository = AppDataSource.getRepository(User);
+  const user = await userRepository.findOne({
+    where: { email },
+    select: { email: true, userId: true, name: true },
+  });
+
+  if (!user) {
+    return next(new AppError('No user registered with this email ', 400));
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  await userRepository.save(user);
+
+  try {
+    const url = `${req.protocol}://${req.get(
+      'host',
+    )}/resetPassword/${resetToken}`; //reset page url
+    await new Email(user, { url }).sendResetPasswordEmail();
+  } catch (error) {
+    user.setPasswordResetToken(null);
+    user.setPasswordResetTokenExpires(null);
+    await userRepository.save(user);
+
+    return next(new AppError('Error in sending the reset password email', 400));
+  }
+
+  res.status(200).json({
+    status: true,
+    message: 'Password reset email sent successfully',
+  });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { resetToken } = req.params;
+  const { newPassword } = req.body;
+
+  const hashedResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  const userRepository = AppDataSource.getRepository(User);
+
+  const user = await userRepository.findOne({
+    where: { passwordResetToken: hashedResetToken },
+    select: { userId: true, passwordResetTokenExpires: true },
+  });
+
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  user.setPasswordResetToken(null);
+
+  if (user.passwordResetTokenExpires < new Date()) {
+    user.setPasswordResetTokenExpires(null);
+    await userRepository.save(user);
+
+    return next(new AppError('Token expired', 400));
+  }
+
+  const hashedPassword = await Password.hashPassword(newPassword);
+  user.setPassword(hashedPassword);
+  user.setPasswordResetTokenExpires(null);
+  await userRepository.save(user);
+
+  res.status(200).json({
+    status: true,
+    message: 'Password reseted successfully ',
+  });
 });
