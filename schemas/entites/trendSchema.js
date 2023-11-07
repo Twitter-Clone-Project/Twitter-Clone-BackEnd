@@ -14,14 +14,4 @@ module.exports = new EntitySchema({
       type: 'varchar',
     },
   },
-  relations: {
-    Support: {
-      type: 'many-to-many',
-      target: 'Tweet',
-      joinTable: {
-        name: 'Support',
-      },
-      cascade: true,
-    },
-  },
 });
