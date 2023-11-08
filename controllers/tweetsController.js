@@ -106,7 +106,6 @@ exports.deleteTweet = catchAsync(async (req, res, next) => {
 exports.getTweet = catchAsync(async (req, res, next) => {
   try {
     const tweetId = req.params.tweetId;
-    const tweetRepository = AppDataSource.getRepository(Tweet);
     const currUserId = req.cookies.userId;
     const tweet = await AppDataSource.getRepository(Tweet).findOne({
       where: {
@@ -181,6 +180,117 @@ exports.getTweet = catchAsync(async (req, res, next) => {
     res.status(400).json({
       status: false,
       message: 'error while getting tweet',
+    });
+  }
+});
+
+exports.addLike = catchAsync(async (req, res, next) => {
+  try {
+    const tweetId = req.params.tweetId;
+    const currUserId = req.cookies.userId;
+    const like = new Like();
+    like.userId = currUserId;
+    like.tweetId = tweetId;
+    const savedLike = await AppDataSource.getRepository(Like).save(like);
+
+    res.status(200).json({
+      status: true,
+      message: 'like is added successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      status: false,
+      message: 'error occurs when adding like',
+    });
+  }
+});
+
+exports.deleteLike = catchAsync(async (req, res, next) => {
+  try {
+    const tweetId = req.params.tweetId;
+    const currUserId = req.cookies.userId;
+
+    const likeRepository = AppDataSource.getRepository(Like);
+
+    const result = await likeRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Like)
+      .where("tweetId = :tweetId AND userId = :userId", { tweetId: tweetId, userId: currUserId })
+      .execute();
+
+    if (result.affected && result.affected > 0) {
+      res.status(200).json({
+        status: true,
+        message: 'like is deleted successfully',
+      });
+    }
+    else {
+      res.status(400).json({
+        status: false,
+        message: 'error while deleting like',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      status: false,
+      message: 'error occurs when deleting like',
+    });
+  }
+});
+
+exports.addMedia = catchAsync(async (req, res, next) => {
+  try {
+    const tweetId = req.params.tweetId;
+    const { media } = req.body;
+
+    const med = new Media();
+    med.tweetId = tweetId;
+    med.url = media;
+    med.type = 'image';
+    await AppDataSource.getRepository(Media).save(med);
+
+    res.status(200).json({
+      status: true,
+      message: 'media is added successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      status: false,
+      message: 'error occurs when adding media',
+    });
+  }
+});
+
+exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
+  try {
+    const tweetId = req.params.tweetId;
+
+    const attachments = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweetId,
+      },
+    });
+    if (attachments.length > 0) {
+      res.status(200).json({
+        status: true,
+        data: attachments,
+      });
+    }
+    else {
+      res.status(400).json({
+        status: false,
+        message: 'no attachments for this tweet',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      status: false,
+      message: 'error occurs when getting media',
     });
   }
 });
