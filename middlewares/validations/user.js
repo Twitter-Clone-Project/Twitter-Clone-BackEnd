@@ -71,6 +71,9 @@ exports.changePasswordValidationRules = [
 exports.forgetPasswordValidationRules = [
   body('email').isEmail().withMessage('Invalid email address'),
 ];
+exports.resendEmailValidationRules = [
+  body('email').isEmail().withMessage('Invalid email address'),
+];
 exports.otpWithEmailValidationRules = [
   body('email').isEmail().withMessage('Invalid email address'),
   body('otp')

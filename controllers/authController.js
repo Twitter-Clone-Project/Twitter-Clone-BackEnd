@@ -241,7 +241,16 @@ exports.getMe = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: true,
-    data: { user },
+    data: {
+      user: filterObj(
+        user,
+        'username',
+        'name',
+        'email',
+        'userId',
+        'isConfirmed',
+      ),
+    },
   });
 });
 
@@ -297,7 +306,19 @@ exports.confirmEmailAfterSignup = catchAsync(async (req, res, next) => {
 });
 
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
-  const user = req.currentUser;
+  const { email } = req.body;
+
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: { email },
+    select: {
+      userId: true,
+      isConfirmed: true,
+      username: true,
+      email: true,
+      name: true,
+    },
+  });
+
   const userRepository = AppDataSource.getRepository(User);
 
   const otp = user.createOTP();
