@@ -41,6 +41,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
     'userId',
     'isConfirmed',
     'username',
+    'name',
     'email',
   );
 
@@ -109,7 +110,13 @@ exports.signin = catchAsync(async (req, res, next) => {
 
   const user = await AppDataSource.getRepository(User)
     .createQueryBuilder()
-    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .select([
+      'user.username',
+      'user.email',
+      'user.userId',
+      'user.isConfirmed',
+      'user.name',
+    ])
     .from(User, 'user')
     .where('user.email = :email', { email })
     .addSelect('user.password')
@@ -319,7 +326,13 @@ exports.changePassword = catchAsync(async (req, res, next) => {
 
   const user = await userRepository
     .createQueryBuilder()
-    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .select([
+      'user.username',
+      'user.email',
+      'user.userId',
+      'user.isConfirmed',
+      'user.name',
+    ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: req.currentUser.userId })
     .addSelect('user.password')
@@ -396,6 +409,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
       username: true,
       isConfirmed: true,
       email: true,
+      name: true,
       isEmailVerifiedAfterFrgtPass: true,
     },
   });
