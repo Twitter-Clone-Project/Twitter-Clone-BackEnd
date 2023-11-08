@@ -57,11 +57,4 @@ module.exports = class Email {
   async sendConfirmationEmail() {
     await this.sendEmail('confirmEmail', 'Confirm your email on X');
   }
-
-  async sendResetPasswordEmail() {
-    await this.sendEmail(
-      'resetPassword',
-      'Your password reset code (valid for only 10 minutes)',
-    );
-  }
 };

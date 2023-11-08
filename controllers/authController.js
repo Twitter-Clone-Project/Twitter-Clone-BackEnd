@@ -360,7 +360,7 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   await userRepository.save(user);
 
   try {
-    await new Email(user, { otp }).sendResetPasswordEmail();
+    await new Email(user, { otp }).sendConfirmationEmail();
   } catch (error) {
     user.setOtp(null);
     user.setOtpExpires(null);
