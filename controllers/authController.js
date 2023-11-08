@@ -220,14 +220,37 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
-  const { otp } = req.body;
+exports.getMe = catchAsync(async (req, res, next) => {
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: { userId: req.currentUser.userId },
+    select: {
+      userId: true,
+      isConfirmed: true,
+      username: true,
+      email: true,
+      name: true,
+    },
+  });
+
+  res.status(200).json({
+    status: true,
+    data: { user },
+  });
+});
+
+exports.addEmailToBody = (req, res, next) => {
+  req.body.email = req.currentUser.email;
+  next();
+};
+
+exports.checkOTP = catchAsync(async (req, res, next) => {
+  const { otp, email } = req.body;
   const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
 
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
     where: {
-      email: req.currentUser.email,
+      email,
       otp: hashedOTP,
     },
     select: {
@@ -250,9 +273,17 @@ exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
   }
 
   user.setOtpExpires(null);
+
+  res.locals.userRepository = userRepository;
+  res.locals.user = user;
+  next();
+});
+
+exports.confirmEmailAfterSignup = catchAsync(async (req, res, next) => {
+  const { userRepository, user } = res.locals;
+
   user.setIsConfirmed(true);
   await userRepository.save(user);
-
   res
     .status(200)
     .json({ status: true, message: 'Email confirmed successfully' });
@@ -260,11 +291,20 @@ exports.confirmEmailByOTP = catchAsync(async (req, res, next) => {
 
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   const user = req.currentUser;
+  const userRepository = AppDataSource.getRepository(User);
 
   const otp = user.createOTP();
-  await AppDataSource.getRepository(User).save(user);
+  await userRepository.save(user);
 
-  await new Email(user, { otp }).sendConfirmationEmail();
+  try {
+    await new Email(user, { otp }).sendConfirmationEmail();
+  } catch (error) {
+    user.setOtp(null);
+    user.setOtpExpires(null);
+    await userRepository.save(user);
+
+    return next(new AppError('Error in sending the confirmation email', 400));
+  }
 
   res.status(200).json({
     status: true,
@@ -313,20 +353,17 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new AppError('No user registered with this email ', 400));
+    return next(new AppError('No user registered with this email ', 404));
   }
 
-  const resetToken = user.createPasswordResetToken();
+  const otp = user.createOTP();
   await userRepository.save(user);
 
   try {
-    const url = `${req.protocol}://${req.get(
-      'host',
-    )}/resetPassword/${resetToken}`; //reset page url
-    await new Email(user, { url }).sendResetPasswordEmail();
+    await new Email(user, { otp }).sendResetPasswordEmail();
   } catch (error) {
-    user.setPasswordResetToken(null);
-    user.setPasswordResetTokenExpires(null);
+    user.setOtp(null);
+    user.setOtpExpires(null);
     await userRepository.save(user);
 
     return next(new AppError('Error in sending the reset password email', 400));
@@ -338,42 +375,44 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { resetToken } = req.params;
-  const { newPassword } = req.body;
+exports.verifyEmailInFrgtPass = catchAsync(async (req, res, next) => {
+  const { userRepository, user } = res.locals;
 
-  const hashedResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  user.setIsEmailVerifiedAfterFrgtPass(true);
+  await userRepository.save(user);
+  res
+    .status(200)
+    .json({ status: true, message: 'Email verified successfully' });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { newPassword, email } = req.body;
 
   const userRepository = AppDataSource.getRepository(User);
-
   const user = await userRepository.findOne({
-    where: { passwordResetToken: hashedResetToken },
-    select: { userId: true, passwordResetTokenExpires: true },
+    where: { email },
+    select: {
+      userId: true,
+      username: true,
+      isConfirmed: true,
+      email: true,
+      isEmailVerifiedAfterFrgtPass: true,
+    },
   });
 
   if (!user) {
     return next(new AppError('User not found', 404));
   }
 
-  user.setPasswordResetToken(null);
-
-  if (user.passwordResetTokenExpires < new Date()) {
-    user.setPasswordResetTokenExpires(null);
-    await userRepository.save(user);
-
-    return next(new AppError('Token expired', 400));
+  if (!user.isEmailVerifiedAfterFrgtPass) {
+    return next(new AppError('Email is not verified', 400));
   }
 
   const hashedPassword = await Password.hashPassword(newPassword);
   user.setPassword(hashedPassword);
-  user.setPasswordResetTokenExpires(null);
+  user.setIsEmailVerifiedAfterFrgtPass(false);
+
   await userRepository.save(user);
 
-  res.status(200).json({
-    status: true,
-    message: 'Password reseted successfully ',
-  });
+  createAndSendToken(user, req, res, 200);
 });
