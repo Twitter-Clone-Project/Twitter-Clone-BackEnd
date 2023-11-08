@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . .
 
 # Change Windows Command to Linux Command
-RUN sed -i 's/"start:dev": "(SET NODE_ENV=development) & nodemon server.js"/"start:dev": "NODE_ENV=development nodemon server.js"/' package.json
+RUN sed -i 's/(SET NODE_ENV=production)  & node server.js/NODE_ENV=production node server.js/' package.json
 
 # Install app dependencies
 RUN npm install
@@ -16,4 +16,4 @@ RUN npm install
 EXPOSE 2023
 
 # Start the app using the full path to npm
-CMD npm run start:dev
+CMD npm run start:prod
