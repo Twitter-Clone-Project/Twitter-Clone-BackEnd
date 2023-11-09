@@ -1,5 +1,6 @@
 const { AppDataSource } = require('../dataSource');
 const catchAsync = require('../middlewares/catchAsync');
+const AppError = require('../services/AppError');
 
 const Tweet = require('../models/entites/Tweet');
 const User = require('../models/entites/User');
@@ -21,276 +22,237 @@ function getCurrentTimestamp() {
   return formattedDate;
 }
 
+async function checkTweet(tweetId, next) {
+  const tweet = await AppDataSource.getRepository(Tweet).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (!tweet) return next(new AppError('No tweet exists with this id', 400));
+}
+
 exports.addTweet = catchAsync(async (req, res, next) => {
-  try {
-    const { text, attachments } = req.body;
-    const userId = req.cookies.userId;
-    const tweet = new Tweet();
-    tweet.userId = userId;
-    tweet.text = text;
-    tweet.time = getCurrentTimestamp();
+  const { text, attachments } = req.body;
+  const { userId } = req.cookies;
+  const tweet = new Tweet();
+  tweet.userId = userId;
+  tweet.text = text;
+  tweet.time = getCurrentTimestamp();
 
-    const savedTweet = await AppDataSource.getRepository(Tweet).save(tweet);
+  const savedTweet = await AppDataSource.getRepository(Tweet).save(tweet);
 
-    const user = await AppDataSource.getRepository(User).findOne({
-      where: {
-        userId: userId,
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: userId,
+    },
+  });
+  if (attachments.length > 4)
+    return next(
+      new AppError('tweet can not have more than 4 attachments', 400),
+    );
+  const media = new Media();
+  media.tweetId = savedTweet.tweetId;
+  media.url = attachments;
+  media.type = 'image';
+  const savedMedia = await AppDataSource.getRepository(Media).save(media);
+
+  res.status(200).json({
+    status: true,
+    data: {
+      id: savedTweet.tweetId,
+      text: savedTweet.text,
+      createdAt: savedTweet.time,
+      user: {
+        profileImageURL: user.imageUrl,
+        screenName: user.name,
+        userName: user.username,
       },
-    });
-
-    for (const attach of attachments) {
-      const media = new Media();
-      media.tweetId = savedTweet.tweetId;
-      media.url = attach;
-      media.type = 'image';
-      await AppDataSource.getRepository(Media).save(media);
-    }
-
-    res.status(200).json({
-      status: true,
-      data: {
-        id: savedTweet.tweetId,
-        text: savedTweet.text,
-        createdAt: savedTweet.time,
-        user: {
-          profileImageURL: user.imageUrl,
-          screenName: user.name,
-          userName: user.username,
-        },
-        attachmentsURL: attachments,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error occurs when adding tweet',
-    });
-  }
+      attachmentsURL: attachments,
+    },
+  });
 });
 
 exports.deleteTweet = catchAsync(async (req, res, next) => {
-  try {
-    const tweetId = req.params.tweetId;
-    console.log(tweetId);
-    const tweetRepository = AppDataSource.getRepository(Tweet);
+  const { tweetId } = req.params;
+  checkTweet(tweetId, next);
+  const tweetRepository = AppDataSource.getRepository(Tweet);
 
-    const result = await tweetRepository
-      .createQueryBuilder()
-      .delete()
-      .from(Tweet)
-      .where('tweetId = :tweetId', { tweetId: tweetId })
-      .execute();
+  const result = await tweetRepository
+    .createQueryBuilder()
+    .delete()
+    .from(Tweet)
+    .where('tweetId = :tweetId', { tweetId: tweetId })
+    .execute();
 
-    if (result.affected && result.affected > 0) {
-      res.status(200).json({
-        status: true,
-        message: 'tweet is deleted successfully',
-      });
-    } else {
-      res.status(400).json({
-        status: false,
-        message: 'error while deleting tweet',
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error while deleting tweet',
-    });
-  }
+  if (!result.affected || !(result.affected > 0))
+    return next(new AppError('error in deleting tweet , id is not exist', 400));
+
+  res.status(200).json({
+    status: true,
+    message: 'tweet is deleted successfully',
+  });
 });
 
 exports.getTweet = catchAsync(async (req, res, next) => {
-  try {
-    const tweetId = req.params.tweetId;
-    const currUserId = req.cookies.userId;
-    const tweet = await AppDataSource.getRepository(Tweet).findOne({
-      where: {
-        tweetId: tweetId,
-      },
-    });
-    const user = await AppDataSource.getRepository(User).findOne({
-      where: {
-        userId: tweet.userId,
-      },
-    });
-    const attachments = await AppDataSource.getRepository(Media).findOne({
-      where: {
-        tweetId: tweetId,
-      },
-    });
+  const { tweetId } = req.params;
+  const currUserId = req.cookies.userId;
+  const tweet = await AppDataSource.getRepository(Tweet).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (!tweet) return next(new AppError('No tweet exists with this id', 400));
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: tweet.userId,
+    },
+  });
+  if (!user) return next(new AppError('No user exists', 400));
+  const attachments = await AppDataSource.getRepository(Media).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  const likesCount = await AppDataSource.getRepository(Like).count({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  const repostsCount = await AppDataSource.getRepository(Repost).count({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  const repliesCount = await AppDataSource.getRepository(Reply).count({
+    where: {
+      tweetId: tweetId,
+    },
+  });
 
-    const likesCount = await AppDataSource.getRepository(Like).count({
-      where: {
-        tweetId: tweetId,
-      },
-    });
-    const repostsCount = await AppDataSource.getRepository(Repost).count({
-      where: {
-        tweetId: tweetId,
-      },
-    });
-    const repliesCount = await AppDataSource.getRepository(Reply).count({
-      where: {
-        tweetId: tweetId,
-      },
-    });
+  let isLiked = await AppDataSource.getRepository(Like).findOne({
+    where: {
+      userId: currUserId,
+      tweetId: tweetId,
+    },
+  });
 
-    let isLiked = await AppDataSource.getRepository(Like).findOne({
-      where: {
-        userId: currUserId,
-        tweetId: tweetId,
-      },
-    });
+  let isReposted = await AppDataSource.getRepository(Repost).findOne({
+    where: {
+      userId: currUserId,
+      tweetId: tweetId,
+    },
+  });
 
-    let isReposted = await AppDataSource.getRepository(Repost).findOne({
-      where: {
-        userId: currUserId,
-        tweetId: tweetId,
-      },
-    });
+  isLiked = !!isLiked;
+  isReposted = !!isReposted;
 
-    isLiked = isLiked ? true : false;
-    isReposted = isReposted ? true : false;
-
-    res.status(200).json({
-      status: true,
-      data: {
-        id: tweet.tweetId,
-        text: tweet.text,
-        createdAt: tweet.time,
-        user: {
-          profileImageURL: user.imageUrl,
-          screenName: user.name,
-          userName: user.username,
-        },
-        attachmentsURL: attachments,
-        isLiked: isLiked,
-        isRetweeted: isReposted,
-        likesCount: likesCount,
-        retweetsCount: repostsCount,
-        repliesCount: repliesCount,
+  res.status(200).json({
+    status: true,
+    data: {
+      id: tweet.tweetId,
+      text: tweet.text,
+      createdAt: tweet.time,
+      user: {
+        profileImageURL: user.imageUrl,
+        screenName: user.name,
+        userName: user.username,
       },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error while getting tweet',
-    });
-  }
+      attachmentsURL: attachments,
+      isLiked: isLiked,
+      isRetweeted: isReposted,
+      likesCount: likesCount,
+      retweetsCount: repostsCount,
+      repliesCount: repliesCount,
+    },
+  });
 });
 
 exports.addLike = catchAsync(async (req, res, next) => {
-  try {
-    const tweetId = req.params.tweetId;
-    const currUserId = req.cookies.userId;
-    const like = new Like();
-    like.userId = currUserId;
-    like.tweetId = tweetId;
-    const savedLike = await AppDataSource.getRepository(Like).save(like);
+  const { tweetId } = req.params;
+  const currUserId = req.cookies.userId;
 
-    res.status(200).json({
-      status: true,
-      message: 'like is added successfully',
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error occurs when adding like',
-    });
-  }
+  checkTweet(tweetId, next);
+
+  const like = new Like();
+  like.userId = currUserId;
+  like.tweetId = tweetId;
+  const savedLike = await AppDataSource.getRepository(Like).save(like);
+
+  res.status(200).json({
+    status: true,
+    message: 'like is added successfully',
+  });
 });
 
 exports.deleteLike = catchAsync(async (req, res, next) => {
-  try {
-    const tweetId = req.params.tweetId;
-    const currUserId = req.cookies.userId;
+  const { tweetId } = req.params;
+  const currUserId = req.cookies.userId;
 
-    const likeRepository = AppDataSource.getRepository(Like);
+  checkTweet(tweetId, next);
 
-    const result = await likeRepository
-      .createQueryBuilder()
-      .delete()
-      .from(Like)
-      .where('tweetId = :tweetId AND userId = :userId', {
-        tweetId: tweetId,
-        userId: currUserId,
-      })
-      .execute();
+  const likeRepository = AppDataSource.getRepository(Like);
 
-    if (result.affected && result.affected > 0) {
-      res.status(200).json({
-        status: true,
-        message: 'like is deleted successfully',
-      });
-    } else {
-      res.status(400).json({
-        status: false,
-        message: 'error while deleting like',
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error occurs when deleting like',
-    });
-  }
+  const result = await likeRepository
+    .createQueryBuilder()
+    .delete()
+    .from(Like)
+    .where('tweetId = :tweetId AND userId = :userId', {
+      tweetId: tweetId,
+      userId: currUserId,
+    })
+    .execute();
+
+  if (!result.affected || !(result.affected > 0))
+    return next(new AppError('error deleting like', 400));
+
+  res.status(200).json({
+    status: true,
+    message: 'like is deleted successfully',
+  });
 });
 
 exports.addMedia = catchAsync(async (req, res, next) => {
-  try {
-    const tweetId = req.params.tweetId;
-    const { media } = req.body;
+  const { tweetId } = req.params;
+  const { media } = req.body;
 
-    const med = new Media();
-    med.tweetId = tweetId;
-    med.url = media;
-    med.type = 'image';
-    await AppDataSource.getRepository(Media).save(med);
+  checkTweet(tweetId, next);
+  const attachments = await AppDataSource.getRepository(Media).find({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (attachments.length + media.length > 4)
+    return next(
+      new AppError('tweet can not have more than 4 attachments', 400),
+    );
 
-    res.status(200).json({
-      status: true,
-      message: 'media is added successfully',
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error occurs when adding media',
-    });
-  }
+  const med = new Media();
+  med.tweetId = tweetId;
+  med.url = media;
+  med.type = 'image';
+  await AppDataSource.getRepository(Media).save(med);
+
+  res.status(200).json({
+    status: true,
+    message: 'media is added successfully',
+  });
 });
 
 exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
-  try {
-    const tweetId = req.params.tweetId;
+  const { tweetId } = req.params;
 
-    const attachments = await AppDataSource.getRepository(Media).find({
-      where: {
-        tweetId: tweetId,
-      },
+  checkTweet(tweetId, next);
+  const attachments = await AppDataSource.getRepository(Media).find({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (attachments.length > 0) {
+    res.status(200).json({
+      status: true,
+      data: attachments,
     });
-    if (attachments.length > 0) {
-      res.status(200).json({
-        status: true,
-        data: attachments,
-      });
-    } else {
-      res.status(400).json({
-        status: false,
-        message: 'no attachments for this tweet',
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      status: false,
-      message: 'error occurs when getting media',
-    });
+  } else {
+    return next(new AppError('there is no attachments for this tweet', 400));
   }
 });
