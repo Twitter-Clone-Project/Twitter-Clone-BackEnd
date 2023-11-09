@@ -71,8 +71,21 @@ exports.changePasswordValidationRules = [
 exports.forgetPasswordValidationRules = [
   body('email').isEmail().withMessage('Invalid email address'),
 ];
+exports.resendEmailValidationRules = [
+  body('email').isEmail().withMessage('Invalid email address'),
+];
+exports.otpWithEmailValidationRules = [
+  body('email').isEmail().withMessage('Invalid email address'),
+  body('otp')
+    .matches(/^[a-z0-9]+$/)
+    .isLength({ min: 8, max: 8 })
+    .not()
+    .isEmpty()
+    .withMessage('Invalid OTP'),
+];
 
 exports.resetPasswordValidationRules = [
+  body('email').isEmail().withMessage('Invalid email address'),
   body('newPassword')
     .not()
     .isEmpty()

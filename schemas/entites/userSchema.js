@@ -61,18 +61,14 @@ module.exports = new EntitySchema({
       length: 150,
       nullable: true,
     },
-    passwordResetToken: {
-      type: 'varchar',
-      length: 150,
-      nullable: true,
-    },
     otpExpires: {
       type: 'timestamptz',
       nullable: true,
     },
-    passwordResetTokenExpires: {
-      type: 'timestamptz',
+    isEmailVerifiedAfterFrgtPass: {
+      type: 'boolean',
       nullable: true,
+      default: false,
     },
   },
 });

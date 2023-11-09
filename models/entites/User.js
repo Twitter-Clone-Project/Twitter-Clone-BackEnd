@@ -9,14 +9,13 @@ class User {
     this.password = password;
     this.birthDate = birthDate;
     this.isConfirmed = false;
+    this.isEmailVerifiedAfterFrgtPass = false;
     this.imageUrl = undefined;
     this.bio = undefined;
     this.location = undefined;
     this.website = undefined;
     this.otp = undefined;
-    this.passwordResetToken = undefined;
     this.otpExpires = undefined;
-    this.resetTokenExpires = undefined;
     this.userId = undefined;
   }
 
@@ -34,23 +33,6 @@ class User {
     this.otpExpires = currentTime;
 
     return otp;
-  }
-
-  createPasswordResetToken() {
-    const resetToken = crypto.randomBytes(32).toString('hex');
-
-    const hashedResetToken = crypto
-      .createHash('sha256')
-      .update(resetToken)
-      .digest('hex');
-
-    this.setPasswordResetToken(hashedResetToken);
-
-    const currentTime = new Date();
-    currentTime.setMinutes(currentTime.getMinutes() + 10);
-    this.setPasswordResetTokenExpires(currentTime);
-
-    return resetToken;
   }
 
   setUsername(value) {
@@ -97,20 +79,24 @@ class User {
     this.otp = value;
   }
 
-  setPasswordResetToken(value) {
-    this.passwordResetToken = value;
+  setPasswordResetCode(value) {
+    this.passwordResetCode = value;
   }
 
   setOtpExpires(value) {
     this.otpExpires = value;
   }
 
-  setPasswordResetTokenExpires(value) {
-    this.passwordResetTokenExpires = value;
+  setPasswordResetCodeExpires(value) {
+    this.passwordResetCodeExpires = value;
   }
 
   setUserId(value) {
     this.userId = value;
+  }
+
+  setIsEmailVerifiedAfterFrgtPass(value) {
+    this.isEmailVerifiedAfterFrgtPass = value;
   }
 }
 module.exports = User;

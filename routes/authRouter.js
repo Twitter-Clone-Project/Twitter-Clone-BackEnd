@@ -8,6 +8,8 @@ const {
   changePasswordValidationRules,
   resetPasswordValidationRules,
   forgetPasswordValidationRules,
+  resetCodeValidationRules,
+  otpWithEmailValidationRules,
 } = require('../middlewares/validations/user');
 
 const router = express.Router();
@@ -20,18 +22,22 @@ router
   .route('/signin')
   .post(signinValidationRules, validateRequest, authController.signin);
 
+router.route('/me').get(authController.requireAuth, authController.getMe);
+
 router.route('/signout').post(authController.signout);
 
 router.route('/signWithGoogle').post(authController.signWithGoogle);
 router.route('/google/callback').get(authController.oauthGooogleCallback);
 
 router
-  .route('/confirmEmail')
+  .route('/confirmEmailAfterSignup')
   .post(
     authController.requireAuth,
     otpValidationRules,
     validateRequest,
-    authController.confirmEmailByOTP,
+    authController.addEmailToBody,
+    authController.checkOTP,
+    authController.confirmEmailAfterSignup,
   );
 
 router
@@ -56,7 +62,16 @@ router
   );
 
 router
-  .route('/resetPassword/:resetToken')
+  .route('/verifyEmailInFrgtPass')
+  .post(
+    otpWithEmailValidationRules,
+    validateRequest,
+    authController.checkOTP,
+    authController.verifyEmailInFrgtPass,
+  );
+
+router
+  .route('/resetPassword')
   .patch(
     resetPasswordValidationRules,
     validateRequest,
