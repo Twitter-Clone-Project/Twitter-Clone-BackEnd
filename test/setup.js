@@ -6,7 +6,6 @@ dotenv.config({ path: './.env' });
 const app = require('../app');
 const { TestAppDataSource } = require('../dataSource');
 
-console.log(TestAppDataSource.options);
 
 beforeAll(async () => {
   await TestAppDataSource.initialize();
