@@ -71,10 +71,12 @@ app.use((req, res, next) => {
 });
 
 const authRoutes = require('./routes/authRouter');
-const tweetsRoutes = require('./routes/tweets');
+const tweetsRoutes = require('./routes/tweetsRouter');
+const usersRouter = require('./routes/usersRouter');
 
 app.use('/api/v1/auth', authRoutes);
-app.use('/tweets', tweetsRoutes);
+app.use('/api/v1/tweets', tweetsRoutes);
+app.use('/api/v1/users', usersRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
