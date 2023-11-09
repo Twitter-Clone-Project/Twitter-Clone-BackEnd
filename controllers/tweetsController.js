@@ -72,14 +72,14 @@ exports.addTweet = catchAsync(async (req, res, next) => {
 exports.deleteTweet = catchAsync(async (req, res, next) => {
   try {
     const tweetId = req.params.tweetId;
-    console.log(tweetId)
+    console.log(tweetId);
     const tweetRepository = AppDataSource.getRepository(Tweet);
 
     const result = await tweetRepository
       .createQueryBuilder()
       .delete()
       .from(Tweet)
-      .where("tweetId = :tweetId", { tweetId: tweetId })
+      .where('tweetId = :tweetId', { tweetId: tweetId })
       .execute();
 
     if (result.affected && result.affected > 0) {
@@ -87,8 +87,7 @@ exports.deleteTweet = catchAsync(async (req, res, next) => {
         status: true,
         message: 'tweet is deleted successfully',
       });
-    }
-    else {
+    } else {
       res.status(400).json({
         status: false,
         message: 'error while deleting tweet',
@@ -217,7 +216,10 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
       .createQueryBuilder()
       .delete()
       .from(Like)
-      .where("tweetId = :tweetId AND userId = :userId", { tweetId: tweetId, userId: currUserId })
+      .where('tweetId = :tweetId AND userId = :userId', {
+        tweetId: tweetId,
+        userId: currUserId,
+      })
       .execute();
 
     if (result.affected && result.affected > 0) {
@@ -225,8 +227,7 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
         status: true,
         message: 'like is deleted successfully',
       });
-    }
-    else {
+    } else {
       res.status(400).json({
         status: false,
         message: 'error while deleting like',
@@ -279,8 +280,7 @@ exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
         status: true,
         data: attachments,
       });
-    }
-    else {
+    } else {
       res.status(400).json({
         status: false,
         message: 'no attachments for this tweet',

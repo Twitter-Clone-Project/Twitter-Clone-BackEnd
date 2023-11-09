@@ -22,6 +22,7 @@ let server;
 (async () => {
   try {
     await AppDataSource.initialize();
+
     if (AppDataSource.isInitialized) {
       console.log('DB connection established ✔️');
       server = http.createServer(app).listen(PORT, () => {

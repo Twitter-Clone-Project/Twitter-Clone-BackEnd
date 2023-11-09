@@ -1,5 +1,5 @@
 {
-  "name": "y",
+  "name": "x-clone",
   "version": "1.0.0",
   "description": "Backend",
   "main": "server.js",
@@ -7,7 +7,14 @@
     "start": "node server.js",
     "start:dev": "(SET NODE_ENV=development) & nodemon server.js",
     "start:prod": "(SET NODE_ENV=production)  & node server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "test": "jest --watchAll --no-cache"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./test/setup.js"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -47,8 +54,11 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-promise": "^6.1.1",
+    "jest": "^29.7.0",
     "ndb": "^1.1.5",
     "nodemon": "^3.0.1",
-    "prettier": "^3.0.3"
+    "pg-mem": "^2.7.1",
+    "prettier": "^3.0.3",
+    "supertest": "^6.3.3"
   }
 }
