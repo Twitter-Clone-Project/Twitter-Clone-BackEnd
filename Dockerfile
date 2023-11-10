@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:18.16.1
 
 # Set the working directory in the container
 WORKDIR /app
