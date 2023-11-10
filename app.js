@@ -7,6 +7,7 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const formidable = require('express-formidable');
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./services/AppError');
 
@@ -28,6 +29,8 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', true);
   next();
 });
+
+app.use(formidable());
 
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
@@ -72,10 +75,12 @@ app.use((req, res, next) => {
 
 const authRoutes = require('./routes/authRouter');
 const tweetsRoutes = require('./routes/tweetsRouter');
+const timelineRoutes = require('./routes/timelineRouter');
 const usersRouter = require('./routes/usersRouter');
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tweets', tweetsRoutes);
+app.use('/api/v1/users', timelineRoutes);
 app.use('/api/v1/users', usersRouter);
 
 app.all('*', (req, res, next) => {
