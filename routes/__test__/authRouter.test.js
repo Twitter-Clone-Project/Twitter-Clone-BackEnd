@@ -13,6 +13,5 @@ describe('POST signup', () => {
       gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
     });
     console.log(response);
-
   });
 });
