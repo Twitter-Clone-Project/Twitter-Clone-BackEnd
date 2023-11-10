@@ -9,7 +9,6 @@ class User {
     this.password = password;
     this.birthDate = birthDate;
     this.isConfirmed = false;
-    this.isEmailVerifiedAfterFrgtPass = false;
     this.imageUrl = undefined;
     this.bio = undefined;
     this.location = undefined;
@@ -95,8 +94,8 @@ class User {
     this.userId = value;
   }
 
-  setIsEmailVerifiedAfterFrgtPass(value) {
-    this.isEmailVerifiedAfterFrgtPass = value;
+  getOtp() {
+    return this.otp;
   }
 }
 module.exports = User;

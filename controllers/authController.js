@@ -76,6 +76,8 @@ exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
 
+  const userRepository = AppDataSource.getRepository(User);
+
   // const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
 
   // const response = await fetch(verificationUrl, {
@@ -93,16 +95,31 @@ exports.signup = catchAsync(async (req, res, next) => {
   // } else {
   //   return next(new AppError('Error in reCAPTCHA verification'));
   // }
+  
 
   const hashedPassword = await Password.hashPassword(password);
   const user = new User(username, name, email, hashedPassword, dateOfBirth);
 
   const otp = user.createOTP();
-  await AppDataSource.getRepository(User).insert(user);
+  await userRepository.insert(user);
 
   await new Email(user, { otp }).sendConfirmationEmail();
 
-  createAndSendToken(user, req, res, 201);
+  setTimeout(
+    async () => {
+      await userRepository
+        .createQueryBuilder()
+        .delete()
+        .where('isConfirmed = false AND email = :email', { email: user.email })
+        .execute();
+    },
+    10 * 60 * 1000,
+  );
+
+  res.status(201).json({
+    status: true,
+    data: { user: filterObj(user, 'name', 'userId', 'email') },
+  });
 });
 
 exports.signin = catchAsync(async (req, res, next) => {
@@ -185,6 +202,7 @@ exports.signout = (req, res) => {
     expires: new Date(Date.now() + 5 * 1000),
     httpOnly: true,
   });
+
   res
     .status(200)
     .json({ status: 'success', message: 'Signed out successfully' });
@@ -254,11 +272,6 @@ exports.getMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.addEmailToBody = (req, res, next) => {
-  req.body.email = req.currentUser.email;
-  next();
-};
-
 exports.checkOTP = catchAsync(async (req, res, next) => {
   const { otp, email } = req.body;
   const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
@@ -267,10 +280,12 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
   const user = await userRepository.findOne({
     where: {
       email,
-      otp: hashedOTP,
     },
     select: {
       otpExpires: true,
+      name: true,
+      username: true,
+      otp: true,
       isConfirmed: true,
       email: true,
       userId: true,
@@ -278,6 +293,10 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
   });
 
   if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  if (user.getOtp() !== hashedOTP) {
     return next(new AppError('Incorrect OTP', 400));
   }
 
@@ -295,14 +314,13 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.confirmEmailAfterSignup = catchAsync(async (req, res, next) => {
+exports.confirmEmail = catchAsync(async (req, res, next) => {
   const { userRepository, user } = res.locals;
 
   user.setIsConfirmed(true);
   await userRepository.save(user);
-  res
-    .status(200)
-    .json({ status: true, message: 'Email confirmed successfully' });
+
+  createAndSendToken(user, req, res, 200);
 });
 
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
@@ -324,15 +342,7 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   const otp = user.createOTP();
   await userRepository.save(user);
 
-  try {
-    await new Email(user, { otp }).sendConfirmationEmail();
-  } catch (error) {
-    user.setOtp(null);
-    user.setOtpExpires(null);
-    await userRepository.save(user);
-
-    return next(new AppError('Error in sending the confirmation email', 400));
-  }
+  await new Email(user, { otp }).sendConfirmationEmail();
 
   res.status(200).json({
     status: true,
@@ -409,29 +419,18 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.verifyEmailInFrgtPass = catchAsync(async (req, res, next) => {
-  const { userRepository, user } = res.locals;
-
-  user.setIsEmailVerifiedAfterFrgtPass(true);
-  await userRepository.save(user);
-  res
-    .status(200)
-    .json({ status: true, message: 'Email verified successfully' });
-});
-
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { newPassword, email } = req.body;
+  const { newPassword } = req.body;
 
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
-    where: { email },
+    where: { email: req.currentUser.email },
     select: {
       userId: true,
       username: true,
       isConfirmed: true,
       email: true,
       name: true,
-      isEmailVerifiedAfterFrgtPass: true,
     },
   });
 
@@ -439,15 +438,13 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     return next(new AppError('User not found', 404));
   }
 
-  if (!user.isEmailVerifiedAfterFrgtPass) {
-    return next(new AppError('Email is not verified', 400));
-  }
-
   const hashedPassword = await Password.hashPassword(newPassword);
   user.setPassword(hashedPassword);
-  user.setIsEmailVerifiedAfterFrgtPass(false);
 
   await userRepository.save(user);
 
-  createAndSendToken(user, req, res, 200);
+  res.status(200).json({
+    status: true,
+    message: 'Password reseted  successfully',
+  });
 });

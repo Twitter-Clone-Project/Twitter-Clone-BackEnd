@@ -85,7 +85,6 @@ exports.otpWithEmailValidationRules = [
 ];
 
 exports.resetPasswordValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
   body('newPassword')
     .not()
     .isEmpty()

@@ -65,10 +65,5 @@ module.exports = new EntitySchema({
       type: 'timestamptz',
       nullable: true,
     },
-    isEmailVerifiedAfterFrgtPass: {
-      type: 'boolean',
-      nullable: true,
-      default: false,
-    },
   },
 });
