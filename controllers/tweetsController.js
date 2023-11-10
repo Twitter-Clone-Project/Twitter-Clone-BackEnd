@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const AWS = require('aws-sdk');
 const { AppDataSource } = require('../dataSource');
 const catchAsync = require('../middlewares/catchAsync');
@@ -61,7 +62,12 @@ function getImagesUrls(req, next) {
 }
 
 exports.addTweet = catchAsync(async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ status: false, errors: errors.array() });
+  }
   const { tweetText } = req.fields;
+
   const { userId } = req.cookies;
   const tweet = new Tweet();
   tweet.userId = userId;
@@ -243,6 +249,10 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
 });
 
 exports.addMedia = catchAsync(async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ status: false, errors: errors.array() });
+  }
   const { tweetId } = req.params;
   const { media } = req.body;
 
