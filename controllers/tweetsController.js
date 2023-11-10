@@ -61,11 +61,11 @@ function getImagesUrls(req, next) {
 }
 
 exports.addTweet = catchAsync(async (req, res, next) => {
-  const { text } = req.fields;
+  const { tweetText } = req.fields;
   const { userId } = req.cookies;
   const tweet = new Tweet();
   tweet.userId = userId;
-  tweet.text = text;
+  tweet.text = tweetText;
   tweet.time = getCurrentTimestamp();
 
   const savedTweet = await AppDataSource.getRepository(Tweet).save(tweet);
