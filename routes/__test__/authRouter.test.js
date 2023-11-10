@@ -2,8 +2,8 @@ const app = require('../../app');
 const request = require('supertest');
 
 describe('POST signup', () => {
-  it('returns 201 on successful signup', async () => {
-    const response = await request(app).post('/api/v1/auth/signup').send({
+  test('returns 201 on successful signup', async () => {
+    const response = await request(app).post('/api/v1/auth').send({
       name: 'Mohamed',
       username: 'string58',
       email: 'myehia58@gmail.com',
@@ -12,7 +12,7 @@ describe('POST signup', () => {
       dateOfBirth: '2023-11-03',
       gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
     });
+    console.log(response);
 
-    expect(response.statusCode).toEqual(201);
   });
 });

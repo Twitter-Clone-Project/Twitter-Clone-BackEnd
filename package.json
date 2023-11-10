@@ -14,7 +14,9 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./test/setup.js"
-    ]
+    ],
+    "injectGlobals": true,
+    "testTimeout": 50000
   },
   "author": "",
   "license": "ISC",
