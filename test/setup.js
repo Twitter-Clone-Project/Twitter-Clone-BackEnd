@@ -2,13 +2,11 @@ const request = require('supertest');
 const dotenv = require('dotenv');
 dotenv.config({ path: './.env' });
 
-
 const app = require('../app');
-const { TestAppDataSource } = require('../dataSource');
-
+// const { TestAppDataSource } = require('../dataSource');
 
 beforeAll(async () => {
-  await TestAppDataSource.initialize();
+  // await TestAppDataSource.initialize();
 });
 
 // beforeEach(async () => {
@@ -20,7 +18,7 @@ beforeAll(async () => {
 // });
 
 afterAll(async () => {
-  await TestAppDataSource.dropDatabase();
+  // await TestAppDataSource.dropDatabase();
 });
 
 global.signin = async () => {
