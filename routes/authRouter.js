@@ -14,6 +14,7 @@ const {
 
 const router = express.Router();
 
+
 router
   .route('/signup')
   .post(signupValidationRules, validateRequest, authController.signup);
@@ -30,14 +31,12 @@ router.route('/signWithGoogle').post(authController.signWithGoogle);
 router.route('/google/callback').get(authController.oauthGooogleCallback);
 
 router
-  .route('/confirmEmailAfterSignup')
+  .route('/verifyEmail')
   .post(
-    authController.requireAuth,
-    otpValidationRules,
+    otpWithEmailValidationRules,
     validateRequest,
-    authController.addEmailToBody,
     authController.checkOTP,
-    authController.confirmEmailAfterSignup,
+    authController.confirmEmail,
   );
 
 router
@@ -62,17 +61,9 @@ router
   );
 
 router
-  .route('/verifyEmailInFrgtPass')
-  .post(
-    otpWithEmailValidationRules,
-    validateRequest,
-    authController.checkOTP,
-    authController.verifyEmailInFrgtPass,
-  );
-
-router
   .route('/resetPassword')
   .patch(
+    authController.requireAuth,
     resetPasswordValidationRules,
     validateRequest,
     authController.resetPassword,

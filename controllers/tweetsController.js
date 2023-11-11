@@ -1,3 +1,4 @@
+const AWS = require('aws-sdk');
 const { AppDataSource } = require('../dataSource');
 const catchAsync = require('../middlewares/catchAsync');
 const AppError = require('../services/AppError');
@@ -31,8 +32,36 @@ async function checkTweet(tweetId, next) {
   if (!tweet) return next(new AppError('No tweet exists with this id', 400));
 }
 
+function getImagesUrls(req, next) {
+  AWS.config.update({
+    accessKeyId: 'YOUR_ACCESS_KEY_ID',
+    secretAccessKey: 'YOUR_SECRET_ACCESS_KEY',
+    region: 'YOUR_REGION',
+  });
+
+  const s3 = new AWS.S3();
+
+  const params = {
+    Bucket: 'your-s3-bucket-name',
+    Key: 'unique-key-for-image.jpg',
+    Body: req.file.buffer,
+    ACL: 'public-read',
+  };
+
+  s3.upload(params, (err, data) => {
+    if (err) {
+      return next(
+        new AppError('Error while uploading media to the cloud', 400),
+      );
+    }
+    // data.Location contains the public URL of the uploaded image
+    const imageUrls = data.Location;
+    return imageUrls;
+  });
+}
+
 exports.addTweet = catchAsync(async (req, res, next) => {
-  const { text, attachments } = req.body;
+  const { text } = req.fields;
   const { userId } = req.cookies;
   const tweet = new Tweet();
   tweet.userId = userId;
@@ -46,6 +75,8 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       userId: userId,
     },
   });
+
+  const attachments = [];
   if (attachments.length > 4)
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),

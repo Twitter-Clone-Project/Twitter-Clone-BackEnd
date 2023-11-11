@@ -111,7 +111,7 @@ module.exports = (err, req, res, next) => {
       error = handleJWTExpiredError(error);
     }
     sendErrorProd(error, req, res);
-  } else if (process.env.NODE_ENV === 'development') {
+  } else {
     sendErrorDev(err, req, res);
   }
 };

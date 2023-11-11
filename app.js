@@ -29,6 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
 
@@ -48,7 +49,7 @@ app.use(compression());
 // limit the traffic => prevent DoS attacks
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 60 minutes
-  limit: 300, // Limit each IP to 300 requests per `window` (here, per 60 minutes)
+  limit: 600, // Limit each IP to 300 requests per `window` (here, per 60 minutes)
   message: {
     message: 'Too many requests, try again in an hour',
     status: 'warning',
@@ -71,11 +72,16 @@ app.use((req, res, next) => {
 });
 
 const authRoutes = require('./routes/authRouter');
-const tweetsRoutes = require('./routes/tweets');
+
 const interactionsRoutes = require('./routes/interactionsRouter');
+const tweetsRoutes = require('./routes/tweetsRouter');
+const timelineRoutes = require('./routes/timelineRouter');
+const usersRouter = require('./routes/usersRouter');
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tweets', tweetsRoutes);
+app.use('/api/v1/users', timelineRoutes);
+app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/users', interactionsRoutes);
 
 app.all('*', (req, res, next) => {
