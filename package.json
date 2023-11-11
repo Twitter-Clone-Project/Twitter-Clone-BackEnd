@@ -45,6 +45,7 @@
     "mongoose": "^8.0.0",
     "morgan": "^1.10.0",
     "nock": "^13.3.8",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
     "path": "^0.12.7",
