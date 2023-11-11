@@ -1,42 +1,160 @@
 const request = require('supertest');
 const nock = require('nock');
 const app = require('../../app');
+const uuid = require('uuid');
 
-describe('POST signup', () => {
-  jest.setTimeout(10000);
+describe('POST /api/v1/auth/signup', () => {
+  jest.setTimeout(100000);
   test('returns 201 on successful signup', async () => {
-    // Mocking the Email class and its sendConfirmationEmail method
-    // jest.mock('../../services/Email.js', () => {
-    //   return jest.fn().mockImplementation(() => ({
-    //     sendConfirmationEmail: jest.fn().mockResolvedValue(),
-    //   }));
-    // });
+    const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+    const uniqueUsername = `user_${uuid.v4()}`;
 
-    // const res = await request(app)
-    //   .post('/api/v1/auth/me')
-    //   .send({
-    //     name: 'Mohamed',
-    //     username: 'string59',
-    //     email: 'myehia59@gmail.com',
-    //     password: 'password',
-    //     passwordConfirm: 'password',
-    //     dateOfBirth: '2023-11-03',
-    //     gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
-    //   })
-    //   .set('Content-Type', 'application/json')
-    //   .expect(201);
-    let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
     const res = await request(app)
-      .get('/api/v1/auth/me')
-      .set("Authorization", token)
-      .set('Content-Type', 'application/json')
-      .expect(201);
-    console.log(res);
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: 'password',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json');
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.data.user.name).toBe('Mahmoud Yahia');
   });
 
-  test('testing one', async () => {
-    const res = await request(app).post('/api/v1/auth/sign').expect(201);
-    expect(res.body.status).toBe(true);
+  test('returns 400 for validation errors', async () => {
+    const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+    const uniqueUsername = `user_${uuid.v4()}`;
+
+    const res2 = await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: 'passwod',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json');
+
+
+    expect(res2.statusCode).toBe(400);
+    expect(res2.body.status).toBe(false);
+  });
+
+  test('returns 400 when user allready exists', async () => {
+    const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+    const uniqueUsername = `user_${uuid.v4()}`;
+
+    await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: 'password',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json');
+
+    const res2 = await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: 'password',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json');
+
+    expect(res2.statusCode).toBe(400);
+    expect(res2.body.status).toBe(false);
+  });
+});
+
+describe('POST /api/v1/auth/signin', () => {
+  test('returns 201, user and token on successful signin', async () => {
+    const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+    const uniqueUsername = `user_${uuid.v4()}`;
+
+    await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: 'password',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json');
+
+    const res = await request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: uniqueEmail,
+        password: 'password',
+      })
+      .set('Content-Type', 'application/json');
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.data.user.name).toEqual('Mahmoud Yahia');
+    expect(res.body.data.token).toBeDefined();
+  });
+
+  test('returns 400, signin with wrong password', async () => {
+    const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+    const uniqueUsername = `user_${uuid.v4()}`;
+
+    await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: 'password',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json');
+
+    const res = await request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: uniqueEmail,
+        password: 'pa4554ssord',
+      })
+      .set('Content-Type', 'application/json');
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.status).toEqual(false);
+  });
+
+  test('returns 400, user not found', async () => {
+    const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+
+    const res = await request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: uniqueEmail,
+        password: 'pa4554ssord',
+      })
+      .set('Content-Type', 'application/json');
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.status).toEqual(false);
   });
 });

@@ -1,11 +1,18 @@
 const request = require('supertest');
 const dotenv = require('dotenv');
 dotenv.config({ path: './.env' });
+const uuid = require('uuid');
 
 const app = require('../app');
 const { AppDataSource } = require('../dataSource');
 
 beforeAll(async () => {
+  jest.mock('../services/Email.js', () => {
+    return jest.fn().mockImplementation(() => ({
+      sendConfirmationEmail: jest.fn().mockResolvedValue(),
+    }));
+  });
+
   await AppDataSource.initialize();
 
   if (AppDataSource.isInitialized) {
@@ -22,22 +29,27 @@ beforeAll(async () => {
 // });
 
 afterAll(async () => {
-  // await AppDataSource.dropDatabase();
+  await AppDataSource.dropDatabase();
   console.log('Test db dropped');
 });
 
-// global.signin = async () => {
-//   const authRes = await request(app)
-//     .post('/api/users/signup')
-//     .send({
-//       email: 'user@example.com',
-//       password: 'password',
-//       passwordConfirm: 'password',
-//       name: 'user',
-//     })
-//     .expect(201);
+global.getToken = async () => {
+  const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
+  const uniqueUsername = `user_${uuid.v4()}`;
+  const authRes = await request(app)
+    .post('/api/v1/auth/signup')
+    .send({
+      name: 'Mahmoud Yahia',
+      username: uniqueUsername,
+      email: uniqueEmail,
+      password: 'password',
+      passwordConfirm: 'password',
+      dateOfBirth: '2023-11-03',
+      gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+    })
+    .set('Content-Type', 'application/json');
 
-//   const cookie = authRes.get('Set-Cookie');
+  const cookie = authRes.get('Set-Cookie');
 
-//   return cookie;
-// };
+  return cookie;
+};
