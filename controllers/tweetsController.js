@@ -184,7 +184,7 @@ exports.getTweet = catchAsync(async (req, res, next) => {
       text: tweet.text,
       createdAt: tweet.time,
       user: {
-        profileImageURL: user.imageUrl,
+        profileImageURL: user.c,
         screenName: user.name,
         userName: user.username,
       },
