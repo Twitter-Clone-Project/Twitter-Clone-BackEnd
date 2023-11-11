@@ -20,6 +20,11 @@ const filterObj = (obj, ...fields) => {
   return filteredObj;
 };
 
+exports.tttest = (req, res, next) => {
+  res.status(201).json({
+    status: true,
+  });
+};
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_TOKEN_EXPIRESIN,
@@ -95,7 +100,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   // } else {
   //   return next(new AppError('Error in reCAPTCHA verification'));
   // }
-  
 
   const hashedPassword = await Password.hashPassword(password);
   const user = new User(username, name, email, hashedPassword, dateOfBirth);

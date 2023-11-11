@@ -14,6 +14,8 @@ const {
 
 const router = express.Router();
 
+router.route('/sign').post(authController.tttest);
+
 router
   .route('/signup')
   .post(signupValidationRules, validateRequest, authController.signup);

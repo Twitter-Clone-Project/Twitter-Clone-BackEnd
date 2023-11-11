@@ -49,16 +49,33 @@ const AppDataSource = new DataSource({
   migrations: [],
 });
 
-// const TestAppDataSource = new DataSource({
-//   type: 'postgres',
-//   host: process.env.DATABASE_HOST,
-//   port: process.env.DATABASE_PORT,
-//   username: process.env.DATABASE_USERNAME,
-//   password: process.env.DATABASE_PASSWORD,
-//   database: process.env.DATABASE_TEST_NAME,
-//   synchronize: false,
-//   logging: false,
-//   entities: ['./schemas/entites/**/*.js'],
-// });
+const TestAppDataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DATABASE_HOST,
+  port: process.env.DATABASE_PORT,
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_TEST_NAME,
+  synchronize: false,
+  logging: false,
+  entities: [
+    userSchema,
+    tweetSchema,
+    messageSchema,
+    mediaSchema,
+    conversationSchema,
+    trendSchema,
+    replySchema,
+    notificationSchema,
+    supportSchema,
+    repostSchema,
+    muteSchema,
+    blockSchema,
+    mentionSchema,
+    likeReplySchema,
+    likeSchema,
+    followSchema,
+  ],
+});
 
-module.exports = { AppDataSource };
+module.exports = { AppDataSource, TestAppDataSource };
