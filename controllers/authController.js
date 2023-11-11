@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const { promisify } = require('util');
 const crypto = require('crypto');
-const fetch = require('node-fetch');
 
 const { AppDataSource } = require('../dataSource');
 const catchAsync = require('../middlewares/catchAsync');
