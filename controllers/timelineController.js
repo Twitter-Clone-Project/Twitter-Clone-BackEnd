@@ -10,8 +10,8 @@ const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
 
-const numTweetsPerPage = 2;
 let totalRes;
+const numTweetsPerPage = 10;
 
 async function getTweetInfo(tweetId, currUserId) {
   const likesCount = await AppDataSource.getRepository(Like).count({

@@ -79,6 +79,7 @@ const timelineRoutes = require('./routes/timelineRouter');
 const usersRouter = require('./routes/usersRouter');
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/tweets', tweetsRoutes);
 app.use('/api/v1/users', timelineRoutes);
 app.use('/api/v1/users', usersRouter);
