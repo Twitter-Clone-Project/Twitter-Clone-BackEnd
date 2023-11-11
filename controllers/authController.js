@@ -96,7 +96,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   } else {
     return next(new AppError('Error in reCAPTCHA verification'));
   }
-
   const hashedPassword = await Password.hashPassword(password);
   const user = new User(username, name, email, hashedPassword, dateOfBirth);
 
