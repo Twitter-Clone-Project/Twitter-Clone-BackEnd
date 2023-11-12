@@ -41,7 +41,7 @@ router
 
 router
   .route('/resendConfirmEmail')
-  .post(authController.requireAuth, authController.resendConfirmationEmail);
+  .post(authController.resendConfirmationEmail);
 
 router
   .route('/updatePassword')
