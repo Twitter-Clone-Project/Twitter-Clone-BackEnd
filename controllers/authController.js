@@ -192,7 +192,7 @@ exports.oauthGooogleCallback = async (req, res, next) => {
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
-  res.redirect(303, `${req.protocol}://${req.get('host')}/home`);
+  res.redirect(303, `${req.protocol}://${req.get('host')}/app`);
 };
 
 exports.signout = (req, res) => {
