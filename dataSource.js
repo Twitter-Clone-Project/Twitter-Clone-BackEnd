@@ -35,6 +35,13 @@ const AppDataSource = new DataSource({
   logging:
     process.env.NODE_ENV === 'testing' ||
     process.env.NODE_ENV === 'development',
+  ssl: process.env.NODE_ENV === 'production',
+  extra: {
+    ssl:
+      process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
+  },
   entities: [
     userSchema,
     tweetSchema,
