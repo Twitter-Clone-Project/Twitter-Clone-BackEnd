@@ -1,3 +1,11 @@
+/**
+ * testSetup.js
+ *
+ * This module contains setup code for testing using Jest and Supertest.
+ * It initializes the necessary components, sets up mock functions, and
+ * provides a global function for obtaining an authentication token.
+ */
+
 const request = require('supertest');
 const dotenv = require('dotenv');
 dotenv.config({ path: './.env' });

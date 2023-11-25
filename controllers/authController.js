@@ -1,3 +1,8 @@
+/**
+ * File: authController.js
+ * Description: This file contains the authentication-related controllers for user signup, signin, and OAuth2 authentication.
+ */
+
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const { promisify } = require('util');
@@ -10,6 +15,13 @@ const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
 
+/**
+ * Filters object properties based on specified fields.
+ * @param {Object} obj - The object to be filtered
+ * @param {...string} fields - The fields to include in the filtered object
+ * @returns {Object} - The filtered object
+ */
+
 const filterObj = (obj, ...fields) => {
   const filteredObj = {};
   Object.keys(obj).forEach((key) => {
@@ -20,11 +32,23 @@ const filterObj = (obj, ...fields) => {
   return filteredObj;
 };
 
+/**
+ * Generates a JWT token for a given user ID.
+ * @param {string} id - The user ID
+ * @returns {string} - The generated JWT token
+ */
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_TOKEN_EXPIRESIN,
   });
 
+/**
+ * Creates and sends a JWT token along with user data in the response.
+ * @param {Object} user - The user object
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {number} statusCode - The HTTP status code for the response
+ */
 const createAndSendToken = (user, req, res, statusCode) => {
   const token = signToken(user.userId);
 
@@ -51,6 +75,11 @@ const createAndSendToken = (user, req, res, statusCode) => {
   });
 };
 
+/**
+ * Retrieves user data from Google API using an access token.
+ * @param {string} accessToken - The access token
+ * @returns {Object} - User data from the Google API
+ */
 const getUserData = async (accessToken) => {
   const response = await fetch(
     `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
@@ -60,6 +89,10 @@ const getUserData = async (accessToken) => {
   return userData;
 };
 
+/**
+ * Creates an OAuth2 client for Google authentication.
+ * @returns {OAuth2Client} - The OAuth2 client for Google
+ */
 const createOAuth2Client = () => {
   const redirectUrl = 'https://ticketing.dev/api/users/auth/google/callback';
 
@@ -72,28 +105,36 @@ const createOAuth2Client = () => {
   return oAuth2Client;
 };
 
+/**
+ * Controller for user signup.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
 
   const userRepository = AppDataSource.getRepository(User);
 
-  const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
+  if (process.env.NODE_ENV === 'production') {
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
 
-  const response = await fetch(verificationUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+    const response = await fetch(verificationUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (response.ok) {
-    const result = await response.json();
-    if (!result.success) {
-      return next(new AppError('reCAPTCHA verification failed'));
+    if (response.ok) {
+      const result = await response.json();
+      if (!result.success) {
+        return next(new AppError('reCAPTCHA verification failed'));
+      }
+    } else {
+      return next(new AppError('Error in reCAPTCHA verification'));
     }
-  } else {
-    return next(new AppError('Error in reCAPTCHA verification'));
   }
   const hashedPassword = await Password.hashPassword(password);
   const user = new User(username, name, email, hashedPassword, dateOfBirth);
@@ -120,6 +161,12 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Controller for user signin.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.signin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -149,6 +196,11 @@ exports.signin = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
+/**
+ * Controller for initiating Google OAuth2 authentication.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
 exports.signWithGoogle = (req, res) => {
   const oAuth2Client = createOAuth2Client();
 
@@ -162,6 +214,12 @@ exports.signWithGoogle = (req, res) => {
   res.json({ url: authorizeUrl });
 };
 
+/**
+ * Controller for handling the callback from Google OAuth2 authentication.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.oauthGooogleCallback = async (req, res, next) => {
   const { code } = req.query;
 
@@ -195,6 +253,11 @@ exports.oauthGooogleCallback = async (req, res, next) => {
   res.redirect(303, `${req.protocol}://${req.get('host')}/home`);
 };
 
+/**
+ * Controller for signing out.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
 exports.signout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 5 * 1000),
@@ -206,6 +269,12 @@ exports.signout = (req, res) => {
     .json({ status: 'success', message: 'Signed out successfully' });
 };
 
+/**
+ * Middleware to check if the user is authenticated.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.requireAuth = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -243,6 +312,12 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Controller for getting user information.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.getMe = catchAsync(async (req, res, next) => {
   const user = await AppDataSource.getRepository(User).findOne({
     where: { userId: req.currentUser.userId },
@@ -270,6 +345,12 @@ exports.getMe = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Middleware to check the provided OTP for email confirmation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.checkOTP = catchAsync(async (req, res, next) => {
   const { otp, email } = req.body;
   const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
@@ -312,6 +393,12 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Controller for confirming user email after OTP validation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.confirmEmail = catchAsync(async (req, res, next) => {
   const { userRepository, user } = res.locals;
 
@@ -321,6 +408,12 @@ exports.confirmEmail = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
+/**
+ * Controller for resending email confirmation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
@@ -348,6 +441,12 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Controller for changing the user's password.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.changePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
 
@@ -385,6 +484,12 @@ exports.changePassword = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
+/**
+ * Controller for initiating the password reset process.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.forgetPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
@@ -417,6 +522,12 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Controller for resetting the user's password after the reset request.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { newPassword } = req.body;
 

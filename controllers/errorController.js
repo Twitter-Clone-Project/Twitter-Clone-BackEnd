@@ -1,10 +1,29 @@
+/**
+ * errorController.js
+ *
+ * This module provides middleware for handling errors in an Express application.
+ * It includes functions to handle various types of errors and send appropriate responses
+ * based on the environment (development or production). Additionally, it exports an
+ * Express middleware function that is used to handle errors in the entire application.
+ */
+
 const AppError = require('../services/AppError');
 
+/**
+ * Handles casting errors in the database.
+ * @param {Object} err - The error object
+ * @returns {AppError} - An instance of AppError with a specific error message
+ */
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
 };
 
+/**
+ * Handles duplicate field errors in the database.
+ * @param {Object} err - The error object
+ * @returns {AppError} - An instance of AppError with a specific error message
+ */
 const handleDuplicateFieldsDB = (err) => {
   const regex = /Key \(([^)]+)\)=\(([^)]+)\) already exists\./;
   const match = err.detail.match(regex);
@@ -24,6 +43,11 @@ const handleDuplicateFieldsDB = (err) => {
   );
 };
 
+/**
+ * Handles validation errors in the database.
+ * @param {Object} err - The error object
+ * @returns {AppError} - An instance of AppError with a specific error message
+ */
 const handleValidationErrorDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
 
@@ -31,12 +55,26 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+/**
+ * Handles invalid JSON Web Token (JWT) errors.
+ * @returns {AppError} - An instance of AppError with a specific error message
+ */
 const handleJWTError = () =>
   new AppError('Invalid token. Please log in again!', 401);
 
+/**
+ * Handles expired JWT errors.
+ * @returns {AppError} - An instance of AppError with a specific error message
+ */
 const handleJWTExpiredError = () =>
   new AppError('Your token has expired! Please log in again.', 401);
 
+/**
+ * Sends a production-friendly error response.
+ * @param {AppError} err - An instance of AppError or an error object
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
 const sendErrorProd = (err, req, res) => {
   // A) API
   if (req.originalUrl.startsWith('/api')) {
@@ -79,6 +117,12 @@ const sendErrorProd = (err, req, res) => {
   });
 };
 
+/**
+ * Sends a development-friendly error response.
+ * @param {AppError} err - An instance of AppError or an error object
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
 const sendErrorDev = (err, req, res) =>
   res.status(err.statusCode).json({
     status: err.status,
@@ -87,6 +131,13 @@ const sendErrorDev = (err, req, res) =>
     stack: err.stack,
   });
 
+/**
+ * Express middleware for handling errors.
+ * @param {Object} err - The error object
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || false;
