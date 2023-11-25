@@ -32,15 +32,10 @@ const AppDataSource = new DataSource({
     process.env.NODE_ENV === 'testing' ||
     process.env.NODE_ENV === 'development' ||
     process.env.NODE_ENV === 'production',
-  logging:
-    process.env.NODE_ENV === 'testing' ||
-    process.env.NODE_ENV === 'development',
-  ssl: process.env.NODE_ENV === 'production',
+  logging: false,
+  ssl: process.env.SSL === 'TRUE',
   extra: {
-    ssl:
-      process.env.NODE_ENV === 'production'
-        ? { rejectUnauthorized: false }
-        : false,
+    ssl: process.env.SSL === 'TRUE' ? { rejectUnauthorized: false } : false,
   },
   entities: [
     userSchema,
