@@ -10,6 +10,7 @@ const Media = require('../models/entites/Media');
 const Reply = require('../models/entites/Reply');
 const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
+const Follow = require('../models/relations/Follow');
 
 function getCurrentTimestamp() {
   const date = new Date(Date.now());
@@ -248,36 +249,37 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.addMedia = catchAsync(async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ status: false, errors: errors.array() });
-  }
-  const { tweetId } = req.params;
-  const { media } = req.body;
+// exports.addMedia = catchAsync(async (req, res, next) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ status: false, errors: errors.array() });
+//   }
+//   const { tweetId } = req.params;
+//   const { media } = req.fields;
+//   console.log(media);
 
-  checkTweet(tweetId, next);
-  const attachments = await AppDataSource.getRepository(Media).find({
-    where: {
-      tweetId: tweetId,
-    },
-  });
-  if (attachments.length + media.length > 4)
-    return next(
-      new AppError('tweet can not have more than 4 attachments', 400),
-    );
+//   checkTweet(tweetId, next);
+//   const attachments = await AppDataSource.getRepository(Media).find({
+//     where: {
+//       tweetId: tweetId,
+//     },
+//   });
+//   if (attachments.length + media.length > 4)
+//     return next(
+//       new AppError('tweet can not have more than 4 attachments', 400),
+//     );
 
-  const med = new Media();
-  med.tweetId = tweetId;
-  med.url = media;
-  med.type = 'image';
-  await AppDataSource.getRepository(Media).save(med);
+//   const med = new Media();
+//   med.tweetId = tweetId;
+//   med.url = media;
+//   med.type = 'image';
+//   await AppDataSource.getRepository(Media).save(med);
 
-  res.status(200).json({
-    status: true,
-    message: 'media is added successfully',
-  });
-});
+//   res.status(200).json({
+//     status: true,
+//     message: 'media is added successfully',
+//   });
+// });
 
 exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
@@ -296,4 +298,83 @@ exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
   } else {
     return next(new AppError('there is no attachments for this tweet', 400));
   }
+});
+
+exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+  const currUserId = req.cookies.userId;
+
+  checkTweet(tweetId, next);
+  const retweets = await AppDataSource.getRepository(Repost)
+    .createQueryBuilder('repost')
+    .innerJoinAndMapOne(
+      'repost.user',
+      User,
+      'user',
+      'user.userId = repost.userId',
+    )
+    .where('repost.tweetId = :tweetId', { tweetId })
+    .getMany();
+
+  const retweeters = retweets.map((retweets) => retweets.user);
+
+  const finalRetweetersPromises = retweeters.map(async (retweeter) => {
+    const { userId, name, username, profileImageURL } = retweeter;
+    const isFollowed = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: retweeter.userId,
+        followerId: currUserId,
+      },
+    });
+    return {
+      id: userId,
+      name: name,
+      screenName: username,
+      profileImageURL: profileImageURL,
+      isFollowed: !!isFollowed,
+    };
+  });
+  const finalRetweeters = await Promise.all(finalRetweetersPromises);
+
+  res.status(200).json({
+    status: true,
+    data: finalRetweeters,
+  });
+});
+
+exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+  const currUserId = req.cookies.userId;
+
+  checkTweet(tweetId, next);
+  const likes = await AppDataSource.getRepository(Like)
+    .createQueryBuilder('like')
+    .innerJoinAndMapOne('like.user', User, 'user', 'user.userId = like.userId')
+    .where('like.tweetId = :tweetId', { tweetId })
+    .getMany();
+
+  const likers = likes.map((likes) => likes.user);
+
+  const finalLikersPromises = likers.map(async (liker) => {
+    const { userId, name, username, profileImageURL } = liker;
+    const isFollowed = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: liker.userId,
+        followerId: currUserId,
+      },
+    });
+    return {
+      id: userId,
+      name: name,
+      screenName: username,
+      profileImageURL: profileImageURL,
+      isFollowed: !!isFollowed,
+    };
+  });
+  const finalLikers = await Promise.all(finalLikersPromises);
+
+  res.status(200).json({
+    status: true,
+    data: finalLikers,
+  });
 });
