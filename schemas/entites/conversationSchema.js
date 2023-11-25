@@ -5,7 +5,7 @@ module.exports = new EntitySchema({
   name: 'Conversation',
   target: Conversation,
   columns: {
-    ConversationId: {
+    conversationId: {
       primary: true,
       type: 'bigint',
       generated: 'increment',

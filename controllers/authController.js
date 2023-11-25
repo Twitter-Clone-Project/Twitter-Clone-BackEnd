@@ -78,22 +78,24 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const userRepository = AppDataSource.getRepository(User);
 
-  const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
+  if (process.env.NODE_ENV === 'production') {
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
 
-  const response = await fetch(verificationUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+    const response = await fetch(verificationUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (response.ok) {
-    const result = await response.json();
-    if (!result.success) {
-      return next(new AppError('reCAPTCHA verification failed'));
+    if (response.ok) {
+      const result = await response.json();
+      if (!result.success) {
+        return next(new AppError('reCAPTCHA verification failed'));
+      }
+    } else {
+      return next(new AppError('Error in reCAPTCHA verification'));
     }
-  } else {
-    return next(new AppError('Error in reCAPTCHA verification'));
   }
   const hashedPassword = await Password.hashPassword(password);
   const user = new User(username, name, email, hashedPassword, dateOfBirth);

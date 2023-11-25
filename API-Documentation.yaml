@@ -82,10 +82,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      userId:
+                      id:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      name: 
+                        type: string  
                       username:
                         type: string  
                       email:
@@ -147,10 +147,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      userId:
+                      id:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      name: 
+                        type: string  
                       username:
                         type: string  
                       email:
@@ -236,10 +236,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      userId:
+                      id:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      name: 
+                        type: string  
                       username:
                         type: string  
                       email:
@@ -269,7 +269,7 @@ paths:
         - application/json
       responses:
         '200':
-          description: Successful sign-out
+          description: Successful sign-in
           headers:
             Set-Cookie:
               type: string
@@ -455,10 +455,10 @@ paths:
                   user:
                     type: object
                     properties:
-                      userId:
+                      id:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      name: 
+                        type: string  
                       username:
                         type: string  
                       email:
@@ -539,9 +539,21 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
   /auth/resetPassword/{resetToken}:
-    patch:
+    post:
       tags:
         - auth
       summary: Reset the password
@@ -571,7 +583,7 @@ paths:
                 type: string
       responses:
         '200':
-          description: Successful reset password
+          description: Successful Sending a Password Change Email
           schema:
             type: object
             properties:
@@ -596,6 +608,19 @@ paths:
             application/json:
               status: false
               message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
   /profile/updateUsername:
     patch:
       tags:
@@ -778,7 +803,7 @@ paths:
       tags:
         - auth
       summary: Is this email registered?
-      description: Endpoint that Checks if a user with this email is registered befo.
+      description: Endpoint that Checks if a user with this email is registered before.
       consumes:
         - application/json
       produces:
@@ -1730,7 +1755,7 @@ paths:
               message:
                 type: string
 ###################################################                
-  /profile/{conversationId}/messages:
+  /conversations/{conversationId}/messages:
     get:
       tags:
         - profile
@@ -1769,8 +1794,11 @@ paths:
                           type: string
                         isSeen:
                           type: boolean
+                        isFromMe:
+                          type: boolean  
                         time:
-                          type: string  
+                          type: string
+                          format: date  
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1798,7 +1826,7 @@ paths:
               status: false
               message: Unauthorized user
 ####################################################
-  /profile/{conversationId}/sendMessage:
+  /conversations/{conversationId}/sendMessage:
     post:
       tags:
         - profile
@@ -1850,13 +1878,13 @@ paths:
               status: false
               message: Unauthorized user              
 ####################################################
-  /profile/conversations:
+  /conversations:
     get:
       tags:
         - profile
       summary: List the conversations of the authenticated user
       description: >-
-        Endpoint that get my conversations with all.
+        Endpoint that get my conversations with all. returned array will be sorted by last message time
       consumes:
         - application/json
       produces:
@@ -1882,6 +1910,8 @@ paths:
                         contact:
                           type: object
                           properties:
+                            imageUrl:
+                              type: string
                             id:
                               type: string
                               description: The user's ID.
@@ -1893,6 +1923,18 @@ paths:
                             username:
                               type: string
                               description: The user's name. 
+                        lastMessage:
+                          type: object
+                          properties:
+                            id: 
+                              type: integer
+                            isSeen:
+                              type: boolean
+                            timestamp: 
+                              type: string
+                              example: "2023-11-20T14:14:37.588Z"
+                            text: 
+                              type: string            
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1920,7 +1962,7 @@ paths:
               status: false
               message: Unauthorized user    
 ####################################################
-  /profile/unseenChatsCnt:
+  /conversations/unseenConversationsCnt:
     get:
       tags:
         - profile
@@ -2131,32 +2173,17 @@ paths:
                     properties:
                       profileImageURL:
                         type: string
-                        description: The profile picture of the user that create the tweet .
+                        description: The profile of the user that create the tweet.
                       screenName:
                         type: string
-                        description: The screen name of the user that make the tweet.
+                        description: The screen name of the user that create the tweet.
                       userName:
                         type: string
-                        description: The username of the user that create the tweet.
+                        description: The username that create the tweet.
                   attachmentsURL:
                     type: array
                     items:
                       type: string
-                  isLiked:
-                    type: boolean
-                    description: Is the current user liked this tweet and in this response it will be false as it just posted.
-                  isRetweeted:
-                    type: boolean
-                    description: Is the current user retweeted this tweet and in this response it will be false as it just posted.
-                  likesCount:
-                    type: integer 
-                    description: Total number of likes on tweet and in this response it will be zero as it just posted.
-                  retweetsCount:
-                    type: integer
-                    description: Total number of likes on tweet and in this response it will be zero as it just posted.
-                  repliesCount:
-                    type: integer
-                    description: Total number of replies on tweet and in this response it will be zero as it just posted.
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2255,21 +2282,6 @@ paths:
                     type: array
                     items:
                       type: string
-                  isLiked:
-                    type: boolean
-                    description: Is the current user liked this tweet.
-                  isRetweeted:
-                    type: boolean
-                    description: Is the current user retweeted this tweet.
-                  likesCount:
-                    type: integer 
-                    description: Total number of likes on tweet.
-                  retweetsCount:
-                    type: integer
-                    description: Total number of likes on tweet.
-                  repliesCount:
-                    type: integer
-                    description: Total number of replies on tweet.
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2426,13 +2438,12 @@ paths:
                 type: boolean
               message:
                 type: string
-
   /tweets/{tweetId}/retweet: 
     post:
       tags:
         - tweets
       summary: Add a retweet.
-      description: Endpoint to add a retweet which takes a tweetId and userId from cookies .
+      description: Endpoint to add a retweet which takes a tweetId and userId .
       consumes:
         - application/json
       produces:
@@ -2440,9 +2451,19 @@ paths:
       parameters:
         - name: tweetId
           in: path
-          description: The tweetId of tweet that retweeted.
-          required: true
           type: string
+          description: The userId that add retweet.
+          required: true
+        - name: body
+          in: body
+          description: The retweet to add.
+          required: true
+          schema:
+            type: object
+            properties:
+              retweetId:
+                type: string
+                description: The ID of the tweet to retweet.
       responses:
         '200':
           description: Successful Add
@@ -2498,9 +2519,6 @@ paths:
                     id:
                       type: string
                       description: The ID of the tweet.
-                    isRetweet:
-                      type: boolean
-                      description: is this response tweet or retweet.
                     text:
                       type: string
                       description: The text of the tweet.
@@ -2541,22 +2559,6 @@ paths:
                         profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet .
-                    isLiked:
-                      type: boolean
-                      description: Is the current user liked this tweet.
-                    isRetweeted:
-                      type: boolean
-                      description: Is the current user retweeted this tweet.
-                    likesCount:
-                      type: integer 
-                      description: Total number of likes on tweet.
-                    retweetsCount:
-                      type: integer
-                      description: Total number of likes on tweet.
-                    repliesCount:
-                      type: integer
-                      description: Total number of replies on tweet.
-                    
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -2566,7 +2568,6 @@ paths:
                 type: boolean
               message:
                 type: string
- 
   /tweets/{retweetId}/deleteRetweet: 
     delete:
       tags:
@@ -2789,7 +2790,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /tweets/search?searchString="search string": 
+  /tweets/search: 
     get:
       tags:
         - search
@@ -2945,6 +2946,7 @@ paths:
                 type: boolean
               message:
                 type: string
+
 #######Timeline#######
   /users/{userId}/timeline:
     get:
@@ -2978,9 +2980,6 @@ paths:
                     id:
                       type: string
                       description: The ID of the tweet.
-                    isRetweet:
-                      type: boolean
-                      description: is this response tweet or retweet.
                     text:
                       type: string
                       description: The text of the tweet.
@@ -2991,51 +2990,21 @@ paths:
                       type: array
                       items:
                         type: string
-                    retweetedUser:
-                      type: object
-                      properties:
-                        userId:
-                          type: string
-                          description: The ID of the user who retweeted.
-                        userName:
-                          type: string
-                          description: The name of the user who retweeted.
-                        screenName:
-                          type: string
-                          description: The screen name of the user who retweeted.
-                        profileImageURL:
-                          type: string
-                          description: The profile picture of the user who retweeted.
                     user:
                       type: object
                       properties:
-                        userId:
+                        userid:
                           type: string
-                          description: The ID of the user who retweeted.
+                          description: The ID of the user who posted the tweet.
                         userName:
                           type: string
-                          description: The username of the user that create the tweet.
+                          description: The name of the user who posted the tweet.
                         screenName:
                           type: string
-                          description: The screen name of the user that make the tweet.
+                          description: The screen name of the user who posted the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
-                    isLiked:
-                      type: boolean
-                      description: Is the current user liked this tweet.
-                    isRetweeted:
-                      type: boolean
-                      description: Is the current user retweeted this tweet.
-                    likesCount:
-                      type: integer 
-                      description: Total number of likes on tweet.
-                    retweetsCount:
-                      type: integer
-                      description: Total number of likes on tweet.
-                    repliesCount:
-                      type: integer
-                      description: Total number of replies on tweet.
+                          description: The profile picture of the user who posted the tweet.
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3077,9 +3046,6 @@ paths:
                     id:
                       type: string
                       description: The ID of the tweet.
-                    isRetweet:
-                      type: boolean
-                      description: is this response tweet or retweet.
                     text:
                       type: string
                       description: The text of the tweet.
@@ -3090,51 +3056,21 @@ paths:
                       type: array
                       items:
                         type: string
-                    retweetedUser:
-                      type: object
-                      properties:
-                        userId:
-                          type: string
-                          description: The ID of the user who retweeted.
-                        userName:
-                          type: string
-                          description: The name of the user who retweeted.
-                        screenName:
-                          type: string
-                          description: The screen name of the user who retweeted.
-                        profileImageURL:
-                          type: string
-                          description: The profile picture of the user who retweeted.
                     user:
                       type: object
                       properties:
-                        userId:
+                        userid:
                           type: string
-                          description: The ID of the user who retweeted.
+                          description: The ID of the user who posted the tweet.
                         userName:
                           type: string
-                          description: The username of the user that create the tweet.
+                          description: The name of the user who posted the tweet.
                         screenName:
                           type: string
-                          description: The screen name of the user that make the tweet.
+                          description: The screen name of the user who posted the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
-                    isLiked:
-                      type: boolean
-                      description: Is the current user liked this tweet.
-                    isRetweeted:
-                      type: boolean
-                      description: Is the current user retweeted this tweet.
-                    likesCount:
-                      type: integer 
-                      description: Total number of likes on tweet.
-                    retweetsCount:
-                      type: integer
-                      description: Total number of likes on tweet.
-                    repliesCount:
-                      type: integer
-                      description: Total number of replies on tweet.
+                          description: The profile picture of the user who posted the tweet.
         '400':
           description: Bad request - something went wrong
           schema:
@@ -3185,9 +3121,6 @@ paths:
                     id:
                       type: string
                       description: The ID of the tweet.
-                    isRetweet:
-                      type: boolean
-                      description: is this response tweet or retweet.
                     text:
                       type: string
                       description: The text of the tweet.
@@ -3198,51 +3131,21 @@ paths:
                       type: array
                       items:
                         type: string
-                    retweetedUser:
-                      type: object
-                      properties:
-                        userId:
-                          type: string
-                          description: The ID of the user who retweeted.
-                        userName:
-                          type: string
-                          description: The name of the user who retweeted.
-                        screenName:
-                          type: string
-                          description: The screen name of the user who retweeted.
-                        profileImageURL:
-                          type: string
-                          description: The profile picture of the user who retweeted.
                     user:
                       type: object
                       properties:
                         userId:
                           type: string
-                          description: The ID of the user who retweeted.
+                          description: The ID of the user who posted the tweet.
                         userName:
                           type: string
-                          description: The username of the user that create the tweet.
+                          description: The name of the user who posted the tweet.
                         screenName:
                           type: string
-                          description: The screen name of the user that make the tweet.
+                          description: The screen name of the user who posted the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
-                    isLiked:
-                      type: boolean
-                      description: Is the current user liked this tweet.
-                    isRetweeted:
-                      type: boolean
-                      description: Is the current user retweeted this tweet.
-                    likesCount:
-                      type: integer 
-                      description: Total number of likes on tweet.
-                    retweetsCount:
-                      type: integer
-                      description: Total number of likes on tweet.
-                    repliesCount:
-                      type: integer
-                      description: Total number of replies on tweet.
+                          description: The profile picture of the user who posted the tweet.
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3293,9 +3196,6 @@ paths:
                     id:
                       type: string
                       description: The ID of the tweet.
-                    isRetweet:
-                      type: boolean
-                      description: is this response tweet or retweet.
                     text:
                       type: string
                       description: The text of the tweet.
@@ -3306,51 +3206,21 @@ paths:
                       type: array
                       items:
                         type: string
-                    retweetedUser:
-                      type: object
-                      properties:
-                        userId:
-                          type: string
-                          description: The ID of the user who retweeted.
-                        userName:
-                          type: string
-                          description: The name of the user who retweeted.
-                        screenName:
-                          type: string
-                          description: The screen name of the user who retweeted.
-                        profileImageURL:
-                          type: string
-                          description: The profile picture of the user who retweeted.
                     user:
                       type: object
                       properties:
                         userId:
                           type: string
-                          description: The ID of the user who retweeted.
+                          description: The ID of the user who posted the tweet.
                         userName:
                           type: string
-                          description: The username of the user that create the tweet.
+                          description: The name of the user who posted the tweet.
                         screenName:
                           type: string
-                          description: The screen name of the user that make the tweet.
+                          description: The screen name of the user who posted the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
-                    isLiked:
-                      type: boolean
-                      description: Is the current user liked this tweet.
-                    isRetweeted:
-                      type: boolean
-                      description: Is the current user retweeted this tweet.
-                    likesCount:
-                      type: integer 
-                      description: Total number of likes on tweet.
-                    retweetsCount:
-                      type: integer
-                      description: Total number of likes on tweet.
-                    repliesCount:
-                      type: integer
-                      description: Total number of replies on tweet.
+                          description: The profile picture of the user who posted the tweet.
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3436,9 +3306,6 @@ paths:
                     id:
                       type: string
                       description: The ID of the tweet.
-                    isRetweet:
-                      type: boolean
-                      description: is this response tweet or retweet.
                     text:
                       type: string
                       description: The text of the tweet.
@@ -3449,51 +3316,21 @@ paths:
                       type: array
                       items:
                         type: string
-                    retweetedUser:
-                      type: object
-                      properties:
-                        userId:
-                          type: string
-                          description: The ID of the user who retweeted.
-                        userName:
-                          type: string
-                          description: The name of the user who retweeted.
-                        screenName:
-                          type: string
-                          description: The screen name of the user who retweeted.
-                        profileImageURL:
-                          type: string
-                          description: The profile picture of the user who retweeted.
                     user:
                       type: object
                       properties:
                         userId:
                           type: string
-                          description: The ID of the user who retweeted.
+                          description: The ID of the user who posted the tweet.
                         userName:
                           type: string
-                          description: The username of the user that create the tweet.
+                          description: The name of the user who posted the tweet.
                         screenName:
                           type: string
-                          description: The screen name of the user that make the tweet.
+                          description: The screen name of the user who posted the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
-                    isLiked:
-                      type: boolean
-                      description: Is the current user liked this tweet.
-                    isRetweeted:
-                      type: boolean
-                      description: Is the current user retweeted this tweet.
-                    likesCount:
-                      type: integer 
-                      description: Total number of likes on tweet.
-                    retweetsCount:
-                      type: integer
-                      description: Total number of likes on tweet.
-                    repliesCount:
-                      type: integer
-                      description: Total number of replies on tweet.
+                          description: The profile picture of the user who posted the tweet.
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3502,4 +3339,4 @@ paths:
               status:
                 type: boolean
               message:
-                type: string   
+                type: string                                                               

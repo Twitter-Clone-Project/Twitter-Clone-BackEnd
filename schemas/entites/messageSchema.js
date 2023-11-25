@@ -5,20 +5,23 @@ module.exports = new EntitySchema({
   name: 'Message',
   target: Message,
   columns: {
-    conversationId: {
+    messageId: {
+      type: 'bigint',
       primary: true,
+      generated: true,
+      nullable: false,
+    },
+    conversationId: {
       type: 'bigint',
     },
     senderId: {
-      primary: true,
       type: 'bigint',
     },
     receiverId: {
-      primary: true,
       type: 'bigint',
     },
     time: {
-      type: 'timestamp',
+      type: 'timestamptz',
     },
     text: {
       type: 'varchar',
