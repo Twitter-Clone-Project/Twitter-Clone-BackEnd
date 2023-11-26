@@ -7,6 +7,7 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const formidable = require('express-formidable');
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./services/AppError');
 
@@ -16,6 +17,9 @@ const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// to destructure req.fields
+app.use(formidable());
 
 //headers
 app.use((req, res, next) => {
@@ -28,7 +32,6 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', true);
   next();
 });
-
 
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
