@@ -8,9 +8,11 @@ const Tweet = require('../models/entites/Tweet');
 const User = require('../models/entites/User');
 const Media = require('../models/entites/Media');
 const Reply = require('../models/entites/Reply');
+const Trend = require('../models/entites/Trend');
 const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
+const Support = require('../models/relations/Support');
 
 function getCurrentTimestamp() {
   const date = new Date(Date.now());
@@ -68,8 +70,10 @@ exports.addTweet = catchAsync(async (req, res, next) => {
     return res.status(400).json({ status: false, errors: errors.array() });
   }
   const { tweetText } = req.fields;
-
+  const { trends } = req.fields;
+  const trendsArray = trends.split(',');
   const { userId } = req.cookies;
+
   const tweet = new Tweet();
   tweet.userId = userId;
   tweet.text = tweetText;
@@ -93,6 +97,29 @@ exports.addTweet = catchAsync(async (req, res, next) => {
   media.url = attachments;
   media.type = 'image';
   const savedMedia = await AppDataSource.getRepository(Media).save(media);
+
+  //add trends
+  for (const trend of trendsArray) {
+    const existingTrend = await AppDataSource.getRepository(Trend).findOne({
+      where: {
+        name: trend,
+      },
+    });
+    let newTrend = null;
+    if (existingTrend) {
+      existingTrend.count = BigInt(existingTrend.count) + BigInt(1);
+      await AppDataSource.getRepository(Trend).save(existingTrend);
+    } else {
+      const newTrendLocal = new Trend();
+      newTrendLocal.name = trend;
+      await AppDataSource.getRepository(Trend).save(newTrendLocal);
+      newTrend = newTrendLocal;
+    }
+    const support = new Support();
+    support.trendId = existingTrend ? existingTrend.trendId : newTrend.trendId;
+    support.tweetId = tweet.tweetId;
+    const savedSupport = await AppDataSource.getRepository(Support).save(support);
+  }
 
   res.status(200).json({
     status: true,

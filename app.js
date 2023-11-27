@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // to destructure req.fields
-app.use(formidable());
+app.use(formidable({ multiples: true }));
 
 //headers
 app.use((req, res, next) => {
