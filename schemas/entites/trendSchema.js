@@ -12,6 +12,11 @@ module.exports = new EntitySchema({
     },
     name: {
       type: 'varchar',
+      length: 150,
+    },
+    count: {
+      type: 'bigint',
+      default: 1,
     },
   },
 });
