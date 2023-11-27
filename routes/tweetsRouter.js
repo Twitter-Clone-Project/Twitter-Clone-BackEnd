@@ -19,5 +19,7 @@ router.route('/:tweetId/deleteLike').delete(tweetsController.deleteLike);
 router.route('/:tweetId/media').get(tweetsController.getMediaOfTweet);
 router.route('/:tweetId/retweeters').get(tweetsController.getRetweetersOfTweet);
 router.route('/:tweetId/likers').get(tweetsController.getLikersOfTweet);
+router.route('/:tweetId/replies').get(tweetsController.getRepliesOfTweet);
+router.route('/:tweetId/retweet').post(tweetsController.retweet);
 
 module.exports = router;

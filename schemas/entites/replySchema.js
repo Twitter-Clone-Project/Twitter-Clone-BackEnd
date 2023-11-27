@@ -19,5 +19,8 @@ module.exports = new EntitySchema({
     text: {
       type: 'varchar',
     },
+    time: {
+      type: 'timestamp',
+    },
   },
 });

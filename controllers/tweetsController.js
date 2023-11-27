@@ -10,6 +10,7 @@ const Media = require('../models/entites/Media');
 const Reply = require('../models/entites/Reply');
 const Trend = require('../models/entites/Trend');
 const Like = require('../models/relations/Like');
+const LikeReply = require('../models/relations/LikeReply');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
 const Support = require('../models/relations/Support');
@@ -118,7 +119,8 @@ exports.addTweet = catchAsync(async (req, res, next) => {
     const support = new Support();
     support.trendId = existingTrend ? existingTrend.trendId : newTrend.trendId;
     support.tweetId = tweet.tweetId;
-    const savedSupport = await AppDataSource.getRepository(Support).save(support);
+    const savedSupport =
+      await AppDataSource.getRepository(Support).save(support);
   }
 
   res.status(200).json({
@@ -403,5 +405,69 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: true,
     data: finalLikers,
+  });
+});
+
+exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+
+  checkTweet(tweetId, next);
+
+  const replies = await AppDataSource.getRepository(Reply)
+    .createQueryBuilder('reply')
+    .innerJoinAndMapOne(
+      'reply.user',
+      User,
+      'user',
+      'user.userId = reply.userId',
+    )
+    .where('reply.tweetId = :tweetId', { tweetId })
+    .getMany();
+
+  const repliesPromises = replies.map(async (reply) => {
+    const likesCount = await AppDataSource.getRepository(LikeReply).count({
+      where: {
+        replyId: reply.replyId,
+      },
+    });
+    return {
+      id: reply.replyId,
+      text: reply.text,
+      username: reply.user.username,
+      bio: reply.user.bio,
+      profileImageURL: reply.user.imageUrl,
+      createdAt: reply.time,
+      likesCount: likesCount,
+    };
+  });
+  let repliesRes = await Promise.all(repliesPromises);
+  console.log(repliesRes);
+  repliesRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  console.log(repliesRes);
+
+  if (replies.length > 0) {
+    res.status(200).json({
+      status: true,
+      data: repliesRes,
+    });
+  } else {
+    return next(new AppError('There is no replies for this tweet', 404));
+  }
+});
+
+exports.retweet = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+  const currUserId = req.cookies.userId;
+
+  checkTweet(tweetId, next);
+
+  const repost = new Repost();
+  repost.userId = currUserId;
+  repost.tweetId = tweetId;
+  const savedRepost = await AppDataSource.getRepository(Repost).save(repost);
+
+  res.status(200).json({
+    status: true,
+    message: 'Repost is done successfully',
   });
 });
