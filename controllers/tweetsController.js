@@ -73,7 +73,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
   const { tweetText } = req.fields;
   const { trends } = req.fields;
   const trendsArray = trends.split(',');
-  const { userId } = req.cookies;
+  const userId = req.currentUser.userId;
 
   const tweet = new Tweet();
   tweet.userId = userId;
@@ -162,7 +162,7 @@ exports.deleteTweet = catchAsync(async (req, res, next) => {
 
 exports.getTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
   const tweet = await AppDataSource.getRepository(Tweet).findOne({
     where: {
       tweetId: tweetId,
@@ -236,7 +236,7 @@ exports.getTweet = catchAsync(async (req, res, next) => {
 
 exports.addLike = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
 
   checkTweet(tweetId, next);
 
@@ -253,7 +253,7 @@ exports.addLike = catchAsync(async (req, res, next) => {
 
 exports.deleteLike = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
 
   checkTweet(tweetId, next);
 
@@ -331,7 +331,7 @@ exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
 
 exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
 
   checkTweet(tweetId, next);
   const retweets = await AppDataSource.getRepository(Repost)
@@ -373,7 +373,7 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
 
 exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
 
   checkTweet(tweetId, next);
   const likes = await AppDataSource.getRepository(Like)
@@ -407,6 +407,7 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
     data: finalLikers,
   });
 });
+
 
 exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;

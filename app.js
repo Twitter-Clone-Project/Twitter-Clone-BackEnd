@@ -18,8 +18,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// to destructure req.fields
-app.use(formidable({ multiples: true }));
+
 
 //headers
 app.use((req, res, next) => {
@@ -33,16 +32,32 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware to handle form-data requests
+const formMiddleware = formidable({ multiples: true });
+
+app.use((req, res, next) => {
+  // Check if the request is multipart/form-data
+  if (req.is('multipart/form-data')) {
+    formMiddleware(req, res, (err) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      next();
+    });
+  } else {
+    // If not multipart/form-data, use body-parser for json and urlencoded requests
+    bodyParser.urlencoded({ extended: true })(req, res, () => {});
+    bodyParser.json()(req, res, next);
+  }
+});
+
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
 
 // Set security HTTP headers
 app.use(helmet());
 
-// Body parser, reading data from body into req.body
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 app.use(cookieParser());
 
@@ -79,12 +94,14 @@ const interactionsRoutes = require('./routes/interactionsRouter');
 const tweetsRoutes = require('./routes/tweetsRouter');
 const timelineRoutes = require('./routes/timelineRouter');
 const usersRouter = require('./routes/usersRouter');
+const trendsRouter = require('./routes/trendsRouter');
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/tweets', tweetsRoutes);
 app.use('/api/v1/users', timelineRoutes);
 app.use('/api/v1/users', interactionsRoutes);
+app.use('/api/v1/trends', trendsRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
