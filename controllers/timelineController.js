@@ -14,7 +14,7 @@ let tweetsTotalRes = [];
 let userTweetsTotalRes = [];
 const numTweetsPerPage = 10;
 
-async function getTweetInfo(tweetId, currUserId) {
+async function getTweetInfo(tweetId, userId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
       tweetId: tweetId,
@@ -33,21 +33,21 @@ async function getTweetInfo(tweetId, currUserId) {
 
   let isLiked = await AppDataSource.getRepository(Like).findOne({
     where: {
-      userId: currUserId,
+      userId: userId,
       tweetId: tweetId,
     },
   });
 
   let isReposted = await AppDataSource.getRepository(Repost).findOne({
     where: {
-      userId: currUserId,
+      userId: userId,
       tweetId: tweetId,
     },
   });
 
   let isReplied = await AppDataSource.getRepository(Reply).findOne({
     where: {
-      userId: currUserId,
+      userId: userId,
       tweetId: tweetId,
     },
   });
@@ -66,7 +66,7 @@ async function getTweetInfo(tweetId, currUserId) {
   };
 }
 
-async function getFirstTweets(userId, currUserId) {
+async function getFirstTweets(userId) {
   const tweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoin(Follow, 'follow', 'follow.userId = tweet.userId')
@@ -111,7 +111,7 @@ async function getFirstTweets(userId, currUserId) {
     .getMany();
 
   const tweetsPromises = tweets.map(async (tweet) => {
-    const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
     return {
       id: tweet.tweetId,
       isRetweet: false,
@@ -136,7 +136,7 @@ async function getFirstTweets(userId, currUserId) {
   const tweetsRes = await Promise.all(tweetsPromises);
 
   const retweetsPromises = retweets.map(async (tweet) => {
-    const retweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const retweetInfo = await getTweetInfo(tweet.tweetId, userId);
     return {
       id: tweet.tweetId,
       isRetweet: true,
@@ -170,12 +170,11 @@ async function getFirstTweets(userId, currUserId) {
 }
 
 exports.getTweets = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
-  const { pageNum } = req.fields;
-  const currUserId = req.cookies.userId;
+  const { pageNum } = req.body;
+  const userId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstTweets(userId, currUserId);
+    await getFirstTweets(userId);
   }
 
   const resTweets = tweetsTotalRes.slice(
@@ -185,6 +184,7 @@ exports.getTweets = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: true,
     data: resTweets,
+    total: tweetsTotalRes.length,
   });
 });
 
