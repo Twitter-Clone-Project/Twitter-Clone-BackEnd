@@ -13,6 +13,13 @@ const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
 const Support = require('../models/relations/Support');
 
+const multer = require('multer');
+
+// Set up multer storage and limits
+const storage = multer.memoryStorage(); // You can change this based on your requirements
+const upload = multer({ storage: storage });
+exports.uploadFiles = upload.fields([{ name: 'media', maxCount: 4 }]);
+
 function getCurrentTimestamp() {
   const date = new Date(Date.now());
   const pad = (n) => (n < 10 ? `0${n}` : n);
@@ -64,13 +71,13 @@ function getImagesUrls(req, next) {
 }
 
 exports.addTweet = catchAsync(async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ status: false, errors: errors.array() });
+  const { tweetText, trends } = req.body;
+  const files = req.files;
+  console.log(files);
+  let trendsArray = [];
+  if (trends) {
+    trendsArray = trends.split(',');
   }
-  const { tweetText } = req.fields;
-  const { trends } = req.fields;
-  const trendsArray = trends.split(',');
   const userId = req.currentUser.userId;
 
   const tweet = new Tweet();
@@ -405,7 +412,6 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
     data: finalLikers,
   });
 });
-
 
 exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;

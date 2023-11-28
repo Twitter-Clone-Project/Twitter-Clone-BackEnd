@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 
 exports.addTweetValidation = [
   body('tweetText').custom((value, { req }) => {
-    const { tweetText } = req.fields;
+    const { tweetText } = req.body;
 
     if (!tweetText || tweetText.trim() === '') {
       throw new Error('Tweet can not be empty');
