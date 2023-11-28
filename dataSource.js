@@ -32,9 +32,7 @@ const AppDataSource = new DataSource({
     process.env.NODE_ENV === 'testing' ||
     process.env.NODE_ENV === 'development' ||
     process.env.NODE_ENV === 'production',
-  logging:
-    process.env.NODE_ENV === 'testing' ||
-    process.env.NODE_ENV === 'development',
+  logging: false,
   entities: [
     userSchema,
     tweetSchema,

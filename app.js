@@ -29,7 +29,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
 

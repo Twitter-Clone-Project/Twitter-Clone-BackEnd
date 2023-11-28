@@ -4,11 +4,9 @@ const validateRequest = require('../middlewares/validateRequest');
 const {
   signupValidationRules,
   signinValidationRules,
-  otpValidationRules,
   changePasswordValidationRules,
   resetPasswordValidationRules,
   forgetPasswordValidationRules,
-  resetCodeValidationRules,
   otpWithEmailValidationRules,
 } = require('../middlewares/validations/user');
 

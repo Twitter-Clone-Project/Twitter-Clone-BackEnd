@@ -37,7 +37,7 @@ const filterObj = (obj, ...fields) => {
  * @param {string} id - The user ID
  * @returns {string} - The generated JWT token
  */
-const signToken = (id) =>
+exports.signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_TOKEN_EXPIRESIN,
   });
@@ -50,7 +50,7 @@ const signToken = (id) =>
  * @param {number} statusCode - The HTTP status code for the response
  */
 const createAndSendToken = (user, req, res, statusCode) => {
-  const token = signToken(user.userId);
+  const token = this.signToken(user.userId);
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -114,7 +114,6 @@ const createOAuth2Client = () => {
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
-
   const userRepository = AppDataSource.getRepository(User);
 
   if (process.env.NODE_ENV === 'production') {
@@ -240,7 +239,7 @@ exports.oauthGooogleCallback = async (req, res, next) => {
     return next(new AppError('User not found. Please go to sign up'));
   }
 
-  const token = signToken(user.userId);
+  const token = this.signToken(user.userId);
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -264,9 +263,7 @@ exports.signout = (req, res) => {
     httpOnly: true,
   });
 
-  res
-    .status(200)
-    .json({ status: 'success', message: 'Signed out successfully' });
+  res.status(200).json({ status: true, message: 'Signed out successfully' });
 };
 
 /**
