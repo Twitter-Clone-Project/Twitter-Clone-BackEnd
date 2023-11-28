@@ -61,13 +61,13 @@ exports.getListOfFollowers = catchAsync(async (req, res, next) => {
     .getMany();
   const isFollowedQuery = await AppDataSource.getRepository(User)
     .createQueryBuilder('user')
-    .where('follow.followerId = :userId', { userId: req.cookies.userId })
+    .where('follow.followerId = :userId', { userId: req.currentUser.userId })
     .innerJoin(Follow, 'follow', 'follow.userId = user.userId')
     .select(['user.userId'])
     .getMany();
   const isFollowingQuery = await AppDataSource.getRepository(Follow)
     .createQueryBuilder('follow')
-    .where('follow.userId = :userId', { userId: req.cookies.userId })
+    .where('follow.userId = :userId', { userId: req.currentUser.userId })
     .select(['follow.followerId'])
     .getMany();
 
@@ -106,13 +106,13 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
     .getMany();
   const isFollowedQuery = await AppDataSource.getRepository(User)
     .createQueryBuilder('user')
-    .where('follow.followerId = :userId', { userId: req.cookies.userId })
+    .where('follow.followerId = :userId', { userId: req.currentUser.userId })
     .innerJoin(Follow, 'follow', 'follow.userId = user.userId')
     .select(['user.userId'])
     .getMany();
   const isFollowingQuery = await AppDataSource.getRepository(Follow)
     .createQueryBuilder('follow')
-    .where('follow.userId = :userId', { userId: req.cookies.userId })
+    .where('follow.userId = :userId', { userId: req.currentUser.userId })
     .select(['follow.followerId'])
     .getMany();
 
@@ -154,9 +154,7 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
 
 exports.follow = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
-  const currUserId = req.cookies.userId;
-  console.log(userId);
-  console.log(currUserId);
+  const currUserId = req.currentUser.userId;
 
   const follow = new Follow();
   follow.userId = userId;
@@ -171,7 +169,7 @@ exports.follow = catchAsync(async (req, res, next) => {
 
 exports.unFollow = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
 
   const followRepository = AppDataSource.getRepository(Follow);
 
