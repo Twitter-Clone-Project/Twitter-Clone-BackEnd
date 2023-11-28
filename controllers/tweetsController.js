@@ -9,6 +9,7 @@ const Media = require('../models/entites/Media');
 const Reply = require('../models/entites/Reply');
 const Trend = require('../models/entites/Trend');
 const Like = require('../models/relations/Like');
+const LikeReply = require('../models/relations/LikeReply');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
 const Support = require('../models/relations/Support');
@@ -406,7 +407,6 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
 
@@ -456,7 +456,7 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
 
 exports.retweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
-  const currUserId = req.cookies.userId;
+  const currUserId = req.currentUser.userId;
 
   checkTweet(tweetId, next);
 
@@ -468,5 +468,88 @@ exports.retweet = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: true,
     message: 'Repost is done successfully',
+  });
+});
+
+exports.addReply = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+  const replyText = req.body.text;
+  const currUserId = req.currentUser.userId;
+
+  checkTweet(tweetId, next);
+
+  const reply = new Reply();
+  reply.userId = currUserId;
+  reply.tweetId = tweetId;
+  reply.text = replyText;
+  reply.time = getCurrentTimestamp();
+  const savedRerply = await AppDataSource.getRepository(Reply).save(reply);
+
+  res.status(200).json({
+    status: true,
+    message: 'Reply is added successfully',
+  });
+});
+
+exports.deleteReply = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+  const { replyId } = req.params;
+  const currUserId = req.currentUser.userId;
+  console.log(tweetId, replyId, currUserId);
+
+  const tweet = await AppDataSource.getRepository(Tweet).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+
+  const replyRepository = AppDataSource.getRepository(Reply);
+  let result;
+  if (currUserId == tweet.userId) {
+    result = await replyRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Reply)
+      .where('replyId = :replyId', { replyId: replyId })
+      .execute();
+  } else {
+    result = await replyRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Reply)
+      .where('replyId = :replyId', { replyId: replyId })
+      .andWhere('userId = :currUserId', { currUserId: currUserId })
+      .execute();
+  }
+
+  if (!result.affected || !(result.affected > 0))
+    return next(new AppError('Error in deleting reply', 400));
+
+  res.status(200).json({
+    status: true,
+    message: 'Reply is deleted successfully',
+  });
+});
+
+exports.deleteRetweet = catchAsync(async (req, res, next) => {
+  const { retweetId } = req.params;
+  const currUserId = req.currentUser.userId;
+  console.log(retweetId, currUserId);
+
+  const retweetsRepository = AppDataSource.getRepository(Repost);
+  result = await retweetsRepository
+    .createQueryBuilder()
+    .delete()
+    .from(Repost)
+    .where('tweetId = :retweetId', { retweetId: retweetId })
+    .andWhere('userId = :currUserId', { currUserId: currUserId })
+    .execute();
+
+  if (!result.affected || !(result.affected > 0))
+    return next(new AppError('Error in deleting retweet', 400));
+
+  res.status(200).json({
+    status: true,
+    message: 'Retweet is deleted successfully',
   });
 });
