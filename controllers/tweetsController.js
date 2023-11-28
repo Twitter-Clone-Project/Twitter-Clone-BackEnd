@@ -141,6 +141,11 @@ exports.addTweet = catchAsync(async (req, res, next) => {
         userName: user.username,
       },
       attachmentsURL: attachments,
+      isLiked: false,
+      isRetweeted: false,
+      likesCount: 0,
+      retweetsCount: 0,
+      repliesCount: 0,
     },
   });
 });
