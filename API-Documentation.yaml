@@ -845,14 +845,25 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
-                          type: string
-                        email:
+                        userId:
                           type: string
                         username:
                           type: string
                         name:
                           type: string
+                        bio:
+                          type: string
+                        imageUrl:
+                          type: string
+                        isFollowed:
+                          type: boolean 
+                        isFollowing:
+                          type: boolean 
+                        followersCount:
+                          type: integer 
+                        followingsCount:
+                          type: integer 
+
         '400':
           description: Bad request - something went wrong
           schema:
@@ -910,14 +921,24 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
-                          type: string
-                        email:
+                        userId:
                           type: string
                         username:
                           type: string
                         name:
                           type: string
+                        bio:
+                          type: string
+                        imageUrl:
+                          type: string
+                        isFollowed:
+                          type: boolean 
+                        isFollowing:
+                          type: boolean 
+                        followersCount:
+                          type: integer 
+                        followingsCount:
+                          type: integer 
         '400':
           description: Bad request - something went wrong
           schema:
