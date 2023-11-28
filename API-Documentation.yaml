@@ -76,7 +76,7 @@ paths:
               data:
                 type: object
                 properties:
-                  token: 
+                  token:
                     type: string
                     discription: All user data will return
                   user:
@@ -84,10 +84,10 @@ paths:
                     properties:
                       userId:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      isConfirmed:
+                        type: boolean
                       username:
-                        type: string  
+                        type: string
                       email:
                         type: string
         '400':
@@ -142,17 +142,17 @@ paths:
               data:
                 type: object
                 properties:
-                  token: 
+                  token:
                     type: string
                   user:
                     type: object
                     properties:
                       userId:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      isConfirmed:
+                        type: boolean
                       username:
-                        type: string  
+                        type: string
                       email:
                         type: string
         '400':
@@ -189,7 +189,7 @@ paths:
               data:
                 type: object
                 properties:
-                  authorizeUrl: 
+                  authorizeUrl:
                     type: string
                     discription: url that you should navigate to, so that the user can choose from his emails
         '400':
@@ -204,13 +204,13 @@ paths:
           examples:
             application/json:
               status: false
-              message: Something went wrong 
+              message: Something went wrong
   /auth/google/callback:
     post:
       tags:
         - auth
-      summary: The callback api where the user can choose his google account 
-      description: Endpoint for user authentication using google. This is the callback api that will redirect you after choosing your google account. the cookie will be sent to browser cookies 
+      summary: The callback api where the user can choose his google account
+      description: Endpoint for user authentication using google. This is the callback api that will redirect you after choosing your google account. the cookie will be sent to browser cookies
       consumes:
         - application/json
       produces:
@@ -230,7 +230,7 @@ paths:
               data:
                 type: object
                 properties:
-                  token: 
+                  token:
                     type: string
                     discription: All user data will return
                   user:
@@ -238,10 +238,10 @@ paths:
                     properties:
                       userId:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      isConfirmed:
+                        type: boolean
                       username:
-                        type: string  
+                        type: string
                       email:
                         type: string
         '400':
@@ -256,7 +256,7 @@ paths:
           examples:
             application/json:
               status: false
-              message: Something went wrong    
+              message: Something went wrong
   /auth/signout:
     delete:
       tags:
@@ -282,9 +282,9 @@ paths:
               data:
                 type: object
                 properties:
-                  token: 
+                  token:
                     type: string
-                    example: loggedout                  
+                    example: loggedout
         '400':
           description: Bad request - something went wrong
           schema:
@@ -297,7 +297,7 @@ paths:
           examples:
             application/json:
               status: false
-              message: Something went wrong                                 
+              message: Something went wrong
   /auth/resendConfirmEmail:
     post:
       tags:
@@ -352,7 +352,7 @@ paths:
     post:
       tags:
         - auth
-      summary: Confirm the email of the user 
+      summary: Confirm the email of the user
       description: Endpoint for user email confirmation by the otp sent to the email.
       consumes:
         - application/json
@@ -450,17 +450,17 @@ paths:
               data:
                 type: object
                 properties:
-                  token: 
-                    type: string                
+                  token:
+                    type: string
                   user:
                     type: object
                     properties:
                       userId:
                         type: bigint
-                      isConfirmed: 
-                        type: boolean  
+                      isConfirmed:
+                        type: boolean
                       username:
-                        type: string  
+                        type: string
                       email:
                         type: string
         '400':
@@ -856,13 +856,13 @@ paths:
                         imageUrl:
                           type: string
                         isFollowed:
-                          type: boolean 
+                          type: boolean
                         isFollowing:
-                          type: boolean 
+                          type: boolean
                         followersCount:
-                          type: integer 
+                          type: integer
                         followingsCount:
-                          type: integer 
+                          type: integer
 
         '400':
           description: Bad request - something went wrong
@@ -932,13 +932,13 @@ paths:
                         imageUrl:
                           type: string
                         isFollowed:
-                          type: boolean 
+                          type: boolean
                         isFollowing:
-                          type: boolean 
+                          type: boolean
                         followersCount:
-                          type: integer 
+                          type: integer
                         followingsCount:
-                          type: integer 
+                          type: integer
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1750,7 +1750,7 @@ paths:
                 type: boolean
               message:
                 type: string
-###################################################                
+  ###################################################
   /profile/{conversationId}/messages:
     get:
       tags:
@@ -1767,7 +1767,7 @@ paths:
           in: path
           description: The ID of the conversation between the two users.
           required: true
-          type: string  
+          type: string
       responses:
         '200':
           description: Successful Get Messages
@@ -1778,7 +1778,7 @@ paths:
                 type: boolean
               data:
                 type: object
-                properties:  
+                properties:
                   messages:
                     type: array
                     items:
@@ -1791,7 +1791,7 @@ paths:
                         isSeen:
                           type: boolean
                         time:
-                          type: string  
+                          type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1818,7 +1818,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-####################################################
+  ####################################################
   /profile/{conversationId}/sendMessage:
     post:
       tags:
@@ -1834,7 +1834,7 @@ paths:
         - name: conversationId
           in: path
           required: true
-          type: string  
+          type: string
       responses:
         '200':
           description: Successful Send
@@ -1843,129 +1843,6 @@ paths:
             properties:
               status:
                 type: boolean
-              
-        '400':
-          description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Something went wrong
-        '401':
-          description: Unauthorized - Should be authorized to complete the request
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Unauthorized user              
-####################################################
-  /profile/conversations:
-    get:
-      tags:
-        - profile
-      summary: List the conversations of the authenticated user
-      description: >-
-        Endpoint that get my conversations with all.
-      consumes:
-        - application/json
-      produces:
-        - application/json 
-      responses:
-        '200':
-          description: Successful Send
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              data:
-                type: object
-                properties:  
-                  conversations:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        conversationId:
-                          type: string 
-                        contact:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              description: The user's ID.
-                            email:
-                              type: string 
-                            name:
-                              type: string
-                              description: The user's name.
-                            username:
-                              type: string
-                              description: The user's name. 
-        '400':
-          description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Something went wrong
-        '401':
-          description: Unauthorized - Should be authorized to complete the request
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Unauthorized user    
-####################################################
-  /profile/unseenChatsCnt:
-    get:
-      tags:
-        - profile
-      summary: Get number of unseen conversations
-      description: >-
-        Endpoint that get my conversations with all.
-      consumes:
-        - application/json
-      produces:
-        - application/json 
-      responses:
-        '200':
-          description: Successful Get
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              data:
-                type: object
-                properties:  
-                  unseenCnt: 
-                    type: integer
-                    example: 10   
 
         '400':
           description: Bad request - something went wrong
@@ -1993,7 +1870,130 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-###################################################33              
+  ####################################################
+  /profile/conversations:
+    get:
+      tags:
+        - profile
+      summary: List the conversations of the authenticated user
+      description: >-
+        Endpoint that get my conversations with all.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Send
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  conversations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        conversationId:
+                          type: string
+                        contact:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: The user's ID.
+                            email:
+                              type: string
+                            name:
+                              type: string
+                              description: The user's name.
+                            username:
+                              type: string
+                              description: The user's name.
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  ####################################################
+  /profile/unseenChatsCnt:
+    get:
+      tags:
+        - profile
+      summary: Get number of unseen conversations
+      description: >-
+        Endpoint that get my conversations with all.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful Get
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  unseenCnt:
+                    type: integer
+                    example: 10
+
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user
+  ###################################################33
   /profile/notifications:
     post:
       tags:
@@ -2015,7 +2015,7 @@ paths:
                 type: boolean
               data:
                 type: object
-                properties:  
+                properties:
                   notifications:
                     type: array
                     items:
@@ -2026,7 +2026,7 @@ paths:
                         content:
                           type: string
                         isSeen:
-                          type: boolean      
+                          type: boolean
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2052,13 +2052,13 @@ paths:
           examples:
             application/json:
               status: false
-              message: Unauthorized user   
-###################################################              
+              message: Unauthorized user
+  ###################################################
   /profile/unseenNotificationsCnt:
     post:
       tags:
         - profile
-      summary: Get the number of unseen notifications  
+      summary: Get the number of unseen notifications
       description: >-
         Endpoint that return the number of notifications of the authenticated user.
       consumes:
@@ -2075,9 +2075,9 @@ paths:
                 type: boolean
               data:
                 type: object
-                properties:  
-                  unseenCnt: 
-                    type: integer     
+                properties:
+                  unseenCnt:
+                    type: integer
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2103,7 +2103,7 @@ paths:
           examples:
             application/json:
               status: false
-              message: Unauthorized user  
+              message: Unauthorized user
   /tweets/add:
     post:
       tags:
@@ -2170,7 +2170,7 @@ paths:
                     type: boolean
                     description: Is the current user retweeted this tweet and in this response it will be false as it just posted.
                   likesCount:
-                    type: integer 
+                    type: integer
                     description: Total number of likes on tweet and in this response it will be zero as it just posted.
                   retweetsCount:
                     type: integer
@@ -2223,8 +2223,8 @@ paths:
                 type: boolean
               message:
                 type: string
-  
-  /tweets/{tweetId}:  ## naming
+
+  /tweets/{tweetId}: ## naming
     get:
       tags:
         - tweets
@@ -2283,7 +2283,7 @@ paths:
                     type: boolean
                     description: Is the current user retweeted this tweet.
                   likesCount:
-                    type: integer 
+                    type: integer
                     description: Total number of likes on tweet.
                   retweetsCount:
                     type: integer
@@ -2367,7 +2367,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /tweets/{tweetId}/addReply:  # body object
+  /tweets/{tweetId}/addReply: # body object
     post:
       tags:
         - tweets
@@ -2412,7 +2412,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /tweets/deleteReplies/{replyId}:  
+  /tweets/{tweetId}/deleteReplies/{replyId}:
     delete:
       tags:
         - tweets
@@ -2423,6 +2423,11 @@ paths:
       produces:
         - application/json
       parameters:
+        - name: tweetId
+          in: path
+          description: The ID of the tweet which contain the reply.
+          required: true
+          type: string
         - name: replyId
           in: path
           description: The ID of the reply to delete.
@@ -2448,7 +2453,7 @@ paths:
               message:
                 type: string
 
-  /tweets/{tweetId}/retweet: 
+  /tweets/{tweetId}/retweet:
     post:
       tags:
         - tweets
@@ -2487,11 +2492,11 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/retweets:  
+  /users/{userId}/retweets:
     get:
       tags:
         - tweets
-      summary: Get a list of retweets for a user.
+      summary: Get a list of retweets for a user (Canceled).
       description: Endpoint to get a list of retweets for a user.
       consumes:
         - application/json
@@ -2569,7 +2574,7 @@ paths:
                       type: boolean
                       description: Is the current user retweeted this tweet.
                     likesCount:
-                      type: integer 
+                      type: integer
                       description: Total number of likes on tweet.
                     retweetsCount:
                       type: integer
@@ -2577,7 +2582,7 @@ paths:
                     repliesCount:
                       type: integer
                       description: Total number of replies on tweet.
-                    
+
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -2587,8 +2592,8 @@ paths:
                 type: boolean
               message:
                 type: string
- 
-  /tweets/{retweetId}/deleteRetweet: 
+
+  /tweets/{retweetId}/deleteRetweet:
     delete:
       tags:
         - tweets
@@ -2733,9 +2738,9 @@ paths:
                       type: string
                       description: The screen name of the retweeter.
                     profileImageURL:
-                        type: string
-                        description: The profile of the user that retweet.
-                    isFollowed: 
+                      type: string
+                      description: The profile of the user that retweet.
+                    isFollowed:
                       type: boolean
                       description: Is the user follow this user or not.
         '400':
@@ -2755,7 +2760,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string 
+                type: string
   /tweets/{tweetId}/likers:
     get:
       tags:
@@ -2795,12 +2800,12 @@ paths:
                       type: string
                       description: The screen name of the liker.
                     profileImageURL:
-                        type: string
-                        description: The profile of the liker.
-                    isFollowed: 
+                      type: string
+                      description: The profile of the liker.
+                    isFollowed:
                       type: boolean
                       description: Is the liker follow the user that make tweet
-                      
+
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -2810,7 +2815,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /tweets/search?searchString="search string": 
+  /tweets/search?searchString="search string":
     get:
       tags:
         - search
@@ -2884,7 +2889,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string  
+                type: string
   /tweets/{tweetId}/addMedia:
     post:
       tags:
@@ -2925,7 +2930,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /tweets/{tweetId}/media: 
+  /tweets/{tweetId}/media:
     get:
       tags:
         - tweets
@@ -2966,7 +2971,7 @@ paths:
                 type: boolean
               message:
                 type: string
-#######Timeline#######
+  #######Timeline#######
   /users/{userId}/timeline:
     get:
       tags:
@@ -3049,7 +3054,7 @@ paths:
                       type: boolean
                       description: Is the current user retweeted this tweet.
                     likesCount:
-                      type: integer 
+                      type: integer
                       description: Total number of likes on tweet.
                     retweetsCount:
                       type: integer
@@ -3069,7 +3074,7 @@ paths:
   /users/{userId}/tweets:
     get:
       tags:
-        -  timeline
+        - timeline
       summary: Get user tweets  .
       description: Endpoint to get user tweets by user_id for a specific user and get max of 10 objects in data.
       consumes:
@@ -3148,7 +3153,7 @@ paths:
                       type: boolean
                       description: Is the current user retweeted this tweet.
                     likesCount:
-                      type: integer 
+                      type: integer
                       description: Total number of likes on tweet.
                     retweetsCount:
                       type: integer
@@ -3164,7 +3169,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string 
+                type: string
         '404':
           description: No tweets found.
           schema:
@@ -3173,7 +3178,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string          
+                type: string
   /users/{userId}/mentions:
     get:
       tags:
@@ -3256,7 +3261,7 @@ paths:
                       type: boolean
                       description: Is the current user retweeted this tweet.
                     likesCount:
-                      type: integer 
+                      type: integer
                       description: Total number of likes on tweet.
                     retweetsCount:
                       type: integer
@@ -3281,7 +3286,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string          
+                type: string
   /users/{userId}/likedTweets:
     get:
       tags:
@@ -3364,7 +3369,7 @@ paths:
                       type: boolean
                       description: Is the current user retweeted this tweet.
                     likesCount:
-                      type: integer 
+                      type: integer
                       description: Total number of likes on tweet.
                     retweetsCount:
                       type: integer
@@ -3380,7 +3385,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string     
+                type: string
         '404':
           description: No tweets found.
           schema:
@@ -3424,7 +3429,7 @@ paths:
               status:
                 type: boolean
               message:
-                type: string        
+                type: string
   /trends/{trendName}/tweets:
     get:
       tags:
@@ -3507,7 +3512,7 @@ paths:
                       type: boolean
                       description: Is the current user retweeted this tweet.
                     likesCount:
-                      type: integer 
+                      type: integer
                       description: Total number of likes on tweet.
                     retweetsCount:
                       type: integer
@@ -3523,4 +3528,4 @@ paths:
               status:
                 type: boolean
               message:
-                type: string   
+                type: string

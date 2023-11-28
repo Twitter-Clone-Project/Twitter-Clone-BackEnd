@@ -2,9 +2,7 @@ const express = require('express');
 const tweetsController = require('../controllers/tweetsController');
 const authController = require('../controllers/authController');
 
-const {
-  addTweetValidation,
-} = require('../middlewares/validations/tweet');
+const { addTweetValidation } = require('../middlewares/validations/tweet');
 
 const router = express.Router();
 
@@ -25,9 +23,6 @@ router
 router
   .route('/:tweetId/deleteLike')
   .delete(authController.requireAuth, tweetsController.deleteLike);
-// router
-//   .route('/:tweetId/addMedia')
-//   .post(addMediaValidation, tweetsController.addMedia);
 router.route('/:tweetId/media').get(tweetsController.getMediaOfTweet);
 router
   .route('/:tweetId/retweeters')
@@ -35,8 +30,21 @@ router
 router
   .route('/:tweetId/likers')
   .get(authController.requireAuth, tweetsController.getLikersOfTweet);
-
 router.route('/:tweetId/replies').get(tweetsController.getRepliesOfTweet);
-router.route('/:tweetId/retweet').post(tweetsController.retweet);
+router
+  .route('/:tweetId/retweet')
+  .post(authController.requireAuth, tweetsController.retweet);
+router
+  .route('/:tweetId/addReply')
+  .post(authController.requireAuth, tweetsController.addReply);
+router
+  .route('/:tweetId/deleteReplies/:replyId')
+  .delete(authController.requireAuth, tweetsController.deleteReply);
+router
+  .route('/:retweetId/deleteRetweet')
+  .delete(authController.requireAuth, tweetsController.deleteRetweet);
+// router
+//   .route('/:tweetId/addMedia')
+//   .post(addMediaValidation, tweetsController.addMedia);
 
 module.exports = router;
