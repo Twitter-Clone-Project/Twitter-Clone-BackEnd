@@ -65,5 +65,13 @@ module.exports = new EntitySchema({
       type: 'timestamptz',
       nullable: true,
     },
+    followersCount: {
+      type: 'bigint',
+      nullable: true,
+    },
+    followingsCount: {
+      type: 'bigint',
+      nullable: true,
+    },
   },
 });

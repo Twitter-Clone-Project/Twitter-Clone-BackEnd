@@ -6,10 +6,10 @@ const router = express.Router();
 
 router
   .route('/:userId/followers')
-  .get(interactionsController.getListOfFollowers);
+  .get(authController.requireAuth, interactionsController.getListOfFollowers);
 router
-  .route('/:userId/following')
-  .get(interactionsController.getListOfFollowings);
+  .route('/:userId/followings')
+  .get(authController.requireAuth, interactionsController.getListOfFollowings);
 router
   .route('/:userId/follow')
   .post(authController.requireAuth, interactionsController.follow);
