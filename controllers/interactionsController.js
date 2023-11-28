@@ -4,6 +4,7 @@ const AppError = require('../services/AppError');
 
 const Follow = require('../models/relations/Follow');
 const User = require('../models/entites/User');
+const { USERWHITESPACABLE_TYPES } = require('@babel/types');
 
 const filterObj = (result) => {
   const newArray = result.map(
@@ -15,7 +16,8 @@ const filterObj = (result) => {
       imageUrl,
       isFollowed,
       isFollowing,
-      followerCount,
+      followersCount,
+      followingsCount,
     }) => ({
       userId,
       username,
@@ -24,7 +26,8 @@ const filterObj = (result) => {
       imageUrl,
       isFollowed,
       isFollowing,
-      followerCount,
+      followersCount,
+      followingsCount,
     }),
   );
   return newArray;
@@ -56,6 +59,8 @@ exports.getListOfFollowers = catchAsync(async (req, res, next) => {
       'user.name',
       'user.bio',
       'user.imageUrl',
+      'user.followersCount',
+      'user.followingsCount',
     ])
     .groupBy('user.userId')
     .getMany();
@@ -101,6 +106,8 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
       'user.name',
       'user.bio',
       'user.imageUrl',
+      'user.followersCount',
+      'user.followingsCount',
     ])
     .groupBy('user.userId')
     .getMany();
@@ -116,25 +123,6 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
     .select(['follow.followerId'])
     .getMany();
 
-  //   const followers = await AppDataSource.getRepository(Follow)
-  //     .createQueryBuilder('follow')
-  //     .leftJoinAndSelect('follow.follower', 'follower')
-  //     .select(['follower.userId', 'COUNT(follow.followerId) as followerCount'])
-  //     .groupBy('follower.userId')
-  //     .getRawMany();
-  //   const followings = await AppDataSource.getRepository(Follow)
-  //     .createQueryBuilder('follow')
-  //     .leftJoinAndSelect('follow.follower', 'follower')
-  //     .leftJoinAndSelect('follow.user', 'following') // Join to get followings
-  //     .select([
-  //       'follower.userId',
-  //       'COUNT(DISTINCT follower.userId) as followerCount',
-  //       'COUNT(DISTINCT following.userId) as followingCount',
-  //     ])
-  //     .groupBy('follower.userId')
-  //     .getRawMany();
-  //   console.log(followers);
-  //   console.log(followings);
   let followingList = markFollowedUsers(followingQuery, isFollowedQuery);
   followingList = markFollowingUsers(followingList, isFollowingQuery);
 
@@ -159,6 +147,22 @@ exports.follow = catchAsync(async (req, res, next) => {
   const follow = new Follow();
   follow.userId = userId;
   follow.followerId = currUserId;
+  const currUser = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: userId,
+    },
+  });
+  currUser.followersCount = BigInt(currUser.followersCount) + BigInt(1);
+
+  await AppDataSource.getRepository(User).save(currUser);
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: currUserId,
+    },
+  });
+  user.followingsCount = BigInt(currUser.followersCount) + BigInt(1);
+  await AppDataSource.getRepository(User).save(user);
+
   const savedFollow = await AppDataSource.getRepository(Follow).save(follow);
 
   res.status(200).json({
@@ -182,6 +186,22 @@ exports.unFollow = catchAsync(async (req, res, next) => {
       userId: userId,
     })
     .execute();
+
+  const currUser = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: userId,
+    },
+  });
+  currUser.followersCount = BigInt(currUser.followersCount) - BigInt(1);
+
+  await AppDataSource.getRepository(User).save(currUser);
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: currUserId,
+    },
+  });
+  user.followingsCount = BigInt(currUser.followersCount) - BigInt(1);
+  await AppDataSource.getRepository(User).save(user);
 
   if (!result.affected || !(result.affected > 0))
     return next(new AppError('error in unfollowing', 400));
