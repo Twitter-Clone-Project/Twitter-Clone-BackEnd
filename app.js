@@ -18,9 +18,8 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// to destructure req.fields
-app.use(formidable({ multiples: true }));
-
+// Middleware to handle form-data requests
+const formMiddleware = formidable({ multiples: true });
 //headers
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -33,16 +32,27 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  // Check if the request is multipart/form-data
+  if (req.is('multipart/form-data')) {
+    formMiddleware(req, res, (err) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      next();
+    });
+  } else {
+    // If not multipart/form-data, use body-parser for json and urlencoded requests
+    bodyParser.urlencoded({ extended: true })(req, res, () => {});
+    bodyParser.json()(req, res, next);
+  }
+});
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
 
 // Set security HTTP headers
 app.use(helmet());
-
-// Body parser, reading data from body into req.body
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 app.use(cookieParser());
 
