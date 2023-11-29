@@ -1,6 +1,7 @@
 const express = require('express');
 const tweetsController = require('../controllers/tweetsController');
 const authController = require('../controllers/authController');
+const validateRequest = require('../middlewares/validateRequest');
 
 const { addTweetValidation } = require('../middlewares/validations/tweet');
 
@@ -10,7 +11,9 @@ router
   .route('/add')
   .post(
     authController.requireAuth,
+    tweetsController.uploadFiles,
     addTweetValidation,
+    validateRequest,
     tweetsController.addTweet,
   );
 router.route('/:tweetId/deleteTweet').delete(tweetsController.deleteTweet);

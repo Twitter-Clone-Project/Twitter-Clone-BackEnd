@@ -7,7 +7,6 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const formidable = require('express-formidable');
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./services/AppError');
 
@@ -18,8 +17,6 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Middleware to handle form-data requests
-const formMiddleware = formidable({ multiples: true });
 //headers
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -32,27 +29,16 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  // Check if the request is multipart/form-data
-  if (req.is('multipart/form-data')) {
-    formMiddleware(req, res, (err) => {
-      if (err) {
-        next(err);
-        return;
-      }
-      next();
-    });
-  } else {
-    // If not multipart/form-data, use body-parser for json and urlencoded requests
-    bodyParser.urlencoded({ extended: true })(req, res, () => {});
-    bodyParser.json()(req, res, next);
-  }
-});
 // Data sanitization against XSS => prevent XSS attacks
 app.use(xss());
 
 // Set security HTTP headers
 app.use(helmet());
+
+// Body parser, reading data from body into req.body
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(cookieParser());
 
@@ -90,7 +76,9 @@ const tweetsRoutes = require('./routes/tweetsRouter');
 const timelineRoutes = require('./routes/timelineRouter');
 const usersRouter = require('./routes/usersRouter');
 const trendsRouter = require('./routes/trendsRouter');
+const searchRouter = require('./routes/searchRouter');
 
+app.use('/api/v1', searchRouter);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/tweets', tweetsRoutes);

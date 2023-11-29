@@ -9,12 +9,15 @@ const Reply = require('../models/entites/Reply');
 const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
+const Mention = require('../models/relations/Mention');
 
 let tweetsTotalRes = [];
 let userTweetsTotalRes = [];
+let userMentionsTotalRes = [];
+let userLikesTotalRes = [];
 const numTweetsPerPage = 10;
 
-async function getTweetInfo(tweetId, currUserId) {
+async function getTweetInfo(tweetId, userId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
       tweetId: tweetId,
@@ -33,21 +36,21 @@ async function getTweetInfo(tweetId, currUserId) {
 
   let isLiked = await AppDataSource.getRepository(Like).findOne({
     where: {
-      userId: currUserId,
+      userId: userId,
       tweetId: tweetId,
     },
   });
 
   let isReposted = await AppDataSource.getRepository(Repost).findOne({
     where: {
-      userId: currUserId,
+      userId: userId,
       tweetId: tweetId,
     },
   });
 
   let isReplied = await AppDataSource.getRepository(Reply).findOne({
     where: {
-      userId: currUserId,
+      userId: userId,
       tweetId: tweetId,
     },
   });
@@ -66,7 +69,7 @@ async function getTweetInfo(tweetId, currUserId) {
   };
 }
 
-async function getFirstTweets(userId, currUserId) {
+async function getFirstTweets(userId) {
   const tweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoin(Follow, 'follow', 'follow.userId = tweet.userId')
@@ -111,7 +114,7 @@ async function getFirstTweets(userId, currUserId) {
     .getMany();
 
   const tweetsPromises = tweets.map(async (tweet) => {
-    const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
     return {
       id: tweet.tweetId,
       isRetweet: false,
@@ -136,7 +139,7 @@ async function getFirstTweets(userId, currUserId) {
   const tweetsRes = await Promise.all(tweetsPromises);
 
   const retweetsPromises = retweets.map(async (tweet) => {
-    const retweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const retweetInfo = await getTweetInfo(tweet.tweetId, userId);
     return {
       id: tweet.tweetId,
       isRetweet: true,
@@ -170,12 +173,11 @@ async function getFirstTweets(userId, currUserId) {
 }
 
 exports.getTweets = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
-  const { pageNum } = req.fields;
-  const currUserId = req.cookies.userId;
+  const { pageNum } = req.params;
+  const userId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstTweets(userId, currUserId);
+    await getFirstTweets(userId);
   }
 
   const resTweets = tweetsTotalRes.slice(
@@ -185,6 +187,7 @@ exports.getTweets = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: true,
     data: resTweets,
+    total: tweetsTotalRes.length,
   });
 });
 
@@ -293,8 +296,8 @@ async function getFirstUserTweets(userId, currUserId) {
 
 exports.getUserTweets = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
-  const { pageNum } = req.fields;
-  const currUserId = req.cookies.userId;
+  const { pageNum } = req.params;
+  const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
     await getFirstUserTweets(userId, currUserId);
@@ -307,5 +310,146 @@ exports.getUserTweets = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: true,
     data: resTweets,
+    total: userTweetsTotalRes.length,
+  });
+});
+
+async function getFirstUserMentions(userId, currUserId) {
+  const userMentionsTweets = await AppDataSource.getRepository(Tweet)
+    .createQueryBuilder('tweet')
+    .innerJoin(Mention, 'mention', 'mention.tweetId = tweet.tweetId')
+    .innerJoinAndMapOne(
+      'tweet.user',
+      User,
+      'user',
+      'user.userId = tweet.userId',
+    )
+    .innerJoinAndMapOne(
+      'tweet.attachmentsUrl',
+      Media,
+      'mediaTweet',
+      'mediaTweet.tweetId = tweet.tweetId',
+    )
+    .where('mention.mentionedId = :userId', { userId })
+    .getMany();
+
+  const tweetsPromises = userMentionsTweets.map(async (tweet) => {
+    const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    return {
+      id: tweet.tweetId,
+      isRetweet: false,
+      text: tweet.text,
+      createdAt: tweet.time,
+      attachmentsUrl: tweet.attachmentsUrl.url,
+      retweetedUser: {},
+      user: {
+        userId: tweet.user.userId,
+        username: tweet.user.username,
+        screenName: tweet.user.name,
+        profileImageURL: tweet.user.imageUrl,
+      },
+      isLiked: tweetInfo.isLiked,
+      isRetweeted: tweetInfo.isReposted,
+      isReplied: tweetInfo.isReplied,
+      likesCount: tweetInfo.likesCount,
+      retweetsCount: tweetInfo.repostsCount,
+      repliesCount: tweetInfo.repliesCount,
+    };
+  });
+  const tweetsRes = await Promise.all(tweetsPromises);
+
+  userMentionsTotalRes = tweetsRes;
+  userMentionsTotalRes.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
+}
+
+exports.getUserMentions = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+  const { pageNum } = req.params;
+  const currUserId = req.currentUser.userId;
+
+  if (parseInt(pageNum, 10) === 1) {
+    await getFirstUserMentions(userId, currUserId);
+  }
+
+  const resTweets = userMentionsTotalRes.slice(
+    (pageNum - 1) * numTweetsPerPage,
+    pageNum * numTweetsPerPage,
+  );
+  res.status(200).json({
+    status: true,
+    data: resTweets,
+    total: userMentionsTotalRes.length,
+  });
+});
+
+async function getFirstUserLikes(userId, currUserId) {
+  const userLikesTweets = await AppDataSource.getRepository(Tweet)
+    .createQueryBuilder('tweet')
+    .innerJoin(Like, 'like', 'like.tweetId = tweet.tweetId')
+    .innerJoinAndMapOne(
+      'tweet.user',
+      User,
+      'user',
+      'user.userId = tweet.userId',
+    )
+    .innerJoinAndMapOne(
+      'tweet.attachmentsUrl',
+      Media,
+      'mediaTweet',
+      'mediaTweet.tweetId = tweet.tweetId',
+    )
+    .where('like.userId = :userId', { userId })
+    .getMany();
+
+  const tweetsPromises = userLikesTweets.map(async (tweet) => {
+    const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    return {
+      id: tweet.tweetId,
+      isRetweet: false,
+      text: tweet.text,
+      createdAt: tweet.time,
+      attachmentsUrl: tweet.attachmentsUrl.url,
+      retweetedUser: {},
+      user: {
+        userId: tweet.user.userId,
+        username: tweet.user.username,
+        screenName: tweet.user.name,
+        profileImageURL: tweet.user.imageUrl,
+      },
+      isLiked: tweetInfo.isLiked,
+      isRetweeted: tweetInfo.isReposted,
+      isReplied: tweetInfo.isReplied,
+      likesCount: tweetInfo.likesCount,
+      retweetsCount: tweetInfo.repostsCount,
+      repliesCount: tweetInfo.repliesCount,
+    };
+  });
+  const tweetsRes = await Promise.all(tweetsPromises);
+
+  userLikesTotalRes = tweetsRes;
+  userLikesTotalRes.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
+}
+
+exports.getUserLikes = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+  const { pageNum } = req.params;
+  const currUserId = req.currentUser.userId;
+
+  if (parseInt(pageNum, 10) === 1) {
+    await getFirstUserLikes(userId, currUserId);
+  }
+
+  const resTweets = userLikesTotalRes.slice(
+    (pageNum - 1) * numTweetsPerPage,
+    pageNum * numTweetsPerPage,
+  );
+  res.status(200).json({
+    status: true,
+    data: resTweets,
+    total: userLikesTotalRes.length,
   });
 });
