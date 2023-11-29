@@ -14,7 +14,7 @@
   - Retrieves a list of online users and emits it to the newly connected user.
 - **Emits**: `getOnlineUsers` - Sends a list of online users to the connected user.
 
-## `send-msg` Event
+## `msg-send` Event
 
 - **Purpose**: Sends a message from one user to another.
 - **Payload**: `message` - Object containing information about the message, including `conversationId`, `senderId`, `receiverId`, and `text`.
@@ -29,7 +29,7 @@
 ## `msg-receive` Event
 
 - **Purpose**: Sends a chat message to the receiver's socket.
-- **Payload**: `text` - The text of the message.
+- **Payload**: `message` - Object containing information about the message, including `conversationId`, `senderId`, `receiverId`, and `text`.
 - **Action**: Emits the message text to the receiver's socket.
 
 ## `chat-opened` Event

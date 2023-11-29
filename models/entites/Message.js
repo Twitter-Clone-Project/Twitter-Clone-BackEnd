@@ -6,7 +6,7 @@ class Message {
     text,
   ) {
     this.conversationId = conversationId;
-    this.senderI = senderId;
+    this.senderId = senderId;
     this.receiverId = receiverId;
     this.text = text;
     this.time = new Date();

@@ -15,5 +15,11 @@ router
     conversationsController.getConversationHistory,
   );
 
-module.exports = router;
+router
+  .route('/unseenConversationsCnt')
+  .get(
+    authController.requireAuth,
+    conversationsController.getUnseenConversationsCnt,
+  );
 
+module.exports = router;

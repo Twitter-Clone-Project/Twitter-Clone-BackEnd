@@ -70,6 +70,7 @@ module.exports = new EntitySchema({
       default: false,
     },
     socketId: {
+      unique: true,
       nullable: true,
       type: 'varchar',
       length: 150,

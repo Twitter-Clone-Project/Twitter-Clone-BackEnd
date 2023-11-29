@@ -122,3 +122,13 @@ exports.getConversationHistory = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getUnseenConversationsCnt = catchAsync(async (req, res, next) => {
+  const { userId } = req.currentUser;
+
+  const cnt = await AppDataSource.getRepository(Message).find({
+    where: [
+      { receiverId: userId, isSeen: false },
+    ],
+  });
+  console.log(cnt);
+});

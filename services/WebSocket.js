@@ -10,12 +10,12 @@ class SocketService {
   }
 
   async emitNotification(userId, content) {
-    const receiver = await AppDataSource.getRepository(User).find({
+    const receiver = await this.AppDataSource.getRepository(User).findOne({
       where: { userId },
     });
 
     const notification = new Notification(userId, content, false);
-    await AppDataSource.getRepository(Notification).insert(notification);
+    await this.AppDataSource.getRepository(Notification).insert(notification);
 
     if (receiver && receiver.socketId) {
       this.socket
@@ -26,7 +26,7 @@ class SocketService {
 
   initializeSocket(server, AppDataSource) {
     this.server = server;
-
+    this.AppDataSource = AppDataSource;
     const io = require('socket.io')(this.server, {
       cors: {
         origin: 'http://localhost:3000',
@@ -36,6 +36,7 @@ class SocketService {
 
     io.on('connection', (socket) => {
       this.socket = socket;
+      console.log('socket connected');
 
       socket.on('add-user', async (userData) => {
         await AppDataSource.getRepository(User).update(
@@ -44,14 +45,21 @@ class SocketService {
         );
 
         const onlineUsers = await AppDataSource.getRepository(User).find({
+          select: {
+            name: true,
+            userId: true,
+            username: true,
+            email: true,
+            isOnline: true,
+          },
           where: { isOnline: true },
         });
 
         socket.emit('getOnlineUsers', onlineUsers);
       });
 
-      socket.on('send-msg', async (message) => {
-        const receiver = await AppDataSource.getRepository(User).find({
+      socket.on('msg-send', async (message) => {
+        const receiver = await AppDataSource.getRepository(User).findOne({
           where: { userId: message.receiverId },
         });
 
@@ -63,24 +71,23 @@ class SocketService {
         );
         await AppDataSource.getRepository(Message).insert(newMessage);
 
-        const sender = await AppDataSource.getRepository(User).find({
+        const sender = await AppDataSource.getRepository(User).findOne({
           select: { name: true },
           where: { userId: message.senderId },
         });
 
-        await this.emitNotification(
-          message.receiverId,
-          `${sender.name} sent you a message`,
-        );
-
         if (receiver.socketId) {
-          socket.to(receiver.socketId).emit('msg-receive', message.text);
+          socket.to(receiver.socketId).emit('msg-receive', message);
+          await this.emitNotification(
+            message.receiverId,
+            `${sender.name} sent you a message`,
+          );
         }
       });
 
       socket.on('mark-notifications-as-seen', async () => {
         await AppDataSource.getRepository(Notification).update(
-          { isSeen: false },
+          { isSeen: false, isFromChat: false },
           { isSeen: true },
         );
       });

@@ -1826,58 +1826,6 @@ paths:
               status: false
               message: Unauthorized user
 ####################################################
-  /conversations/{conversationId}/sendMessage:
-    post:
-      tags:
-        - profile
-      summary: Send a message in a conversation
-      description: >-
-        Endpoint that take a message and add it at the conversation attached.
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: conversationId
-          in: path
-          required: true
-          type: string  
-      responses:
-        '200':
-          description: Successful Send
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              
-        '400':
-          description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Something went wrong
-        '401':
-          description: Unauthorized - Should be authorized to complete the request
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Unauthorized user              
-####################################################
   /conversations:
     get:
       tags:
@@ -1906,7 +1854,7 @@ paths:
                       type: object
                       properties:
                         conversationId:
-                          type: string 
+                          type: integer 
                         contact:
                           type: object
                           properties:
@@ -2014,8 +1962,8 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-###################################################33              
-  /profile/notifications:
+###################################################          
+  /notifications:
     post:
       tags:
         - profile
@@ -2075,7 +2023,7 @@ paths:
               status: false
               message: Unauthorized user   
 ###################################################              
-  /profile/unseenNotificationsCnt:
+  /notifications/unseenNotificationsCnt:
     post:
       tags:
         - profile
