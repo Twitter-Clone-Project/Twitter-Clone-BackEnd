@@ -83,6 +83,11 @@ async function uploadMedia(mediaArray) {
 exports.addTweet = catchAsync(async (req, res, next) => {
   const { tweetText, trends } = req.body;
   const files = req.files;
+
+  if (!files || !files.media) {
+    return next(new AppError('No media files provided', 400));
+  }
+
   if (files.media.length > 4)
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
