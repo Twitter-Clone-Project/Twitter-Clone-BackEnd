@@ -5,15 +5,15 @@ const authController = require('../controllers/authController');
 const router = express.Router();
 
 router
-  .route('/:userId/followers')
+  .route('/:username/followers')
   .get(authController.requireAuth, interactionsController.getListOfFollowers);
 router
-  .route('/:userId/followings')
+  .route('/:username/followings')
   .get(authController.requireAuth, interactionsController.getListOfFollowings);
 router
-  .route('/:userId/follow')
+  .route('/:username/follow')
   .post(authController.requireAuth, interactionsController.follow);
 router
-  .route('/:userId/unfollow')
+  .route('/:username/unfollow')
   .delete(authController.requireAuth, interactionsController.unFollow);
 module.exports = router;
