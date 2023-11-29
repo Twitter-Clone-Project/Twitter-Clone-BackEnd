@@ -146,12 +146,18 @@ async function getFirstTweets(userId) {
 
   const retweetsPromises = retweets.map(async (tweet) => {
     const retweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const retweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const retweetMediaUrls = retweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: true,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: retweetMediaUrls,
       retweetedUser: {
         userId: tweet.retweeter.userId,
         username: tweet.retweeter.username,
@@ -241,12 +247,18 @@ async function getFirstUserTweets(userId, currUserId) {
 
   const tweetsPromises = userTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
@@ -266,12 +278,18 @@ async function getFirstUserTweets(userId, currUserId) {
 
   const retweetsPromises = userRetweets.map(async (tweet) => {
     const retweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const retweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const retweetMediaUrls = retweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: true,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: retweetMediaUrls,
       retweetedUser: {
         userId: tweet.retweeter.userId,
         username: tweet.retweeter.username,
@@ -341,12 +359,18 @@ async function getFirstUserMentions(userId, currUserId) {
 
   const tweetsPromises = userMentionsTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
@@ -411,12 +435,18 @@ async function getFirstUserLikes(userId, currUserId) {
 
   const tweetsPromises = userLikesTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
