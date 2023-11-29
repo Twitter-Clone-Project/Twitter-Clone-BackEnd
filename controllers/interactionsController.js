@@ -4,7 +4,6 @@ const AppError = require('../services/AppError');
 
 const Follow = require('../models/relations/Follow');
 const User = require('../models/entites/User');
-const { USERWHITESPACABLE_TYPES } = require('@babel/types');
 
 const filterObj = (result) => {
   const newArray = result.map(
@@ -85,20 +84,15 @@ exports.getListOfFollowers = catchAsync(async (req, res, next) => {
 
   let followersList = markFollowedUsers(followersQuery, isFollowedQuery);
   followersList = markFollowingUsers(followersList, isFollowingQuery);
-  console.log(followersList);
   followersList = filterObj(followersList);
+  res.status(200).json({
+    status: true,
+    data: {
+      users: followersList,
+      name: name,
+    },
+  });
 
-  if (followersList.length > 0) {
-    res.status(200).json({
-      status: true,
-      data: {
-        users: followersList,
-        name: name,
-      },
-    });
-  } else {
-    return next(new AppError('There is no followers for this user', 404));
-  }
 });
 
 exports.getListOfFollowings = catchAsync(async (req, res, next) => {
@@ -143,7 +137,7 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
 
   followingList = filterObj(followingList);
 
-  if (followingList.length > 0) {
+
     res.status(200).json({
       status: true,
       data: {
@@ -151,9 +145,6 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
         name: name,
       },
     });
-  } else {
-    return next(new AppError('There is no followings for this user', 404));
-  }
 });
 
 exports.follow = catchAsync(async (req, res, next) => {
