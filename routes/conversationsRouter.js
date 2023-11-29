@@ -8,4 +8,12 @@ router
   .route('/')
   .get(authController.requireAuth, conversationsController.getConversations);
 
+router
+  .route('/:conversationId/history')
+  .get(
+    authController.requireAuth,
+    conversationsController.getConversationHistory,
+  );
+
 module.exports = router;
+

@@ -1,5 +1,6 @@
 const http = require('http');
 const dotenv = require('dotenv');
+const socketService = require('./services/WebSocket');
 
 process.on('uncaughtException', (err) => {
   console.log('uncaught exception'.toUpperCase(), ',Shutting down......');
@@ -15,6 +16,7 @@ const { AppDataSource } = require('./dataSource');
 
 app.use((req, res, next) => {
   req.appDataSource = AppDataSource;
+  console.log(req.appDataSource);
   next();
 });
 
@@ -28,6 +30,8 @@ let server;
         console.log(`Express server listening on port ${PORT} 🫡`);
       });
     }
+
+    socketService.initializeSocket(server, AppDataSource);
   } catch (err) {
     console.log(err.name, err.message);
     process.exit(1);

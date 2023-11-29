@@ -87,3 +87,38 @@ exports.getConversations = catchAsync(async (req, res, next) => {
     data: { conversations: sortedConversations },
   });
 });
+
+exports.getConversationHistory = catchAsync(async (req, res, next) => {
+  const { conversationId } = req.params;
+  const { userId } = req.currentUser;
+
+  const messages = await AppDataSource.getRepository(Message).find({
+    select: {
+      senderId: true,
+      messageId: true,
+      isSeen: true,
+      time: true,
+      text: true,
+      messageId: true,
+    },
+    where: {
+      conversationId,
+    },
+    order: { time: 'ASC' },
+  });
+
+  const history = messages.map((message) => {
+    if (message.senderId === userId) {
+      message = { ...message, isFromMe: true };
+    } else {
+      message = { ...message, isFromMe: false };
+    }
+    return message;
+  });
+
+  res.status(200).json({
+    status: true,
+    data: { messages: history },
+  });
+});
+

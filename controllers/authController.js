@@ -9,6 +9,7 @@ const AppError = require('../services/AppError');
 const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
+const socketService = require('../services/WebSocket');
 
 const filterObj = (obj, ...fields) => {
   const filteredObj = {};
@@ -40,6 +41,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
     user,
     'userId',
     'isConfirmed',
+    'isOnline',
     'username',
     'name',
     'email',
@@ -133,6 +135,7 @@ exports.signin = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.name',
+      'user.isOnline',
     ])
     .from(User, 'user')
     .where('user.email = :email', { email })
@@ -232,7 +235,13 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
 
   const user = await AppDataSource.getRepository(User)
     .createQueryBuilder()
-    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .select([
+      'user.username',
+      'user.email',
+      'user.userId',
+      'user.isConfirmed',
+      'user.isOnline',
+    ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: payload.id })
     .getOne();
@@ -251,6 +260,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
     select: {
       userId: true,
       isConfirmed: true,
+      isOnline: true,
       username: true,
       email: true,
       name: true,
@@ -267,6 +277,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
         'email',
         'userId',
         'isConfirmed',
+        'isOnline',
       ),
     },
   });
@@ -287,6 +298,7 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
       username: true,
       otp: true,
       isConfirmed: true,
+      isOnline: true,
       email: true,
       userId: true,
     },
@@ -331,6 +343,7 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
     select: {
       userId: true,
       isConfirmed: true,
+      isOnline: true,
       username: true,
       email: true,
       name: true,
@@ -362,6 +375,7 @@ exports.changePassword = catchAsync(async (req, res, next) => {
       'user.email',
       'user.userId',
       'user.isConfirmed',
+      'user.isOnline',
       'user.name',
     ])
     .from(User, 'user')
@@ -429,6 +443,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
       userId: true,
       username: true,
       isConfirmed: true,
+      isOnline: true,
       email: true,
       name: true,
     },

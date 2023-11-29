@@ -4,15 +4,14 @@ class Message {
     senderId,
     receiverId,
     text,
-    time,
-    isSeen = false,
   ) {
     this.conversationId = conversationId;
     this.senderI = senderId;
     this.receiverId = receiverId;
     this.text = text;
-    this.time = time;
-    this.isSeen = isSeen;
+    this.time = new Date();
+    this.isSeen = false;
   }
 }
+
 module.exports = Message;

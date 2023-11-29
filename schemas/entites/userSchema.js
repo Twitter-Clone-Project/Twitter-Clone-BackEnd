@@ -65,5 +65,14 @@ module.exports = new EntitySchema({
       type: 'timestamptz',
       nullable: true,
     },
+    isOnline: {
+      type: 'boolean',
+      default: false,
+    },
+    socketId: {
+      nullable: true,
+      type: 'varchar',
+      length: 150,
+    },
   },
 });

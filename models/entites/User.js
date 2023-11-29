@@ -16,6 +16,8 @@ class User {
     this.otp = undefined;
     this.otpExpires = undefined;
     this.userId = undefined;
+    this.socketId = undefined;
+    this.isOnline = false;
   }
 
   createOTP() {

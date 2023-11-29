@@ -1755,7 +1755,7 @@ paths:
               message:
                 type: string
 ###################################################                
-  /conversations/{conversationId}/messages:
+  /conversations/{conversationId}/history:
     get:
       tags:
         - profile

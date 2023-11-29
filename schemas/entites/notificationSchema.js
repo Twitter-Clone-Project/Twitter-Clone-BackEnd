@@ -18,6 +18,11 @@ module.exports = new EntitySchema({
     },
     isSeen: {
       type: 'boolean',
+      default: false,
+    },
+    isFromChat: {
+      type: 'boolean',
+      default: false,
     },
   },
   relations: {
