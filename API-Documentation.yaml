@@ -2477,12 +2477,8 @@ paths:
             properties:
               status:
                 type: boolean
-              data:
-                type: object
-                properties:
-                  retweetId:
-                    type: string
-                    description: The ID of the new tweet.
+              message:
+                type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2593,7 +2589,7 @@ paths:
               message:
                 type: string
 
-  /tweets/{retweetId}/deleteRetweet:
+  /tweets/{tweetId}/deleteRetweet:
     delete:
       tags:
         - tweets
@@ -2604,7 +2600,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: retweetId
+        - name: tweetId
           in: path
           description: The ID of the retweet to delete.
           required: true
@@ -2972,7 +2968,7 @@ paths:
               message:
                 type: string
   #######Timeline#######
-  /users/{userId}/timeline:
+  /users/{pageNum}/timeline:
     get:
       tags:
         - timeline
@@ -2983,9 +2979,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: pageNum
           in: path
-          description: The ID of the user to get the home page timeline for.
+          description: The pageNum to get in the timeline.
           required: true
           type: string
       responses:
@@ -3053,6 +3049,9 @@ paths:
                     isRetweeted:
                       type: boolean
                       description: Is the current user retweeted this tweet.
+                    isReplied:
+                      type: boolean
+                      description: Is the current user replied to this tweet.
                     likesCount:
                       type: integer
                       description: Total number of likes on tweet.
@@ -3071,7 +3070,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/tweets:
+  /users/{userId}/tweets/{pageNum}:
     get:
       tags:
         - timeline
@@ -3085,6 +3084,11 @@ paths:
         - name: userId
           in: path
           description: The ID of the user to get the tweets for.
+          required: true
+          type: string
+        - name: pageNum
+          in: path
+          description: The pageNum of the tweets of user.
           required: true
           type: string
       responses:
@@ -3152,6 +3156,9 @@ paths:
                     isRetweeted:
                       type: boolean
                       description: Is the current user retweeted this tweet.
+                    isReplied:
+                      type: boolean
+                      description: Is the current user replied to this tweet.
                     likesCount:
                       type: integer
                       description: Total number of likes on tweet.
@@ -3179,7 +3186,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/mentions:
+  /users/{userId}/mentions/{pageNum}:
     get:
       tags:
         - timeline
@@ -3193,6 +3200,11 @@ paths:
         - name: userId
           in: path
           description: The ID of the user to get the mentions for.
+          required: true
+          type: string
+        - name: pageNum
+          in: path
+          description: The pageNum of the mentions of user.
           required: true
           type: string
       responses:
@@ -3260,6 +3272,9 @@ paths:
                     isRetweeted:
                       type: boolean
                       description: Is the current user retweeted this tweet.
+                    isReplied:
+                      type: boolean
+                      description: Is the current user replied to this tweet.
                     likesCount:
                       type: integer
                       description: Total number of likes on tweet.
@@ -3287,7 +3302,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/likedTweets:
+  /users/{userId}/likedTweets/{pageNum}:
     get:
       tags:
         - timeline
@@ -3301,6 +3316,11 @@ paths:
         - name: userId
           in: path
           description: The ID of the user to get the liked tweets for.
+          required: true
+          type: string
+        - name: pageNum
+          in: path
+          description: The pageNum of the likes of user.
           required: true
           type: string
       responses:
@@ -3368,6 +3388,9 @@ paths:
                     isRetweeted:
                       type: boolean
                       description: Is the current user retweeted this tweet.
+                    isReplied:
+                      type: boolean
+                      description: Is the current user replied to this tweet.
                     likesCount:
                       type: integer
                       description: Total number of likes on tweet.
