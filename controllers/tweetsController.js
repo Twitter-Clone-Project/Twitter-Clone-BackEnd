@@ -81,13 +81,19 @@ async function uploadMedia(mediaArray) {
 }
 
 exports.addTweet = catchAsync(async (req, res, next) => {
-  const { tweetText, trends } = req.body;
+  let { tweetText } = req.body;
+  const { trends } = req.body;
   const files = req.files;
   let validMedia = true;
   if (!files || !files.media) {
     validMedia = false;
   }
-
+  if (!validMedia && (!tweetText || tweetText == '')) {
+    return next(new AppError('tweet can not be empty', 400));
+  }
+  if (validMedia && (!tweetText || tweetText == '')) {
+    tweetText = '';
+  }
   if (validMedia && files.media.length > 4)
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
@@ -366,15 +372,14 @@ exports.addMedia = catchAsync(async (req, res, next) => {
     }
   }
 
-  if(validMedia){
-  res.status(200).json({
-    status: true,
-    message: 'media is added successfully',
-  });
-}
-else {
-  return next(new AppError('No media provided', 400));
-}
+  if (validMedia) {
+    res.status(200).json({
+      status: true,
+      message: 'media is added successfully',
+    });
+  } else {
+    return next(new AppError('No media provided', 400));
+  }
 });
 
 exports.getMediaOfTweet = catchAsync(async (req, res, next) => {

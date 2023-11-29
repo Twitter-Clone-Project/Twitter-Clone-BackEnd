@@ -12,8 +12,6 @@ router
   .post(
     authController.requireAuth,
     tweetsController.uploadFiles,
-    addTweetValidation,
-    validateRequest,
     tweetsController.addTweet,
   );
 router.route('/:tweetId/deleteTweet').delete(tweetsController.deleteTweet);

@@ -41,7 +41,7 @@ exports.addTweetValidation = [
 
 exports.addMediaValidation = [
   body('media').custom((value, { req }) => {
-    const attachmentsArray = Array.isArray(req.fields.attachments)
+    const attachmentsArray = Array.isArray(req.files.media)
       ? req.fields.attachments
       : [req.fields.attachments];
 
