@@ -83,12 +83,12 @@ async function uploadMedia(mediaArray) {
 exports.addTweet = catchAsync(async (req, res, next) => {
   const { tweetText, trends } = req.body;
   const files = req.files;
-
+  let validMedia = true;
   if (!files || !files.media) {
-    return next(new AppError('No media files provided', 400));
+    validMedia = false;
   }
 
-  if (files.media.length > 4)
+  if (validMedia && files.media.length > 4)
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
     );
@@ -110,7 +110,10 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       userId: userId,
     },
   });
-  const attachments = await uploadMedia(files.media);
+  let attachments = [];
+  if (validMedia) {
+    attachments = await uploadMedia(files.media);
+  }
 
   for (const m of attachments) {
     const media = new Media();
@@ -149,7 +152,10 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       tweetId: savedTweet.tweetId,
     },
   });
-  const tweetMediaUrls = tweetMedia.map((media) => media.url);
+  let tweetMediaUrls = [];
+  if (validMedia) {
+    tweetMediaUrls = tweetMedia.map((media) => media.url);
+  }
   res.status(200).json({
     status: true,
     data: {
@@ -316,8 +322,11 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
 
 exports.addMedia = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
+  let validMedia = true;
   const files = req.files;
-
+  if (!files || !files.media) {
+    validMedia = false;
+  }
   checkTweet(tweetId, next);
   const tweetRepository = AppDataSource.getRepository(Tweet);
   const tweet = await AppDataSource.getRepository(Tweet).findOne({
@@ -330,11 +339,14 @@ exports.addMedia = catchAsync(async (req, res, next) => {
       tweetId: tweetId,
     },
   });
-  if (media.length + files.media.length > 4)
+  if (validMedia && media.length + files.media.length > 4)
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
     );
-  const uploadMed = await uploadMedia(files.media);
+  let uploadMed = [];
+  if (validMedia) {
+    uploadMed = await uploadMedia(files.media);
+  }
 
   if (!media || media.length === 0) {
     for (const m of uploadMed) {
@@ -354,10 +366,15 @@ exports.addMedia = catchAsync(async (req, res, next) => {
     }
   }
 
+  if(validMedia){
   res.status(200).json({
     status: true,
     message: 'media is added successfully',
   });
+}
+else {
+  return next(new AppError('No media provided', 400));
+}
 });
 
 exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
