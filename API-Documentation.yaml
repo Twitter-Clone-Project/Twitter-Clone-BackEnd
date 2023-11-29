@@ -3061,6 +3061,8 @@ paths:
                     repliesCount:
                       type: integer
                       description: Total number of replies on tweet.
+              total:
+                type: integer
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3168,6 +3170,8 @@ paths:
                     repliesCount:
                       type: integer
                       description: Total number of replies on tweet.
+              total:
+                type: integer
         '400':
           description: Bad request - something went wrong
           schema:
@@ -3284,6 +3288,8 @@ paths:
                     repliesCount:
                       type: integer
                       description: Total number of replies on tweet.
+              total:
+                type: integer
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3400,6 +3406,8 @@ paths:
                     repliesCount:
                       type: integer
                       description: Total number of replies on tweet.
+              total:
+                type: integer
         '400':
           description: Bad request - something went wrong.
           schema:
