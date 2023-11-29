@@ -48,10 +48,17 @@ function markFollowingUsers(array1, array2) {
   });
 }
 exports.getListOfFollowers = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
+
+  const name = user.name;
   const followersQuery = await AppDataSource.getRepository(User)
     .createQueryBuilder('user')
-    .where('follow.userId = :userId', { userId: userId })
+    .where('follow.userId = :userId', { userId: user.userId })
     .innerJoin(Follow, 'follow', 'follow.followerId = user.userId')
     .select([
       'user.userId',
@@ -86,6 +93,7 @@ exports.getListOfFollowers = catchAsync(async (req, res, next) => {
       status: true,
       data: {
         users: followersList,
+        name: name,
       },
     });
   } else {
@@ -94,11 +102,18 @@ exports.getListOfFollowers = catchAsync(async (req, res, next) => {
 });
 
 exports.getListOfFollowings = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
 
+  const name = user.name;
+  console.log(name);
   const followingQuery = await AppDataSource.getRepository(User)
     .createQueryBuilder('user')
-    .where('follow.followerId = :userId', { userId: userId })
+    .where('follow.followerId = :userId', { userId: user.userId })
     .innerJoin(Follow, 'follow', 'follow.userId = user.userId')
     .select([
       'user.userId',
@@ -133,6 +148,7 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
       status: true,
       data: {
         users: followingList,
+        name: name,
       },
     });
   } else {
@@ -141,28 +157,28 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
 });
 
 exports.follow = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const currUserId = req.currentUser.userId;
 
-  const follow = new Follow();
-  follow.userId = userId;
-  follow.followerId = currUserId;
-  const currUser = await AppDataSource.getRepository(User).findOne({
+  const user = await AppDataSource.getRepository(User).findOne({
     where: {
-      userId: userId,
+      username: username,
     },
   });
-  currUser.followersCount = BigInt(currUser.followersCount) + BigInt(1);
+  console.log(user);
+  user.followersCount = BigInt(user.followersCount) + BigInt(1);
+  await AppDataSource.getRepository(User).save(user);
 
-  await AppDataSource.getRepository(User).save(currUser);
-  const user = await AppDataSource.getRepository(User).findOne({
+  const currUser = await AppDataSource.getRepository(User).findOne({
     where: {
       userId: currUserId,
     },
   });
-  user.followingsCount = BigInt(currUser.followersCount) + BigInt(1);
-  await AppDataSource.getRepository(User).save(user);
-
+  currUser.followingsCount = BigInt(currUser.followingsCount) + BigInt(1);
+  await AppDataSource.getRepository(User).save(currUser);
+  const follow = new Follow();
+  follow.userId = user.userId;
+  follow.followerId = currUserId;
   const savedFollow = await AppDataSource.getRepository(Follow).save(follow);
 
   res.status(200).json({
@@ -172,36 +188,35 @@ exports.follow = catchAsync(async (req, res, next) => {
 });
 
 exports.unFollow = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const currUserId = req.currentUser.userId;
 
-  const followRepository = AppDataSource.getRepository(Follow);
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
+  user.followersCount = BigInt(user.followersCount) - BigInt(1);
+  await AppDataSource.getRepository(User).save(user);
 
+  const currUser = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: currUserId,
+    },
+  });
+  currUser.followingsCount = BigInt(currUser.followingsCount) - BigInt(1);
+  await AppDataSource.getRepository(User).save(currUser);
+
+  const followRepository = AppDataSource.getRepository(Follow);
   const result = await followRepository
     .createQueryBuilder()
     .delete()
     .from(Follow)
     .where('followerId = :followerId AND userId = :userId', {
       followerId: currUserId,
-      userId: userId,
+      userId: user.userId,
     })
     .execute();
-
-  const currUser = await AppDataSource.getRepository(User).findOne({
-    where: {
-      userId: userId,
-    },
-  });
-  currUser.followersCount = BigInt(currUser.followersCount) - BigInt(1);
-
-  await AppDataSource.getRepository(User).save(currUser);
-  const user = await AppDataSource.getRepository(User).findOne({
-    where: {
-      userId: currUserId,
-    },
-  });
-  user.followingsCount = BigInt(currUser.followersCount) - BigInt(1);
-  await AppDataSource.getRepository(User).save(user);
 
   if (!result.affected || !(result.affected > 0))
     return next(new AppError('error in unfollowing', 400));

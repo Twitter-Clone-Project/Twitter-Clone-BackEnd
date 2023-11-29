@@ -814,7 +814,7 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-  /users/{userId}/followers:
+  /users/{username}/followers:
     get:
       tags:
         - user interactions
@@ -825,7 +825,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -863,6 +863,8 @@ paths:
                           type: integer
                         followingsCount:
                           type: integer
+                  name:
+                    type: string
 
         '400':
           description: Bad request - something went wrong
@@ -890,7 +892,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/following:
+  /users/{username}/followings:
     get:
       tags:
         - user interactions
@@ -939,6 +941,8 @@ paths:
                           type: integer
                         followingsCount:
                           type: integer
+                  name:
+                    type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -965,7 +969,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/follow:
+  /users/{username}/follow:
     post:
       tags:
         - user interactions
@@ -978,7 +982,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1016,7 +1020,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/unfollow:
+  /users/{username}/unfollow:
     delete:
       tags:
         - user interactions
@@ -1029,7 +1033,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
