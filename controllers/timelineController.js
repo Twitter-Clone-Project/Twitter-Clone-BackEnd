@@ -112,12 +112,18 @@ async function getFirstTweets(userId) {
 
   const tweetsPromises = tweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,

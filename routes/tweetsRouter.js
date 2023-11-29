@@ -46,8 +46,8 @@ router
 router
   .route('/:retweetId/deleteRetweet')
   .delete(authController.requireAuth, tweetsController.deleteRetweet);
-// router
-//   .route('/:tweetId/addMedia')
-//   .post(addMediaValidation, tweetsController.addMedia);
+router
+  .route('/:tweetId/addMedia')
+  .post(tweetsController.uploadFiles, tweetsController.addMedia);
 
 module.exports = router;
