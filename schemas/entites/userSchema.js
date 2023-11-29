@@ -68,10 +68,12 @@ module.exports = new EntitySchema({
     followersCount: {
       type: 'bigint',
       nullable: true,
+      default: 0,
     },
     followingsCount: {
       type: 'bigint',
       nullable: true,
+      default: 0,
     },
   },
 });
