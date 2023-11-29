@@ -452,9 +452,7 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
     };
   });
   let repliesRes = await Promise.all(repliesPromises);
-  console.log(repliesRes);
   repliesRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  console.log(repliesRes);
 
   if (replies.length > 0) {
     res.status(200).json({
