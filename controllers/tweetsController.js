@@ -516,14 +516,10 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
   let repliesRes = await Promise.all(repliesPromises);
   repliesRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  if (replies.length > 0) {
-    res.status(200).json({
-      status: true,
-      data: repliesRes,
-    });
-  } else {
-    return next(new AppError('There is no replies for this tweet', 404));
-  }
+  res.status(200).json({
+    status: true,
+    data: repliesRes,
+  });
 });
 
 exports.retweet = catchAsync(async (req, res, next) => {

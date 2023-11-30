@@ -814,7 +814,7 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-  /users/{username}/followers:
+  /users/{userId}/followers:
     get:
       tags:
         - user interactions
@@ -825,7 +825,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: username
+        - name: userId
           in: path
           required: true
           type: string
@@ -863,8 +863,6 @@ paths:
                           type: integer
                         followingsCount:
                           type: integer
-                  name:
-                    type: string
 
         '400':
           description: Bad request - something went wrong
@@ -892,7 +890,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{username}/followings:
+  /users/{userId}/following:
     get:
       tags:
         - user interactions
@@ -941,8 +939,6 @@ paths:
                           type: integer
                         followingsCount:
                           type: integer
-                  name:
-                    type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -969,7 +965,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{username}/follow:
+  /users/{userId}/follow:
     post:
       tags:
         - user interactions
@@ -982,7 +978,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: username
+        - name: userId
           in: path
           required: true
           type: string
@@ -1020,7 +1016,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{username}/unfollow:
+  /users/{userId}/unfollow:
     delete:
       tags:
         - user interactions
@@ -1033,7 +1029,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: username
+        - name: userId
           in: path
           required: true
           type: string
@@ -2359,15 +2355,6 @@ paths:
                 type: boolean
               message:
                 type: string
-        '404':
-          description: No replies for this tweet
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
   /tweets/{tweetId}/addReply: # body object
     post:
       tags:
@@ -2817,7 +2804,7 @@ paths:
       tags:
         - search
       summary: Get a list of tweets that matches (either fully or partially) the sent string.
-      description: Endpoint to get a list of tweets that matches (either fully or partially) the sent string and get a max 10 objects in array.
+      description: Endpoint to get a list of tweets that matches (either fully or partially) the sent string.
       consumes:
         - application/json
       produces:
