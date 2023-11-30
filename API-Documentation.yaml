@@ -1071,7 +1071,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/mute:
+  /users/{username}/mute:
     post:
       tags:
         - user interactions
@@ -1084,7 +1084,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1122,7 +1122,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/unmute:
+  /users/{username}/unmute:
     delete:
       tags:
         - user interactions
@@ -1135,7 +1135,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1173,21 +1173,16 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/mutedUsers:
+  /users/mutedUsers:
     get:
       tags:
         - user interactions
-      summary: Fetch a list of users muted by the username
+      summary: Fetch a list of users muted by the user thath signed in
       description: Endpoint to get the users following the username.
       consumes:
         - application/json
       produces:
         - application/json
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          type: string
       responses:
         '200':
           description: Successful Get
@@ -1204,13 +1199,15 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
-                          type: string
-                        email:
+                        userId:
                           type: string
                         username:
                           type: string
                         name:
+                          type: string
+                        bio:
+                          type: string
+                        imageUrl:
                           type: string
         '400':
           description: Bad request - something went wrong
@@ -1238,7 +1235,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/block:
+  /users/{username}/block:
     post:
       tags:
         - user interactions
@@ -1251,7 +1248,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1289,7 +1286,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/unblock:
+  /users/{username}/unblock:
     delete:
       tags:
         - user interactions
@@ -1302,7 +1299,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1340,7 +1337,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/blockedUsers:
+  /users/blockedUsers:
     get:
       tags:
         - user interactions
@@ -1350,11 +1347,6 @@ paths:
         - application/json
       produces:
         - application/json
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          type: string
       responses:
         '200':
           description: Successful Get
@@ -1371,13 +1363,15 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
-                          type: string
-                        email:
+                        userId:
                           type: string
                         username:
                           type: string
                         name:
+                          type: string
+                        bio:
+                          type: string
+                        imageUrl:
                           type: string
         '400':
           description: Bad request - something went wrong
