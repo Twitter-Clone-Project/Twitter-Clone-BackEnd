@@ -34,6 +34,10 @@ module.exports = new EntitySchema({
       type: 'varchar',
       nullable: true,
     },
+    bannerUrl: {
+      type: 'varchar',
+      nullable: true,
+    },
     bio: {
       type: 'varchar',
       length: 160,

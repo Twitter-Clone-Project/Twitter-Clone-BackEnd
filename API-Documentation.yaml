@@ -814,7 +814,7 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-  /users/{userId}/followers:
+  /users/{username}/followers:
     get:
       tags:
         - user interactions
@@ -825,7 +825,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -863,6 +863,8 @@ paths:
                           type: integer
                         followingsCount:
                           type: integer
+                  name:
+                    type: string
 
         '400':
           description: Bad request - something went wrong
@@ -890,7 +892,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/following:
+  /users/{username}/followings:
     get:
       tags:
         - user interactions
@@ -939,6 +941,8 @@ paths:
                           type: integer
                         followingsCount:
                           type: integer
+                  name:
+                    type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -965,7 +969,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/follow:
+  /users/{username}/follow:
     post:
       tags:
         - user interactions
@@ -978,7 +982,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1016,7 +1020,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{userId}/unfollow:
+  /users/{username}/unfollow:
     delete:
       tags:
         - user interactions
@@ -1029,7 +1033,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           type: string
@@ -1620,35 +1624,47 @@ paths:
               message:
                 type: string
   /profile/update:
-    put:
+    patch:
       tags:
         - profile
       summary: Update the profile of a specific user.
       description: Endpoint to update the profile of a specific user.
       consumes:
-        - application/json
+        - multipart/form-data
       produces:
         - application/json
       parameters:
-        - name: body
-          in: body
-          description: The updated profile information.
-          required: true
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                description: The user's name.
-              bio:
-                type: string
-                description: The user's bio.
-              website:
-                type: string
-                description: The user's website.
-              location:
-                type: string
-                description: The user's location.
+        - name: profilePhoto
+          in: formData
+          description: The profile photo to update.
+          required: false
+          type: file
+        - name: bannerPhoto
+          in: formData
+          description: The banner photo to update.
+          required: false
+          type: file
+        - name: name
+          in: formData
+          description: The user's name.
+          required: false
+          type: string
+        - name: bio
+          in: formData
+          description: The user's bio.
+          required: false
+        - name: website
+          in: formData
+          description: The user's website.
+          required: false
+        - name: location
+          in : formData
+          description: The user's location.
+          required: false
+        - name : birthDate
+          in: formData
+          description: The user's birthDate.
+          required : false
       responses:
         '200':
           description: Successful Update
@@ -1660,6 +1676,15 @@ paths:
               data:
                 type: object
                 properties:
+                  userId:
+                    type: integer
+                  username:
+                    type: string
+                    description: the user's username.
+                  isConfirmed: 
+                    type: boolean 
+                  email:
+                    type: string
                   name:
                     type: string
                     description: The user's name.
@@ -1672,6 +1697,12 @@ paths:
                   location:
                     type: string
                     description: The user's location.
+                  imageUrl:
+                    type: string
+                    description: The user's profile.
+                  bannerUrl:
+                    type: string
+                    description: The user's banner Picture.
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1681,7 +1712,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /profile/{userId}:
+  /profile/{username}:
     get:
       tags:
         - profile
@@ -1692,9 +1723,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
-          description: The ID of the user to get the profile of.
+          description: The username of the user to get the profile of.
           required: true
           type: string
       responses:
@@ -1708,12 +1739,14 @@ paths:
               data:
                 type: object
                 properties:
-                  id:
+                  userId:
                     type: string
                     description: The user's ID.
                   name:
                     type: string
                     description: The user's name.
+                  email:
+                    type: string
                   username:
                     type: string
                     description: The user's name.
@@ -1726,12 +1759,34 @@ paths:
                   location:
                     type: string
                     description: The user's location.
-                  profileImageUrl:
+                  imageUrl:
                     type: string
                     description: The URL of the user's profile picture.
-                  createdAt:
+                  bannerUrl:
                     type: string
-                    description: The date and time the user's profile was created.
+                    description: The URL of the user's banner picture.
+                  birthdate:
+                    type: date
+                  isConfirmed:
+                    type: boolean 
+                  isFollowed:
+                    type: boolean
+                    description: Is the current user follow this user profile.
+                  isFollowing:
+                    type: boolean
+                    description: Is this user profile follow the current user.
+                  isMuted:
+                    type: boolean
+                    description: Is the current user mutes this user.
+                  isBlocked:
+                    type: boolean 
+                    description: is teh current user blocks this user.
+                  followersCount:
+                    type: integer
+                  followingsCount:
+                    type: integer
+
+
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2349,6 +2404,15 @@ paths:
                 type: boolean
               message:
                 type: string
+        '404':
+          description: No replies for this tweet
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
   /tweets/{tweetId}/addReply: # body object
     post:
       tags:
@@ -2798,7 +2862,7 @@ paths:
       tags:
         - search
       summary: Get a list of tweets that matches (either fully or partially) the sent string.
-      description: Endpoint to get a list of tweets that matches (either fully or partially) the sent string.
+      description: Endpoint to get a list of tweets that matches (either fully or partially) the sent string and get a max 10 objects in array.
       consumes:
         - application/json
       produces:
