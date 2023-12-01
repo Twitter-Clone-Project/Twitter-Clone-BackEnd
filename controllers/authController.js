@@ -62,11 +62,16 @@ const createAndSendToken = (user, req, res, statusCode) => {
 
   const filteredUser = filterObj(
     user,
+    'username',
+    'email',
     'userId',
     'isConfirmed',
-    'username',
     'name',
-    'email',
+    'imageUrl',
+    'birthDate',
+    'website',
+    'location',
+    'bio',
   );
 
   res.status(statusCode).json({
@@ -116,6 +121,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     req.body;
   const userRepository = AppDataSource.getRepository(User);
 
+  // if this email signed but not confirmed remove it
+  await userRepository.delete({
+    isConfirmed: false,
+    email,
+    username,
+  });
+
   if (process.env.NODE_ENV === 'production') {
     const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
 
@@ -156,7 +168,21 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: true,
-    data: { user: filterObj(user, 'name', 'userId', 'email') },
+    data: {
+      user: filterObj(
+        user,
+        'username',
+        'email',
+        'userId',
+        'isConfirmed',
+        'name',
+        'imageUrl',
+        'birthDate',
+        'website',
+        'location',
+        'bio',
+      ),
+    },
   });
 });
 
@@ -177,6 +203,11 @@ exports.signin = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.name',
+      'user.imageUrl',
+      'user.birthDate',
+      'user.website',
+      'user.location',
+      'user.bio',
     ])
     .from(User, 'user')
     .where('user.email = :email', { email })
@@ -324,6 +355,11 @@ exports.getMe = catchAsync(async (req, res, next) => {
       username: true,
       email: true,
       name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
     },
   });
 
@@ -333,10 +369,15 @@ exports.getMe = catchAsync(async (req, res, next) => {
       user: filterObj(
         user,
         'username',
-        'name',
         'email',
         'userId',
         'isConfirmed',
+        'name',
+        'imageUrl',
+        'birthDate',
+        'website',
+        'location',
+        'bio',
       ),
     },
   });
@@ -358,13 +399,18 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
       email,
     },
     select: {
-      otpExpires: true,
-      name: true,
-      username: true,
-      otp: true,
-      isConfirmed: true,
-      email: true,
       userId: true,
+      isConfirmed: true,
+      otpExpires: true,
+      otp: true,
+      username: true,
+      email: true,
+      name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
     },
   });
 
@@ -422,6 +468,11 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
       username: true,
       email: true,
       name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
     },
   });
 
@@ -457,6 +508,11 @@ exports.changePassword = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.name',
+      'user.imageUrl',
+      'user.birthDate',
+      'user.website',
+      'user.location',
+      'user.bio',
     ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: req.currentUser.userId })
@@ -533,10 +589,15 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     where: { email: req.currentUser.email },
     select: {
       userId: true,
-      username: true,
       isConfirmed: true,
+      username: true,
       email: true,
       name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
     },
   });
 

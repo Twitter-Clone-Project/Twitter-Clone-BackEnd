@@ -15,12 +15,22 @@ const User = require('../models/entites/User');
  */
 exports.isUsernameFound = catchAsync(async (req, res, next) => {
   const { username } = req.params;
+  const userRepository = AppDataSource.getRepository(User);
+  let isFound = false;
 
-  const isFound = await AppDataSource.getRepository(User).exist({
-    where: { username },
+  // if this email signed but not confirmed remove it
+  const delResult = await userRepository.delete({
+    isConfirmed: false,
+    username,
   });
 
-  res.status(200).json({
+  if (!delResult.affected) {
+    isFound = await userRepository.exist({
+      where: { username },
+    });
+  }
+
+  res.status(isFound ? 200 : 404).json({
     status: true,
     data: { isFound },
   });
@@ -35,12 +45,22 @@ exports.isUsernameFound = catchAsync(async (req, res, next) => {
  */
 exports.isEmailFound = catchAsync(async (req, res, next) => {
   const { email } = req.params;
+  const userRepository = AppDataSource.getRepository(User);
+  let isFound = false;
 
-  const isFound = await AppDataSource.getRepository(User).exist({
-    where: { email },
+  // if this email signed but not confirmed remove it
+  const delResult = await userRepository.delete({
+    isConfirmed: false,
+    email,
   });
 
-  res.status(200).json({
+  if (!delResult.affected) {
+    isFound = await userRepository.exist({
+      where: { email },
+    });
+  }
+
+  res.status(isFound ? 200 : 404).json({
     status: true,
     data: { isFound },
   });

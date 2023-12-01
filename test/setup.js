@@ -35,12 +35,11 @@ afterAll(async () => {
   console.log('Test db dropped');
 });
 
-global.signin = async (email) => {
-  const uniqueUsername = `user_${uuid.v4()}`;
+global.signin = async (email, username) => {
 
   const hashedPassword = await Password.hashPassword('password');
   const user = new User(
-    uniqueUsername,
+    username,
     'Mahmoud Yahia',
     email,
     hashedPassword,
@@ -50,6 +49,7 @@ global.signin = async (email) => {
   const otp = user.createOTP();
 
   const userRepository = AppDataSource.getRepository(User);
+  user.isConfirmed = true;
   const user2 = await userRepository.insert(user);
 
   const token = signToken(user2.identifiers[0].userId);

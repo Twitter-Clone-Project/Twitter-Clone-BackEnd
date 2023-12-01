@@ -3,9 +3,7 @@ const app = require('../../app');
 const uuid = require('uuid');
 const Email = require('../../services/Email');
 
-
 describe('POST /api/v1/auth/signup', () => {
-  
   jest.setTimeout(100000);
 
   it('try to sign up without username', async () => {
@@ -96,7 +94,7 @@ describe('POST /api/v1/auth/signup', () => {
     expect(res2.body.status).toBe(false);
   });
 
-  test('returns 400 when user allready exists', async () => {
+  test('returns 201 when signup with email exists but not confirmed', async () => {
     const uniqueEmail = `testuser_${uuid.v4()}@example.com`;
     const uniqueUsername = `user_${uuid.v4()}`;
 
@@ -119,6 +117,37 @@ describe('POST /api/v1/auth/signup', () => {
         name: 'Mahmoud Yahia',
         username: uniqueUsername,
         email: uniqueEmail,
+        password: 'password',
+        passwordConfirm: 'password',
+        dateOfBirth: '2023-11-03',
+        gRecaptchaResponse: '6LeousYoAAAAACH0uCm7e4NKQkOWgrZWxmPPCMBZ',
+      })
+      .set('Content-Type', 'application/json')
+      .expect(201);
+
+    expect(res2.body.status).toBe(true);
+  });
+
+  test('returns 400 when user allready exists', async () => {
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+
+    const { otp } = await global.signin(email, username);
+
+    const res = await request(app)
+      .post('/api/v1/auth/verifyEmail')
+      .send({
+        email,
+        otp,
+      })
+      .set('Content-Type', 'application/json');
+
+    const res2 = await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        name: 'Mahmoud Yahia',
+        username,
+        email,
         password: 'password',
         passwordConfirm: 'password',
         dateOfBirth: '2023-11-03',
@@ -252,8 +281,9 @@ describe('POST /api/v1/auth/verifyEmail', () => {
 
   test('return 200, email verified successfully and token returned', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { otp } = await global.signin(email);
+    const { otp } = await global.signin(email, username);
 
     const res = await request(app)
       .post('/api/v1/auth/verifyEmail')
@@ -263,6 +293,7 @@ describe('POST /api/v1/auth/verifyEmail', () => {
       })
       .set('Content-Type', 'application/json');
 
+    console.log(res);
     expect(res.statusCode).toEqual(200);
     expect(res.body.data.user.email).toEqual(email);
     expect(res.body.data.user.isConfirmed).toEqual(true);
@@ -286,8 +317,9 @@ describe('POST /api/v1/auth/resendConfirmEmail', () => {
 
   test('returns 200, email resended successfully', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { token } = await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .post('/api/v1/auth/resendConfirmEmail')
@@ -314,8 +346,9 @@ describe('GET /api/v1/auth/me', () => {
 
   test('refresh  user data successfully', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { token } = await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .get('/api/v1/auth/me')
@@ -341,8 +374,9 @@ describe('POST /api/v1/auth/signout', () => {
 describe('PATCH /api/v1/auth/updatePassword', () => {
   test('returns 400 ,try to change passowrd with wrong current password', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { token } = await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .patch('/api/v1/auth/updatePassword')
@@ -359,8 +393,9 @@ describe('PATCH /api/v1/auth/updatePassword', () => {
 
   test('returns 400, try to change passowrd with invalid new password', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { token } = await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .patch('/api/v1/auth/updatePassword')
@@ -376,8 +411,9 @@ describe('PATCH /api/v1/auth/updatePassword', () => {
   });
   test('returns 200, change passowrd successfully and cookie returned', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { token } = await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .patch('/api/v1/auth/updatePassword')
@@ -410,8 +446,9 @@ describe('POST /api/v1/auth/forgetPassword', () => {
 
   test('returns 200, request forget password email with email sent', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .post('/api/v1/auth/forgetPassword')
@@ -442,8 +479,9 @@ describe('PATCH /api/v1/auth/resetPassword', () => {
 
   test('returns 200, reset password successfully', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
 
-    const { token } = await global.signin(email);
+    const { token } = await global.signin(email, username);
 
     const res = await request(app)
       .patch('/api/v1/auth/resetPassword')
