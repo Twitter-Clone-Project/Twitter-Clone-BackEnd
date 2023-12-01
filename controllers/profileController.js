@@ -95,14 +95,22 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
       blockedId: user.userId,
     },
   });
+  let isBlockingMe = await AppDataSource.getRepository(Block).findOne({
+    where: {
+      userId: user.userId,
+      blockedId: currUserId,
+    },
+  });
   isMuted = !!isMuted;
   isBlocked = !!isBlocked;
   isFollowed = !!isFollowed;
   isFollowing = !!isFollowing;
+  isBlockingMe = !!isBlockingMe;
   user.isMuted = isMuted;
   user.isBlocked = isBlocked;
   user.isFollowed = isFollowed;
   user.isFollowing = isFollowing;
+  user.isBlockingMe = isFollowing;
 
   res.status(200).json({
     status: true,

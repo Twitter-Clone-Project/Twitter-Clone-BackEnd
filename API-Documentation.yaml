@@ -1703,6 +1703,15 @@ paths:
                   bannerUrl:
                     type: string
                     description: The user's banner Picture.
+                  followersCount:
+                    type: integer
+                    description: The user's followers count.
+                  followingsCount:
+                    type: integer
+                    description: The user's followings count.
+                  dateOfBirth:
+                    type: date
+                    description: the user's date of birth.
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1745,8 +1754,6 @@ paths:
                   name:
                     type: string
                     description: The user's name.
-                  email:
-                    type: string
                   username:
                     type: string
                     description: The user's name.
@@ -1780,13 +1787,14 @@ paths:
                     description: Is the current user mutes this user.
                   isBlocked:
                     type: boolean 
-                    description: is teh current user blocks this user.
+                    description: is the current user blocks this user.
+                  isBlockingMe:
+                    type: boolean 
+                    description: is the current user blocked by this user.
                   followersCount:
                     type: integer
                   followingsCount:
                     type: integer
-
-
         '400':
           description: Bad request - something went wrong
           schema:
