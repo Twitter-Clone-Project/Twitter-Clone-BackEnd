@@ -43,6 +43,7 @@
 ## `mark-notifications-as-seen` Event
 
 - **Purpose**: Marks all notifications as seen. When the user go out of the notifications page or unmoun it, this event should be emited to mark the notifications as seened.
+- **Payload**: `data` - Object containing information about the notifications, including you id (the id of the current emiter user that opened the chat :) as `userId`.
 - **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
 
 ## `getOnlineUsers` Event

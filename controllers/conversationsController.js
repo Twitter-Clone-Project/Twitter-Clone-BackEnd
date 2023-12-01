@@ -124,11 +124,17 @@ exports.getConversationHistory = catchAsync(async (req, res, next) => {
 
 exports.getUnseenConversationsCnt = catchAsync(async (req, res, next) => {
   const { userId } = req.currentUser;
+  const cnt = await AppDataSource.getRepository(Message)
+    .createQueryBuilder('message')
+    .select('COUNT(DISTINCT message.conversationId)', 'unseenCnt')
+    .where('message.isSeen = :isSeen', { isSeen: false })
+    .andWhere('message.receiverId = :userId', { userId })
+    .getRawOne();
 
-  const cnt = await AppDataSource.getRepository(Message).find({
-    where: [
-      { receiverId: userId, isSeen: false },
-    ],
+  res.status(200).json({
+    status: true,
+    data: {
+      unseenCnt: cnt.unseenCnt,
+    },
   });
-  console.log(cnt);
 });
