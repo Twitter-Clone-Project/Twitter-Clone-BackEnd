@@ -269,13 +269,6 @@ exports.unmute = catchAsync(async (req, res, next) => {
   });
 });
 exports.getListOfMutes = catchAsync(async (req, res, next) => {
-  // const { username } = req.params;
-  // const user = await AppDataSource.getRepository(User).findOne({
-  //   where: {
-  //     username: username,
-  //   },
-  // });
-  // const userId = user.userId;
   const currUserId = req.currentUser.userId;
 
   const mutesQuery = await AppDataSource.getRepository(User)
@@ -349,13 +342,6 @@ exports.unblock = catchAsync(async (req, res, next) => {
 });
 
 exports.getListOfBlocks = catchAsync(async (req, res, next) => {
-  // const { username } = req.params;
-  // const user = await AppDataSource.getRepository(User).findOne({
-  //   where: {
-  //     username: username,
-  //   },
-  // });
-  // const userId = user.userId;
   const currUserId = req.currentUser.userId;
 
   const blocksQuery = await AppDataSource.getRepository(User)

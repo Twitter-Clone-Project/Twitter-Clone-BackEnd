@@ -77,6 +77,7 @@ const timelineRoutes = require('./routes/timelineRouter');
 const usersRouter = require('./routes/usersRouter');
 const trendsRouter = require('./routes/trendsRouter');
 const searchRouter = require('./routes/searchRouter');
+const profileRoutes = require('./routes/profileRoutes');
 
 app.use('/api/v1', searchRouter);
 app.use('/api/v1/auth', authRoutes);
@@ -85,6 +86,7 @@ app.use('/api/v1/tweets', tweetsRoutes);
 app.use('/api/v1/users', timelineRoutes);
 app.use('/api/v1/users', interactionsRoutes);
 app.use('/api/v1/trends', trendsRouter);
+app.use('/api/v1/profile', profileRoutes);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Cant find ${req.originalUrl} on this server!`, 404));
