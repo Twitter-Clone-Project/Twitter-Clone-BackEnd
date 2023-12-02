@@ -12,12 +12,16 @@ module.exports = new EntitySchema({
       nullable: false,
     },
     conversationId: {
+      nullable: true,
       type: 'bigint',
     },
     senderId: {
+      nullable: true,
       type: 'bigint',
     },
     receiverId: {
+      nullable: true,
+
       type: 'bigint',
     },
     time: {
