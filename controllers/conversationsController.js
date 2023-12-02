@@ -138,3 +138,17 @@ exports.getUnseenConversationsCnt = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.startConversation = catchAsync(async (req, res, next) => {
+  const { user1Id, user2Id } = req.body;
+  const conversationRepository = AppDataSource.getRepository(Conversation);
+
+  const newConversation = new Conversation(user1Id, user2Id);
+
+  await conversationRepository.save(newConversation);
+
+  res.status(200).json({
+    status: true,
+    data: { newConversation },
+  });
+});

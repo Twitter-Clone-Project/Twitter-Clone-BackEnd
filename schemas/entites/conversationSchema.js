@@ -17,6 +17,12 @@ module.exports = new EntitySchema({
       type: 'bigint',
     },
   },
+  uniques: [
+    {
+      name: 'unique_user_pair',
+      columns: ['user1Id', 'user2Id'],
+    },
+  ],
   relations: {
     user1: {
       type: 'many-to-one',

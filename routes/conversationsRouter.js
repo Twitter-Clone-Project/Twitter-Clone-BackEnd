@@ -1,7 +1,11 @@
 const express = require('express');
 const conversationsController = require('../controllers/conversationsController');
 const authController = require('../controllers/authController');
+const validateRequest = require('../middlewares/validateRequest');
 
+const {
+  startChatValidationRules,
+} = require('../middlewares/validations/conversation');
 const router = express.Router();
 
 router
@@ -20,6 +24,15 @@ router
   .get(
     authController.requireAuth,
     conversationsController.getUnseenConversationsCnt,
+  );
+
+router
+  .route('/startConversation')
+  .post(
+    authController.requireAuth,
+    startChatValidationRules,
+    validateRequest,
+    conversationsController.startConversation,
   );
 
 module.exports = router;
