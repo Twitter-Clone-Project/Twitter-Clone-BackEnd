@@ -31,7 +31,7 @@ async function uploadMedia(mediaArray) {
   const uploadPromises = mediaArray.map(async (media) => {
     const uploadParams = {
       Bucket: 'kady-twitter-images',
-      Key: media.originalname,
+      Key: Date.now() + media.originalname,
       Body: Buffer.from(media.buffer),
       ContentType: media.mimetype,
       ACL: 'public-read',
@@ -105,6 +105,7 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
       location: true,
       imageUrl: true,
       bannerUrl: true,
+      createdAt: true,
     },
   });
   let isFollowed = await AppDataSource.getRepository(Follow).findOne({
@@ -147,7 +148,6 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
   user.isFollowed = isFollowed;
   user.isFollowing = isFollowing;
   user.isBlockingMe = isBlockingMe;
-  user.createdAt = null;
 
   res.status(200).json({
     status: true,

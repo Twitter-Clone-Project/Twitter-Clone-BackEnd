@@ -14,14 +14,7 @@ const router = express.Router();
 router
   .route('/:username')
   .get(authController.requireAuth, profileController.getUserProfile);
-// router
-//   .route('/updateUsername')
-//   .patch(
-//     authController.requireAuth,
-//     updateUsernameValidationRules,
-//     validateRequest,
-//     profileController.updateUsername,
-//   );
+
 router
   .route('/updateUsername')
   .patch(
