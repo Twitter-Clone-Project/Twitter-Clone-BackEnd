@@ -3130,7 +3130,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/tweets/{pageNum}:
+  /users/{username}/tweets/{pageNum}:
     get:
       tags:
         - timeline
@@ -3141,9 +3141,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
-          description: The ID of the user to get the tweets for.
+          description: The username of the user to get the tweets for.
           required: true
           type: string
         - name: pageNum
@@ -3248,7 +3248,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/mentions/{pageNum}:
+  /users/{username}/mentions/{pageNum}:
     get:
       tags:
         - timeline
@@ -3259,9 +3259,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
-          description: The ID of the user to get the mentions for.
+          description: The username of the user to get the mentions for.
           required: true
           type: string
         - name: pageNum
@@ -3366,7 +3366,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /users/{userId}/likedTweets/{pageNum}:
+  /users/{username}/likedTweets/{pageNum}:
     get:
       tags:
         - timeline
@@ -3377,9 +3377,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: userId
+        - name: username
           in: path
-          description: The ID of the user to get the liked tweets for.
+          description: The username of the user to get the liked tweets for.
           required: true
           type: string
         - name: pageNum

@@ -191,7 +191,12 @@ exports.getTweets = catchAsync(async (req, res, next) => {
   });
 });
 
-async function getFirstUserTweets(userId, currUserId) {
+async function getFirstUserTweets(username, currUserId) {
+  const { userId } = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
   const userTweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoinAndMapOne(
@@ -295,12 +300,12 @@ async function getFirstUserTweets(userId, currUserId) {
 }
 
 exports.getUserTweets = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const { pageNum } = req.params;
   const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstUserTweets(userId, currUserId);
+    await getFirstUserTweets(username, currUserId);
   }
 
   const resTweets = userTweetsTotalRes.slice(
@@ -314,7 +319,12 @@ exports.getUserTweets = catchAsync(async (req, res, next) => {
   });
 });
 
-async function getFirstUserMentions(userId, currUserId) {
+async function getFirstUserMentions(username, currUserId) {
+  const { userId } = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
   const userMentionsTweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoin(Mention, 'mention', 'mention.tweetId = tweet.tweetId')
@@ -323,12 +333,6 @@ async function getFirstUserMentions(userId, currUserId) {
       User,
       'user',
       'user.userId = tweet.userId',
-    )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
     )
     .where('mention.mentionedId = :userId', { userId })
     .getMany();
@@ -371,12 +375,12 @@ async function getFirstUserMentions(userId, currUserId) {
 }
 
 exports.getUserMentions = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const { pageNum } = req.params;
   const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstUserMentions(userId, currUserId);
+    await getFirstUserMentions(username, currUserId);
   }
 
   const resTweets = userMentionsTotalRes.slice(
@@ -390,7 +394,12 @@ exports.getUserMentions = catchAsync(async (req, res, next) => {
   });
 });
 
-async function getFirstUserLikes(userId, currUserId) {
+async function getFirstUserLikes(username, currUserId) {
+  const { userId } = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
   const userLikesTweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoin(Like, 'like', 'like.tweetId = tweet.tweetId')
@@ -399,12 +408,6 @@ async function getFirstUserLikes(userId, currUserId) {
       User,
       'user',
       'user.userId = tweet.userId',
-    )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
     )
     .where('like.userId = :userId', { userId })
     .getMany();
@@ -447,12 +450,12 @@ async function getFirstUserLikes(userId, currUserId) {
 }
 
 exports.getUserLikes = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const { pageNum } = req.params;
   const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstUserLikes(userId, currUserId);
+    await getFirstUserLikes(username, currUserId);
   }
 
   const resTweets = userLikesTotalRes.slice(
