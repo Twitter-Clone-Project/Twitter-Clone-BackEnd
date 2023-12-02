@@ -79,12 +79,6 @@ async function getFirstTweets(userId) {
       'user',
       'user.userId = tweet.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .where('follow.followerId = :userId', { userId })
     .getMany();
 
@@ -103,12 +97,6 @@ async function getFirstTweets(userId) {
       User,
       'userRetweeter',
       'userRetweeter.userId = repost.userId',
-    )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
     )
     .where('follow.followerId = :userId', { userId })
     .getMany();
@@ -212,12 +200,6 @@ async function getFirstUserTweets(userId, currUserId) {
       'user',
       'user.userId = tweet.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .where('tweet.userId = :userId', { userId })
     .getMany();
 
@@ -235,12 +217,6 @@ async function getFirstUserTweets(userId, currUserId) {
       User,
       'userRetweeter',
       'userRetweeter.userId = repost.userId',
-    )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
     )
     .where('repost.userId = :userId', { userId })
     .getMany();
