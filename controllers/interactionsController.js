@@ -159,6 +159,13 @@ exports.follow = catchAsync(async (req, res, next) => {
     },
   });
   console.log(user);
+  if (currUserId == user.userId) {
+    res.status(400).json({
+      status: false,
+      message: 'Cant follow yourself ',
+    });
+    return;
+  }
   user.followersCount = BigInt(user.followersCount) + BigInt(1);
   await AppDataSource.getRepository(User).save(user);
 
@@ -189,6 +196,13 @@ exports.unFollow = catchAsync(async (req, res, next) => {
       username: username,
     },
   });
+  if (currUserId == user.userId) {
+    res.status(400).json({
+      status: false,
+      message: 'Cant unfollow yourself ',
+    });
+    return;
+  }
   user.followersCount = BigInt(user.followersCount) - BigInt(1);
   await AppDataSource.getRepository(User).save(user);
 
@@ -229,6 +243,13 @@ exports.mute = catchAsync(async (req, res, next) => {
       username: username,
     },
   });
+  if (currUserId == user.userId) {
+    res.status(400).json({
+      status: false,
+      message: 'Cant mute yourself ',
+    });
+    return;
+  }
   const mute = new Mute();
   mute.userId = currUserId;
   mute.mutedId = user.userId;
@@ -249,7 +270,13 @@ exports.unmute = catchAsync(async (req, res, next) => {
       username: username,
     },
   });
-
+  if (currUserId == user.userId) {
+    res.status(400).json({
+      status: false,
+      message: 'Cant unmute yourself ',
+    });
+    return;
+  }
   const result = await AppDataSource.getRepository(Mute)
     .createQueryBuilder()
     .delete()
@@ -301,6 +328,13 @@ exports.block = catchAsync(async (req, res, next) => {
       username: username,
     },
   });
+  if (currUserId == user.userId) {
+    res.status(400).json({
+      status: false,
+      message: 'Cant block yourself ',
+    });
+    return;
+  }
   const block = new Block();
   block.userId = currUserId;
   block.blockedId = user.userId;
@@ -321,7 +355,13 @@ exports.unblock = catchAsync(async (req, res, next) => {
       username: username,
     },
   });
-
+  if (currUserId == user.userId) {
+    res.status(400).json({
+      status: false,
+      message: 'Cant unblock yourself ',
+    });
+    return;
+  }
   const result = await AppDataSource.getRepository(Block)
     .createQueryBuilder()
     .delete()

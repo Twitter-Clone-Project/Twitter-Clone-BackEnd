@@ -5,6 +5,8 @@ const validateRequest = require('../middlewares/validateRequest');
 const {
   updateUsernameValidationRules,
   updateEmailValidationRules,
+  updateProfileValidationRules,
+  imagesValidation,
 } = require('../middlewares/validations/profile');
 
 const router = express.Router();
@@ -37,12 +39,14 @@ router
     validateRequest,
     profileController.updateEmail,
   );
-// router
-//   .route('/updateProfile')
-//   .patch(
-//     authController.requireAuth,
-//     profileController.uploadFiles,
-//     profileController.updateProfile,
-//   );
+router
+  .route('/updateProfile')
+  .patch(
+    authController.requireAuth,
+    updateProfileValidationRules,
+    imagesValidation,
+    profileController.uploadFiles,
+    profileController.updateProfile,
+  );
 
 module.exports = router;

@@ -1665,6 +1665,10 @@ paths:
           in: formData
           description: The user's birthDate.
           required : false
+        - name : isUpdated
+          in: formData
+          description: if the user updated or deleted or not banner photo .
+          required : true
       responses:
         '200':
           description: Successful Update
