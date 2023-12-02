@@ -1799,6 +1799,8 @@ paths:
                     type: integer
                   followingsCount:
                     type: integer
+                  createdAt:
+                    type: date
         '400':
           description: Bad request - something went wrong
           schema:
