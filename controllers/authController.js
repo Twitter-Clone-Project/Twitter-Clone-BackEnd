@@ -75,6 +75,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
     'bannerUrl',
     'followingsCount',
     'followersCount',
+    'createdAt',
   );
 
   res.status(statusCode).json({
@@ -156,7 +157,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const otp = user.createOTP();
   await userRepository.insert(user);
 
-  await new Email(user, { otp }).sendConfirmationEmail();
+  // await new Email(user, { otp }).sendConfirmationEmail();
 
   setTimeout(
     async () => {
@@ -166,7 +167,7 @@ exports.signup = catchAsync(async (req, res, next) => {
         .where('isConfirmed = false AND email = :email', { email: user.email })
         .execute();
     },
-    10 * 60 * 1000,
+    2 * 60 * 1000,
   );
 
   res.status(201).json({
@@ -178,6 +179,7 @@ exports.signup = catchAsync(async (req, res, next) => {
         'email',
         'userId',
         'isConfirmed',
+        'createdAt',
         'name',
         'imageUrl',
         'birthDate',
@@ -217,6 +219,7 @@ exports.signin = catchAsync(async (req, res, next) => {
       'user.bannerUrl',
       'user.followingsCount',
       'user.followersCount',
+      'user.createdAt',
     ])
     .from(User, 'user')
     .where('user.email = :email', { email })
@@ -360,6 +363,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
     where: { userId: req.currentUser.userId },
     select: {
       userId: true,
+      createdAt: true,
       isConfirmed: true,
       username: true,
       email: true,
@@ -385,6 +389,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
         'userId',
         'isConfirmed',
         'name',
+        'createdAt',
         'imageUrl',
         'birthDate',
         'website',
@@ -417,6 +422,7 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
       userId: true,
       isConfirmed: true,
       otpExpires: true,
+      createdAt: true,
       otp: true,
       username: true,
       email: true,
@@ -482,6 +488,7 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
     where: { email },
     select: {
       userId: true,
+      createdAt: true,
       isConfirmed: true,
       username: true,
       email: true,
@@ -531,6 +538,7 @@ exports.changePassword = catchAsync(async (req, res, next) => {
       'user.email',
       'user.userId',
       'user.isConfirmed',
+      'user.createdAt',
       'user.name',
       'user.imageUrl',
       'user.birthDate',
@@ -617,6 +625,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     select: {
       userId: true,
       isConfirmed: true,
+      createdAt: true,
       username: true,
       email: true,
       name: true,

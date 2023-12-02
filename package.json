@@ -11,7 +11,9 @@
     "test": "(SET NODE_ENV=testing) & jest --watchAll --no-cache --runInBand"
   },
   "jest": {
-    "testMatch": ["**/*.test.js"],
+    "testMatch": [
+      "**/*.test.js"
+    ],
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./test/setup.js"

@@ -19,6 +19,7 @@ class User {
     this.followersCount = undefined;
     this.followingsCount = undefined;
     this.bannerUrl = undefined;
+    this.createdAt = undefined;
   }
 
   createOTP() {
