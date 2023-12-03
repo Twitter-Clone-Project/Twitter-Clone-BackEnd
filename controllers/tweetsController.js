@@ -98,10 +98,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
     );
-  let trendsArray = [];
-  if (trends) {
-    trendsArray = trends.split(',');
-  }
+  trendsArray = trends && Array.isArray(trends) ? trends : [];
   const userId = req.currentUser.userId;
 
   const tweet = new Tweet();
