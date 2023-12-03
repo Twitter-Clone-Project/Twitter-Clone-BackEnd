@@ -3,7 +3,7 @@ const tweetsController = require('../controllers/tweetsController');
 const authController = require('../controllers/authController');
 const validateRequest = require('../middlewares/validateRequest');
 
-const { addTweetValidation } = require('../middlewares/validations/tweet');
+const { addMediaValidation } = require('../middlewares/validations/tweet');
 
 const router = express.Router();
 
@@ -12,6 +12,8 @@ router
   .post(
     authController.requireAuth,
     tweetsController.uploadFiles,
+    addMediaValidation,
+    validateRequest,
     tweetsController.addTweet,
   );
 router.route('/:tweetId/deleteTweet').delete(tweetsController.deleteTweet);
@@ -46,6 +48,6 @@ router
   .delete(authController.requireAuth, tweetsController.deleteRetweet);
 router
   .route('/:tweetId/addMedia')
-  .post(tweetsController.uploadFiles, tweetsController.addMedia);
+  .post(tweetsController.uploadFiles,addMediaValidation,validateRequest, tweetsController.addMedia);
 
 module.exports = router;
