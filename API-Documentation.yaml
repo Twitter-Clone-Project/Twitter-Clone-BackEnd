@@ -2450,7 +2450,7 @@ paths:
           schema:
             type: object
             properties:
-              replyText:
+              text:
                 type: string
                 description: The text of the Reply.
       responses:
@@ -3088,6 +3088,21 @@ paths:
                         profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
+                        bio:
+                          type: string
+                          description: The bio of the user who retweeted.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of retweeter.
+                        followingCount:
+                          type: integer
+                          description: The count of users that retweeter follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the retweeter.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the retweeter.
                     user:
                       type: object
                       properties:
@@ -3102,7 +3117,22 @@ paths:
                           description: The screen name of the user that make the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
+                          description: The profile picture of the user that create the tweet.
+                        bio:
+                          type: string
+                          description: The bio of the user who creates the tweet.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of the user who creates the tweet.
+                        followingCount:
+                          type: integer
+                          description: The count of users that the user who creates the tweet. follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the user who creates the tweet.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the user who creates the tweet.
                     isLiked:
                       type: boolean
                       description: Is the current user liked this tweet.
@@ -3197,6 +3227,21 @@ paths:
                         profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
+                        bio:
+                          type: string
+                          description: The bio of the user who retweeted.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of retweeter.
+                        followingCount:
+                          type: integer
+                          description: The count of users that retweeter follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the retweeter.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the retweeter.
                     user:
                       type: object
                       properties:
@@ -3211,7 +3256,22 @@ paths:
                           description: The screen name of the user that make the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
+                          description: The profile picture of the user that create the tweet.
+                        bio:
+                          type: string
+                          description: The bio of the user who creates the tweet.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of the user who creates the tweet.
+                        followingCount:
+                          type: integer
+                          description: The count of users that the user who creates the tweet. follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the user who creates the tweet.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the user who creates the tweet.
                     isLiked:
                       type: boolean
                       description: Is the current user liked this tweet.
@@ -3315,6 +3375,21 @@ paths:
                         profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
+                        bio:
+                          type: string
+                          description: The bio of the user who retweeted.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of retweeter.
+                        followingCount:
+                          type: integer
+                          description: The count of users that retweeter follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the retweeter.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the retweeter.
                     user:
                       type: object
                       properties:
@@ -3329,7 +3404,22 @@ paths:
                           description: The screen name of the user that make the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
+                          description: The profile picture of the user that create the tweet.
+                        bio:
+                          type: string
+                          description: The bio of the user who creates the tweet.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of the user who creates the tweet.
+                        followingCount:
+                          type: integer
+                          description: The count of users that the user who creates the tweet. follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the user who creates the tweet.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the user who creates the tweet.
                     isLiked:
                       type: boolean
                       description: Is the current user liked this tweet.
@@ -3433,6 +3523,21 @@ paths:
                         profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
+                        bio:
+                          type: string
+                          description: The bio of the user who retweeted.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of retweeter.
+                        followingCount:
+                          type: integer
+                          description: The count of users that retweeter follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the retweeter.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the retweeter.
                     user:
                       type: object
                       properties:
@@ -3447,7 +3552,22 @@ paths:
                           description: The screen name of the user that make the tweet.
                         profileImageURL:
                           type: string
-                          description: The profile picture of the user that create the tweet .
+                          description: The profile picture of the user that create the tweet.
+                        bio:
+                          type: string
+                          description: The bio of the user who creates the tweet.
+                        followersCount:
+                          type: integer
+                          description: The count of followers of the user who creates the tweet.
+                        followingCount:
+                          type: integer
+                          description: The count of users that the user who creates the tweet. follow.
+                        isFollowed:
+                          type: boolean
+                          description: Is the current user follow the user who creates the tweet.
+                        isFollowing:
+                          type: boolean
+                          description: Is the current user followed by the user who creates the tweet.
                     isLiked:
                       type: boolean
                       description: Is the current user liked this tweet.
