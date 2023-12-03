@@ -1871,6 +1871,19 @@ paths:
                             username:
                               type: string
                               description: The user's name. 
+                            commonFollowersCnt: 
+                              type: integer  
+                            commonFollowers:
+                              type: array  
+                              items:
+                                type: object
+                                properties:
+                                  imageUrl:
+                                    type: string
+                                  username:
+                                    type: string
+                                  name:
+                                    type: string  
                         lastMessage:
                           type: object
                           properties:

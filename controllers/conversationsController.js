@@ -2,6 +2,7 @@ const catchAsync = require('../middlewares/catchAsync');
 const AppError = require('../services/AppError');
 const Conversation = require('../models/entites/Conversation');
 const Message = require('../models/entites/Message');
+const Follow = require('../models/relations/Follow');
 
 const { AppDataSource } = require('../dataSource');
 
@@ -18,6 +19,9 @@ const getUserConversations = async (userId) => {
       'user1.userId',
       'user1.email',
       'user1.name',
+      'user1.name',
+      'user1.followersCount',
+      'user1.createdAt',
       'user1.username',
       'user1.imageUrl',
       'user2.userId',
@@ -25,6 +29,8 @@ const getUserConversations = async (userId) => {
       'user2.name',
       'user2.username',
       'user2.imageUrl',
+      'user2.followersCount',
+      'user2.createdAt',
     ],
   });
 
@@ -43,6 +49,52 @@ const getUserConversations = async (userId) => {
         order: { time: 'DESC' },
       });
 
+      const followRepository = AppDataSource.getRepository(Follow);
+      const totalCountPromise = followRepository
+        .createQueryBuilder('follow')
+        .where('follow.userId = :user2Id', { user2Id: conversation.user2Id })
+        .andWhere(
+          (qb) => {
+            const subQuery = qb
+              .subQuery()
+              .select('subFollow.followerId')
+              .from(Follow, 'subFollow')
+              .where('subFollow.userId = :user1Id', {
+                user1Id: conversation.user1Id,
+              })
+              .getQuery();
+
+            return `follow.followerId IN ${subQuery}`;
+          },
+          { user1Id: conversation.user1Id },
+        )
+        .getCount(); // Count of all common followers
+
+      const [totalCount, commonFollowers] = await Promise.all([
+        totalCountPromise,
+        followRepository
+          .createQueryBuilder('follow')
+          .leftJoinAndSelect('follow.follower', 'follower')
+          .where('follow.userId = :user2Id', { user2Id: conversation.user2Id })
+          .andWhere(
+            (qb) => {
+              const subQuery = qb
+                .subQuery()
+                .select('subFollow.followerId')
+                .from(Follow, 'subFollow')
+                .where('subFollow.userId = :user1Id', {
+                  user1Id: conversation.user1Id,
+                })
+                .getQuery();
+
+              return `follow.followerId IN ${subQuery}`;
+            },
+            { user1Id: conversation.user1Id },
+          )
+          .take(2) // Limit the main query to the first two rows
+          .getMany(),
+      ]);
+
       return {
         conversationId: conversation.conversationId,
         contact: {
@@ -51,6 +103,16 @@ const getUserConversations = async (userId) => {
           name: otherUser.name,
           username: otherUser.username,
           imageUrl: otherUser.imageUrl,
+          followersCount: otherUser.followersCount,
+          createdAt: otherUser.createdAt,
+          commonFollowers: commonFollowers.map(({ follower }) => {
+            return {
+              name: follower.name,
+              username: follower.username,
+              imageUrl: follower.imageUrl,
+            };
+          }),
+          commonFollowersCnt: totalCount,
         },
         lastMessage: lastMessage
           ? {

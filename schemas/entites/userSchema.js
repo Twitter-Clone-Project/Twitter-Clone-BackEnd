@@ -75,5 +75,20 @@ module.exports = new EntitySchema({
       type: 'varchar',
       length: 150,
     },
+    followersCount: {
+      type: 'bigint',
+      nullable: true,
+      default: 0,
+    },
+    followingsCount: {
+      type: 'bigint',
+      nullable: true,
+      default: 0,
+    },
+    createdAt: {
+      nullable: false,
+      type: 'timestamptz',
+      createDate: true,
+    },
   },
 });

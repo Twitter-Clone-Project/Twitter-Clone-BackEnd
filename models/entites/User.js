@@ -18,6 +18,9 @@ class User {
     this.userId = undefined;
     this.socketId = undefined;
     this.isOnline = false;
+    this.followersCount = undefined;
+    this.followingsCount = undefined;
+    this.createdAt = undefined;
   }
 
   createOTP() {
