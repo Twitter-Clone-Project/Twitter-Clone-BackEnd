@@ -31,7 +31,7 @@ async function uploadMedia(mediaArray) {
   const uploadPromises = mediaArray.map(async (media) => {
     const uploadParams = {
       Bucket: 'kady-twitter-images',
-      Key: Date.now() + media.originalname,
+      Key: media.originalname,
       Body: Buffer.from(media.buffer),
       ContentType: media.mimetype,
       ACL: 'public-read',
@@ -204,6 +204,10 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 
   if (image) {
     const imageUrl = await uploadMedia([image[0]]);
+    if(user.imageUrl){
+      await deleteFromS3(user.imageUrl);
+    }
+    
     user.imageUrl = imageUrl[0];
   }
   if (isUpdated == 'TRUE') {

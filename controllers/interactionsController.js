@@ -335,6 +335,30 @@ exports.block = catchAsync(async (req, res, next) => {
     });
     return;
   }
+
+  user.followersCount = BigInt(user.followersCount) - BigInt(1);
+  await AppDataSource.getRepository(User).save(user);
+
+  const currUser = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: currUserId,
+    },
+  });
+  currUser.followingsCount = BigInt(currUser.followingsCount) - BigInt(1);
+  await AppDataSource.getRepository(User).save(currUser);
+
+  const followRepository = AppDataSource.getRepository(Follow);
+  const result = await followRepository
+    .createQueryBuilder()
+    .delete()
+    .from(Follow)
+    .where('followerId = :followerId AND userId = :userId', {
+      followerId: currUserId,
+      userId: user.userId,
+    })
+    .execute();
+
+
   const block = new Block();
   block.userId = currUserId;
   block.blockedId = user.userId;

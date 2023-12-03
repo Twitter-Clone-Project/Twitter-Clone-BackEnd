@@ -34,7 +34,7 @@ module.exports = new EntitySchema({
       type: 'varchar',
       nullable: true,
       default:
-        'https://i.pinimg.com/564x/4c/85/31/4c8531dbc05c77cb7a5893297977ac89.jpg',
+        'https://kady-twitter-images.s3.amazonaws.com/defaultProfile.jpg',
     },
     bannerUrl: {
       type: 'varchar',
