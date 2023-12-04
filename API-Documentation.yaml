@@ -2389,12 +2389,21 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
-                      type: string
+                    replyId:
+                      type: integer
                       description: The ID of the reply.
-                    text:
+                    replyTweetId:
+                      type: integer
+                      description: The ID of the tweet.
+                    replyUserId:
+                      type: integer
+                      description: The ID of the user.
+                    replyText:
                       type: string
                       description: The text of the reply.
+                    createdAt:
+                      type: "2023-11-27 02:17:25"
+                      description: The date and time the reply was created.
                     userName:
                       type: string
                       description: The name of the user that make reply.
@@ -2404,11 +2413,6 @@ paths:
                     profileImageURL:
                       type: string
                       description: The image of the user that make reply.
-                    createdAt:
-                      type: string
-                      description: The date and time the reply was created.
-                    likesCount:
-                      type: integer
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2463,6 +2467,30 @@ paths:
                 type: boolean
               message:
                 type: string
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    replyId:
+                      type: integer
+                    replyTweetId:
+                      type: integer
+                    replyUserId:
+                      type: integer
+                    replyText:
+                      type: string
+                    createdAt:
+                      type: "2023-11-27 02:17:25"
+                    userName:
+                      type: string
+                      description: The name of the user that make reply.
+                    bio:
+                      type: string
+                      description: The bio of the user that make reply.
+                    profileImageURL:
+                      type: string
+                      description: The image of the user that make reply.
         '400':
           description: Bad request - something went wrong.
           schema:
