@@ -522,19 +522,20 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
     .getMany();
 
   const repliesPromises = replies.map(async (reply) => {
-    const likesCount = await AppDataSource.getRepository(LikeReply).count({
-      where: {
-        replyId: reply.replyId,
-      },
-    });
+    // const likesCount = await AppDataSource.getRepository(LikeReply).count({
+    //   where: {
+    //     replyId: reply.replyId,
+    //   },
+    // });
     return {
-      id: reply.replyId,
-      text: reply.text,
+      replyId: reply.replyId,
+      replyTweetId: reply.tweetId,
+      replyUserId: reply.userId,
+      replyText: reply.text,
+      createdAt: reply.time,
       username: reply.user.username,
       bio: reply.user.bio,
       profileImageURL: reply.user.imageUrl,
-      createdAt: reply.time,
-      likesCount: likesCount,
     };
   });
   let repliesRes = await Promise.all(repliesPromises);
@@ -575,11 +576,18 @@ exports.addReply = catchAsync(async (req, res, next) => {
   reply.tweetId = tweetId;
   reply.text = replyText;
   reply.time = getCurrentTimestamp();
-  const savedRerply = await AppDataSource.getRepository(Reply).save(reply);
+  const savedReply = await AppDataSource.getRepository(Reply).save(reply);
 
   res.status(200).json({
     status: true,
     message: 'Reply is added successfully',
+    data: {
+      replyId: savedReply.replyId,
+      replyTweetId: savedReply.tweetId,
+      replyUserId: savedReply.userId,
+      replyText: savedReply.text,
+      createdAt: savedReply.time,
+    },
   });
 });
 
