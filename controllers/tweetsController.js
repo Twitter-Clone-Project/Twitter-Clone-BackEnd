@@ -578,6 +578,12 @@ exports.addReply = catchAsync(async (req, res, next) => {
   reply.time = getCurrentTimestamp();
   const savedReply = await AppDataSource.getRepository(Reply).save(reply);
 
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: reply.userId,
+    },
+  });
+
   res.status(200).json({
     status: true,
     message: 'Reply is added successfully',
@@ -587,6 +593,9 @@ exports.addReply = catchAsync(async (req, res, next) => {
       replyUserId: savedReply.userId,
       replyText: savedReply.text,
       createdAt: savedReply.time,
+      username: user.username,
+      bio: user.bio,
+      profileImageURL: user.imageUrl,
     },
   });
 });
