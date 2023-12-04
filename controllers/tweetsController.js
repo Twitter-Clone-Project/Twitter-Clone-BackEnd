@@ -170,6 +170,11 @@ exports.addTweet = catchAsync(async (req, res, next) => {
         profileImageURL: user.imageUrl,
         screenName: user.name,
         username: user.username,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingCount,
+        isFollowed: false,
+        isFollowing: false,
       },
       attachmentsUrl: tweetMediaUrls,
       isRetweet: false,
@@ -255,6 +260,23 @@ exports.getTweet = catchAsync(async (req, res, next) => {
     },
   });
 
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: tweet.userId,
+      followerId: currUserId,
+    },
+  });
+
+  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: currUserId,
+      followerId: tweet.userId,
+    },
+  });
+
+  isFollowed = !!isFollowed;
+  isFollowing = !!isFollowing;
+
   isLiked = !!isLiked;
   isReposted = !!isReposted;
   const tweetMediaUrls = attachments.map((media) => media.url);
@@ -265,9 +287,14 @@ exports.getTweet = catchAsync(async (req, res, next) => {
       text: tweet.text,
       createdAt: tweet.time,
       user: {
-        profileImageURL: user.c,
+        profileImageURL: user.imageUrl,
         screenName: user.name,
         userName: user.username,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingCount,
+        isFollowed: isFollowed,
+        isFollowing: isFollowing,
       },
       attachmentsURL: tweetMediaUrls,
       isLiked: isLiked,
