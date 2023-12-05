@@ -20,8 +20,6 @@ app.use((req, res, next) => {
 
 let server;
 (async () => {
-  console.log('cert', process.env.certificate);
-  console.log('key', process.env.privateKey);
   try {
     await AppDataSource.initialize();
     if (AppDataSource.isInitialized) {
@@ -35,7 +33,7 @@ let server;
           app,
         )
         .listen(PORT, () => {
-          console.log(`Express server listening on port ${PORT} 🫡`);
+          console.log(`Https Express server listening on port ${PORT} 🫡`);
         });
     }
   } catch (err) {
