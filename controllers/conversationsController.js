@@ -42,12 +42,24 @@ const getUserConversations = async (userId) => {
           : conversation.user1;
 
       const lastMessage = await AppDataSource.getRepository(Message).findOne({
-        select: { isSeen: true, time: true, text: true, messageId: true },
+        select: {
+          isSeen: true,
+          senderId: true,
+          time: true,
+          text: true,
+          messageId: true,
+        },
         where: {
           conversationId: conversation.conversationId,
         },
         order: { time: 'DESC' },
       });
+
+      const isConversationSeen = lastMessage
+        ? lastMessage.senderId === userId
+          ? true
+          : lastMessage.isSeen
+        : true;
 
       const followRepository = AppDataSource.getRepository(Follow);
       const totalCountPromise = followRepository
@@ -97,6 +109,7 @@ const getUserConversations = async (userId) => {
 
       return {
         conversationId: conversation.conversationId,
+        isConversationSeen,
         contact: {
           id: otherUser.userId,
           email: otherUser.email,
