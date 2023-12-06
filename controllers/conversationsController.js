@@ -19,7 +19,6 @@ const getUserConversations = async (userId) => {
       'user1.userId',
       'user1.email',
       'user1.name',
-      'user1.name',
       'user1.followersCount',
       'user1.createdAt',
       'user1.username',

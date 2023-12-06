@@ -35,10 +35,24 @@
 ## `chat-opened` Event
 
 - **Purpose**: Updates the status of notifications and messages when a chat is opened.
-- **Payload**: `data` - Object containing information about the chat, including you id (the id of the current emiter user that opened the chat :) as `userId` and also `conversationId`.
+- **Payload**: `data` - Object containing information about the chat, including you id (the id of the current emiter user that opened the chat :) as `userId`, id of the person you are chating `contactId` and also `conversationId`.
 - **Action**:
   - Updates notifications with `isFromChat` as `true` and `isSeen` as `true` for the specified user.
   - Updates messages with `isSeen` as `true` for the specified conversation and user.
+  - emits a `status-of-contact` event.
+
+## `chat-closed` Event
+
+- **Purpose**: emit it when a chat with a user is closed.
+- **Payload**: `data` - Object containing information about the chat, including the `conversationId` and `contactId`.
+- **Action**:
+  - emits a `status-of-contact` event.
+
+## `status-of-contact` Event
+
+- **Purpose**: Sends the status of the another contact in a conversation.
+- **Payload**: `status` - Object containing information about the conversation, including `conversationId` and `contactId`.
+- **Action**: Emits the status of the another contact.
 
 ## `mark-notifications-as-seen` Event
 

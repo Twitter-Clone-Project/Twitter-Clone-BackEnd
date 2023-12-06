@@ -1,6 +1,7 @@
 const User = require('../models/entites/User');
 const Message = require('../models/entites/Message');
 const Notification = require('../models/entites/Notification');
+const Conversation = require('../models/entites/Conversation');
 
 class SocketService {
   constructor() {
@@ -38,7 +39,7 @@ class SocketService {
 
     this.io = require('socket.io')(this.server, {
       cors: {
-        origin: 'http://localhost:3000',
+        origin: '*',
         credentials: true,
       },
     });
@@ -67,11 +68,23 @@ class SocketService {
       });
 
       socket.on('msg-send', async (message) => {
+        // const conversation = await AppDataSource.getRepository(
+        //   Conversation,
+        // ).findOne({
+        //   select: { activeUsersCnt },
+        //   where: { conversationId: message.conversationId },
+        // });
+
+        // if (conversation.activeUsersCnt >= 2) {
+        //   message.isSeen = true;
+        // }
+
         const newMessage = new Message(
           message.conversationId,
           message.senderId,
           message.receiverId,
           message.text,
+          message.isSeen,
         );
         await AppDataSource.getRepository(Message).insert(newMessage);
 
@@ -111,10 +124,53 @@ class SocketService {
           { isSeen: true },
         );
 
+        // const updatedConv = await AppDataSource.createQueryBuilder()
+        //   .update(Conversation)
+        //   .set({
+        //     activeUsersCnt: () => 'activeUsersCnt + 1',
+        //   })
+        //   .where('conversationId = :id', { id: data.conversationId })
+        //   .returning('*') // Return all columns
+        //   .execute();
+
+        const receiver = await AppDataSource.getRepository(User).findOne({
+          select: { name: true, socketId: true, userId: true },
+          where: { userId: data.contactId },
+        });
+
+        if (receiver.socketId) {
+          socket.to(receiver.socketId).emit('status-of-contact', {
+            contactId: data.contactId,
+            inConversation: true,
+          });
+        }
+
         await AppDataSource.getRepository(Message).update(
           { conversationId: data.conversationId, receiverId: data.userId },
           { isSeen: true },
         );
+      });
+
+      socket.on('chat-closed', async (data) => {
+        const receiver = await AppDataSource.getRepository(User).findOne({
+          select: { name: true, socketId: true, userId: true },
+          where: { userId: data.contactId },
+        });
+
+        if (receiver.socketId) {
+          socket.to(receiver.socketId).emit('status-of-contact', {
+            conversationId: data.conversationId,
+            inConversation: false,
+          });
+        }
+
+        // await AppDataSource.createQueryBuilder()
+        //   .update(Conversation)
+        //   .set({
+        //     activeUsersCnt: () => 'activeUsersCnt - 1',
+        //   })
+        //   .where('conversationId = :id', { id: data.conversationId })
+        //   .execute();
       });
 
       socket.on('disconnect', async () => {
