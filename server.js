@@ -1,4 +1,4 @@
-const http = require('http');
+const https = require('https');
 const dotenv = require('dotenv');
 
 process.on('uncaughtException', (err) => {
@@ -24,9 +24,17 @@ let server;
     await AppDataSource.initialize();
     if (AppDataSource.isInitialized) {
       console.log('DB connection established ✔️');
-      server = http.createServer(app).listen(PORT, () => {
-        console.log(`Express server listening on port ${PORT} 🫡`);
-      });
+      server = https
+        .createServer(
+          {
+            cert: process.env.certificate.replace(/\\n/g, '\n'),
+            key: process.env.privateKey.replace(/\\n/g, '\n'),
+          },
+          app,
+        )
+        .listen(PORT, () => {
+          console.log(`Https Express server listening on port ${PORT} 🫡`);
+        });
     }
   } catch (err) {
     console.log(err.name, err.message);

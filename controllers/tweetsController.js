@@ -98,10 +98,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
     );
-  let trendsArray = [];
-  if (trends) {
-    trendsArray = trends.split(',');
-  }
+  trendsArray = trends && Array.isArray(trends) ? trends : [];
   const userId = req.currentUser.userId;
 
   const tweet = new Tweet();
@@ -173,6 +170,11 @@ exports.addTweet = catchAsync(async (req, res, next) => {
         profileImageURL: user.imageUrl,
         screenName: user.name,
         username: user.username,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingCount,
+        isFollowed: false,
+        isFollowing: false,
       },
       attachmentsUrl: tweetMediaUrls,
       isRetweet: false,
@@ -258,6 +260,23 @@ exports.getTweet = catchAsync(async (req, res, next) => {
     },
   });
 
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: tweet.userId,
+      followerId: currUserId,
+    },
+  });
+
+  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: currUserId,
+      followerId: tweet.userId,
+    },
+  });
+
+  isFollowed = !!isFollowed;
+  isFollowing = !!isFollowing;
+
   isLiked = !!isLiked;
   isReposted = !!isReposted;
   const tweetMediaUrls = attachments.map((media) => media.url);
@@ -268,9 +287,14 @@ exports.getTweet = catchAsync(async (req, res, next) => {
       text: tweet.text,
       createdAt: tweet.time,
       user: {
-        profileImageURL: user.c,
+        profileImageURL: user.imageUrl,
         screenName: user.name,
         userName: user.username,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingCount,
+        isFollowed: isFollowed,
+        isFollowing: isFollowing,
       },
       attachmentsURL: tweetMediaUrls,
       isLiked: isLiked,
@@ -498,19 +522,20 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
     .getMany();
 
   const repliesPromises = replies.map(async (reply) => {
-    const likesCount = await AppDataSource.getRepository(LikeReply).count({
-      where: {
-        replyId: reply.replyId,
-      },
-    });
+    // const likesCount = await AppDataSource.getRepository(LikeReply).count({
+    //   where: {
+    //     replyId: reply.replyId,
+    //   },
+    // });
     return {
-      id: reply.replyId,
-      text: reply.text,
+      replyId: reply.replyId,
+      replyTweetId: reply.tweetId,
+      replyUserId: reply.userId,
+      replyText: reply.text,
+      createdAt: reply.time,
       username: reply.user.username,
       bio: reply.user.bio,
       profileImageURL: reply.user.imageUrl,
-      createdAt: reply.time,
-      likesCount: likesCount,
     };
   });
   let repliesRes = await Promise.all(repliesPromises);
@@ -551,11 +576,27 @@ exports.addReply = catchAsync(async (req, res, next) => {
   reply.tweetId = tweetId;
   reply.text = replyText;
   reply.time = getCurrentTimestamp();
-  const savedRerply = await AppDataSource.getRepository(Reply).save(reply);
+  const savedReply = await AppDataSource.getRepository(Reply).save(reply);
+
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: reply.userId,
+    },
+  });
 
   res.status(200).json({
     status: true,
     message: 'Reply is added successfully',
+    data: {
+      replyId: savedReply.replyId,
+      replyTweetId: savedReply.tweetId,
+      replyUserId: savedReply.userId,
+      replyText: savedReply.text,
+      createdAt: savedReply.time,
+      username: user.username,
+      bio: user.bio,
+      profileImageURL: user.imageUrl,
+    },
   });
 });
 

@@ -69,6 +69,30 @@ async function getTweetInfo(tweetId, userId) {
   };
 }
 
+async function getUserInfo(userId, currUserId) {
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: userId,
+      followerId: currUserId,
+    },
+  });
+
+  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: currUserId,
+      followerId: userId,
+    },
+  });
+
+  isFollowed = !!isFollowed;
+  isFollowing = !!isFollowing;
+
+  return {
+    isFollowed,
+    isFollowing,
+  };
+}
+
 async function getFirstTweets(userId) {
   const tweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
@@ -103,6 +127,7 @@ async function getFirstTweets(userId) {
 
   const tweetsPromises = tweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const tweeterInfo = await getUserInfo(tweet.userId, userId);
     const tweetMedia = await AppDataSource.getRepository(Media).find({
       where: {
         tweetId: tweet.tweetId,
@@ -121,6 +146,11 @@ async function getFirstTweets(userId) {
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -134,6 +164,8 @@ async function getFirstTweets(userId) {
 
   const retweetsPromises = retweets.map(async (tweet) => {
     const retweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const tweeterInfo = await getUserInfo(tweet.userId, userId);
+    const retweeterInfo = await getUserInfo(tweet.retweeter.userId, userId);
     const retweetMedia = await AppDataSource.getRepository(Media).find({
       where: {
         tweetId: tweet.tweetId,
@@ -151,12 +183,22 @@ async function getFirstTweets(userId) {
         username: tweet.retweeter.username,
         screenName: tweet.retweeter.name,
         profileImageURL: tweet.retweeter.imageUrl,
+        bio: tweet.retweeter.bio,
+        followersCount: tweet.retweeter.followersCount,
+        followingCount: tweet.retweeter.followingsCount,
+        isFollowed: retweeterInfo.isFollowed,
+        isFollowing: retweeterInfo.isFollowing,
       },
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: retweetInfo.isLiked,
       isRetweeted: retweetInfo.isReposted,
@@ -175,7 +217,7 @@ async function getFirstTweets(userId) {
 exports.getTweets = catchAsync(async (req, res, next) => {
   const { pageNum } = req.params;
   const userId = req.currentUser.userId;
-
+  console.log(userId);
   if (parseInt(pageNum, 10) === 1) {
     await getFirstTweets(userId);
   }
@@ -228,6 +270,7 @@ async function getFirstUserTweets(username, currUserId) {
 
   const tweetsPromises = userTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
     const tweetMedia = await AppDataSource.getRepository(Media).find({
       where: {
         tweetId: tweet.tweetId,
@@ -246,6 +289,11 @@ async function getFirstUserTweets(username, currUserId) {
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -259,6 +307,8 @@ async function getFirstUserTweets(username, currUserId) {
 
   const retweetsPromises = userRetweets.map(async (tweet) => {
     const retweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+    const retweeterInfo = await getUserInfo(tweet.retweeter.userId, currUserId);
     const retweetMedia = await AppDataSource.getRepository(Media).find({
       where: {
         tweetId: tweet.tweetId,
@@ -276,12 +326,22 @@ async function getFirstUserTweets(username, currUserId) {
         username: tweet.retweeter.username,
         screenName: tweet.retweeter.name,
         profileImageURL: tweet.retweeter.imageUrl,
+        bio: tweet.retweeter.bio,
+        followersCount: tweet.retweeter.followersCount,
+        followingCount: tweet.retweeter.followingsCount,
+        isFollowed: retweeterInfo.isFollowed,
+        isFollowing: retweeterInfo.isFollowing,
       },
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: retweetInfo.isLiked,
       isRetweeted: retweetInfo.isReposted,
@@ -339,6 +399,7 @@ async function getFirstUserMentions(username, currUserId) {
 
   const tweetsPromises = userMentionsTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
     const tweetMedia = await AppDataSource.getRepository(Media).find({
       where: {
         tweetId: tweet.tweetId,
@@ -357,6 +418,11 @@ async function getFirstUserMentions(username, currUserId) {
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -414,6 +480,7 @@ async function getFirstUserLikes(username, currUserId) {
 
   const tweetsPromises = userLikesTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
     const tweetMedia = await AppDataSource.getRepository(Media).find({
       where: {
         tweetId: tweet.tweetId,
@@ -432,6 +499,11 @@ async function getFirstUserLikes(username, currUserId) {
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
