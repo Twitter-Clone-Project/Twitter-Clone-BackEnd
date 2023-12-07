@@ -203,11 +203,11 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   });
 
   if (image) {
-    const imageUrl = await uploadMedia([image[0]]);
+
     if(user.imageUrl){
       await deleteFromS3(user.imageUrl);
     }
-    
+    const imageUrl = await uploadMedia([image[0]]);
     user.imageUrl = imageUrl[0];
   }
   if (isUpdated == 'TRUE') {
