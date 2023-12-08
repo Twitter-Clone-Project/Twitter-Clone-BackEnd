@@ -103,7 +103,7 @@ const getUserData = async (accessToken) => {
  * @returns {OAuth2Client} - The OAuth2 client for Google
  */
 const createOAuth2Client = () => {
-  const redirectUrl = 'https://ticketing.dev/api/users/auth/google/callback';
+  const redirectUrl = 'https://localhost:2023/api/v1/auth/google/callback';
 
   const oAuth2Client = new OAuth2Client(
     process.env.CLIENT_ID_GOOGLE,
