@@ -36,9 +36,10 @@ router
   .route('/updateProfile')
   .patch(
     authController.requireAuth,
+    profileController.uploadFiles,
     updateProfileValidationRules,
     imagesValidation,
-    profileController.uploadFiles,
+    validateRequest,
     profileController.updateProfile,
   );
 

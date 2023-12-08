@@ -108,53 +108,60 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
       createdAt: true,
     },
   });
-  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
-    where: {
-      userId: user.userId,
-      followerId: currUserId,
-    },
-  });
-  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
-    where: {
-      userId: currUserId,
-      followerId: user.userId,
-    },
-  });
-  let isMuted = await AppDataSource.getRepository(Mute).findOne({
-    where: {
-      userId: currUserId,
-      mutedId: user.userId,
-    },
-  });
-  let isBlocked = await AppDataSource.getRepository(Block).findOne({
-    where: {
-      userId: currUserId,
-      blockedId: user.userId,
-    },
-  });
-  let isBlockingMe = await AppDataSource.getRepository(Block).findOne({
-    where: {
-      userId: user.userId,
-      blockedId: currUserId,
-    },
-  });
-  isMuted = !!isMuted;
-  isBlocked = !!isBlocked;
-  isFollowed = !!isFollowed;
-  isFollowing = !!isFollowing;
-  isBlockingMe = !!isBlockingMe;
-  user.isMuted = isMuted;
-  user.isBlocked = isBlocked;
-  user.isFollowed = isFollowed;
-  user.isFollowing = isFollowing;
-  user.isBlockingMe = isBlockingMe;
+  if (user) {
+    let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: user.userId,
+        followerId: currUserId,
+      },
+    });
+    let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: currUserId,
+        followerId: user.userId,
+      },
+    });
+    let isMuted = await AppDataSource.getRepository(Mute).findOne({
+      where: {
+        userId: currUserId,
+        mutedId: user.userId,
+      },
+    });
+    let isBlocked = await AppDataSource.getRepository(Block).findOne({
+      where: {
+        userId: currUserId,
+        blockedId: user.userId,
+      },
+    });
+    let isBlockingMe = await AppDataSource.getRepository(Block).findOne({
+      where: {
+        userId: user.userId,
+        blockedId: currUserId,
+      },
+    });
+    isMuted = !!isMuted;
+    isBlocked = !!isBlocked;
+    isFollowed = !!isFollowed;
+    isFollowing = !!isFollowing;
+    isBlockingMe = !!isBlockingMe;
+    user.isMuted = isMuted;
+    user.isBlocked = isBlocked;
+    user.isFollowed = isFollowed;
+    user.isFollowing = isFollowing;
+    user.isBlockingMe = isBlockingMe;
 
-  res.status(200).json({
-    status: true,
-    data: {
-      user: user,
-    },
-  });
+    res.status(200).json({
+      status: true,
+      data: {
+        user: user,
+      },
+    });
+  } else {
+    res.status(404).json({
+      status: false,
+      message: 'There is no user with this user name  ',
+    });
+  }
 });
 
 exports.updateUsername = catchAsync(async (req, res, next) => {
@@ -193,9 +200,12 @@ exports.updateEmail = catchAsync(async (req, res, next) => {
 });
 exports.updateProfile = catchAsync(async (req, res, next) => {
   const { name, bio, website, location, birthDate, isUpdated } = req.body;
-  let image = req.files.profilePhoto;
-  let banner = req.files.bannerPhoto;
-
+  let image = null;
+  let banner = null;
+  if (req.files) {
+    image = req.files.profilePhoto;
+    banner = req.files.bannerPhoto;
+  }
   const currUserId = req.currentUser.userId;
 
   const user = await AppDataSource.getRepository(User).findOne({
@@ -210,7 +220,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     const imageUrl = await uploadMedia([image[0]]);
     user.imageUrl = imageUrl[0];
   }
-  if (isUpdated == 'TRUE') {
+  if (isUpdated && isUpdated == 'TRUE') {
     if (banner) {
       const bannerUrl = await uploadMedia([banner[0]]);
       user.bannerUrl = bannerUrl[0];
