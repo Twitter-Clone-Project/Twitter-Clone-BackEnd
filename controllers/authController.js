@@ -157,7 +157,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const otp = user.createOTP();
   await userRepository.insert(user);
 
-  // await new Email(user, { otp }).sendConfirmationEmail();
+  await new Email(user, { otp }).sendConfirmationEmail();
 
   setTimeout(
     async () => {
