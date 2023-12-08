@@ -292,7 +292,7 @@ exports.oauthGooogleCallback = async (req, res, next) => {
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
-  res.redirect(303, `${req.protocol}://${req.get('host')}/app`);
+  res.redirect(303, `https://127.0.0.1:5173/app`);
 };
 
 /**
