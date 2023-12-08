@@ -17,7 +17,7 @@
 ## `msg-send` Event
 
 - **Purpose**: Sends a message from one user to another.
-- **Payload**: `message` - Object containing information about the message, including `conversationId`, `senderId`, `receiverId`, and `text`.
+- **Payload**: `message` - Object containing information about the message, including `conversationId`, `senderId`, `receiverId`, `isSeen`, and `text`.
 - **Action**:
   - Inserts the new message into the database.
   - Sends a chat notification to the receiver.
