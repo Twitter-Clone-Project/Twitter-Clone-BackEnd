@@ -166,6 +166,9 @@ exports.getConversationHistory = catchAsync(async (req, res, next) => {
   const { conversationId } = req.params;
   const { userId } = req.currentUser;
 
+  if (!conversationId)
+    return next(new AppError('No Conversation with that id', 400));
+
   const messages = await AppDataSource.getRepository(Message).find({
     select: {
       senderId: true,

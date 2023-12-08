@@ -51,7 +51,7 @@
 ## `status-of-contact` Event
 
 - **Purpose**: Sends the status of the another contact in a conversation.
-- **Payload**: `status` - Object containing information about the conversation, including `conversationId` and `contactId`.
+- **Payload**: `status` - Object containing `conversationId` and `inConversation`.
 - **Action**: Emits the status of the another contact.
 
 ## `mark-notifications-as-seen` Event

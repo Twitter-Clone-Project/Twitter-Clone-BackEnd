@@ -140,7 +140,7 @@ class SocketService {
 
         if (receiver.socketId) {
           socket.to(receiver.socketId).emit('status-of-contact', {
-            contactId: data.contactId,
+            conversationId: data.conversationId,
             inConversation: true,
           });
         }
