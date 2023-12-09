@@ -19,6 +19,8 @@ class User {
     this.followersCount = undefined;
     this.followingsCount = undefined;
     this.bannerUrl = undefined;
+    this.socketId = undefined;
+    this.isOnline = false;
     this.createdAt = undefined;
   }
 

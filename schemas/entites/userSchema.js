@@ -72,6 +72,16 @@ module.exports = new EntitySchema({
       type: 'timestamptz',
       nullable: true,
     },
+    isOnline: {
+      type: 'boolean',
+      default: false,
+    },
+    socketId: {
+      unique: true,
+      nullable: true,
+      type: 'varchar',
+      length: 150,
+    },
     followersCount: {
       type: 'bigint',
       nullable: true,

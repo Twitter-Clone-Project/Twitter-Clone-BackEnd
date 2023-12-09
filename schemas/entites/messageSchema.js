@@ -21,6 +21,7 @@ module.exports = new EntitySchema({
     },
     receiverId: {
       nullable: true,
+
       type: 'bigint',
     },
     time: {

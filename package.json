@@ -58,6 +58,7 @@
     "pug": "^3.0.2",
     "react-html-email": "^3.0.0",
     "request": "^2.88.2",
+    "socket.io": "^4.7.2",
     "typeorm": "^0.3.17",
     "uuid": "^9.0.1",
     "xss-clean": "^0.1.4"

@@ -67,6 +67,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
     'email',
     'userId',
     'isConfirmed',
+    'isOnline',
     'name',
     'imageUrl',
     'birthDate',
@@ -112,7 +113,6 @@ exports.signup = catchAsync(async (req, res, next) => {
         'Content-Type': 'application/json',
       },
     });
-
     if (response.ok) {
       const result = await response.json();
       if (!result.success) {
@@ -147,6 +147,7 @@ exports.signup = catchAsync(async (req, res, next) => {
       user: filterObj(
         user,
         'username',
+        'isOnline',
         'email',
         'userId',
         'isConfirmed',
@@ -191,6 +192,7 @@ exports.signin = catchAsync(async (req, res, next) => {
       'user.followingsCount',
       'user.followersCount',
       'user.createdAt',
+      'user.isOnline',
     ])
     .from(User, 'user')
     .where('user.email = :email', { email })
@@ -236,6 +238,7 @@ exports.signWithGoogle = catchAsync(async (req, res, next) => {
     .select([
       'user.username',
       'user.email',
+      'user.isOnline',
       'user.userId',
       'user.isConfirmed',
       'user.name',
@@ -304,7 +307,13 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
 
   const user = await AppDataSource.getRepository(User)
     .createQueryBuilder()
-    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .select([
+      'user.username',
+      'user.email',
+      'user.userId',
+      'user.isConfirmed',
+      'user.isOnline',
+    ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: payload.id })
     .getOne();
@@ -330,6 +339,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
       userId: true,
       createdAt: true,
       isConfirmed: true,
+      isOnline: true,
       username: true,
       email: true,
       name: true,
@@ -363,6 +373,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
         'bannerUrl',
         'followingsCount',
         'followersCount',
+        'isOnline',
       ),
     },
   });
@@ -390,6 +401,7 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
       createdAt: true,
       otp: true,
       username: true,
+      isOnline: true,
       email: true,
       name: true,
       imageUrl: true,
@@ -455,6 +467,7 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
       userId: true,
       createdAt: true,
       isConfirmed: true,
+      isOnline: true,
       username: true,
       email: true,
       name: true,
@@ -504,6 +517,7 @@ exports.changePassword = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.createdAt',
+      'user.isOnline',
       'user.name',
       'user.imageUrl',
       'user.birthDate',
@@ -592,6 +606,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
       isConfirmed: true,
       createdAt: true,
       username: true,
+      isOnline: true,
       email: true,
       name: true,
       imageUrl: true,

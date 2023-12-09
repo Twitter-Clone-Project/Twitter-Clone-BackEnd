@@ -1,5 +1,6 @@
 const https = require('https');
 const dotenv = require('dotenv');
+const socketService = require('./services/WebSocket');
 
 process.on('uncaughtException', (err) => {
   console.log('uncaught exception'.toUpperCase(), ',Shutting down......');
@@ -35,6 +36,8 @@ let server;
         .listen(PORT, () => {
           console.log(`Https Express server listening on port ${PORT} 🫡`);
         });
+
+      socketService.initializeSocket(server, AppDataSource);
     }
   } catch (err) {
     console.log(err.name, err.message);
