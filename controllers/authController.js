@@ -229,7 +229,7 @@ exports.signWithGoogle = catchAsync(async (req, res, next) => {
     },
   );
 
-  const { email, name, email_verified } = await response.json();
+  const { email, name } = await response.json();
 
   const existingUser = await AppDataSource.getRepository(User)
     .createQueryBuilder()
