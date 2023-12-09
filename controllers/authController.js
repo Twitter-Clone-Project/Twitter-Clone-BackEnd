@@ -99,22 +99,6 @@ const getUserDataByGoogleAuth = catchAsync(async (accessToken) => {
 });
 
 /**
- * Creates an OAuth2 client for Google authentication.
- * @returns {OAuth2Client} - The OAuth2 client for Google
- */
-const createOAuth2Client = () => {
-  const redirectUrl = 'https://localhost:2023/api/v1/auth/google/callback';
-
-  const oAuth2Client = new OAuth2Client(
-    process.env.CLIENT_ID_GOOGLE,
-    process.env.CLIENT_SECRET_GOOGLE,
-    redirectUrl,
-  );
-
-  return oAuth2Client;
-};
-
-/**
  * Controller for user signup.
  * @param {Object} req - The request object
  * @param {Object} res - The response object
