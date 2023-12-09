@@ -231,10 +231,6 @@ exports.signWithGoogle = catchAsync(async (req, res, next) => {
 
   const { email, name, email_verified } = await response.json();
 
-  if (!email_verified) {
-    return next(new AppError('Google email is not verified', 401));
-  }
-
   const existingUser = await AppDataSource.getRepository(User)
     .createQueryBuilder()
     .select([
