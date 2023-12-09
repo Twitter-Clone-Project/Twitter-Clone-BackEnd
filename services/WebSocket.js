@@ -120,7 +120,7 @@ class SocketService {
               `jsonb_set(isUsersActive, '{userId_${data.userId}}', 'true')`,
           })
           .where('conversationId = :conversationId', {
-            conversationId: data.conversationId
+            conversationId: data.conversationId,
           })
           .execute();
 
@@ -170,11 +170,35 @@ class SocketService {
       socket.on('disconnect', async () => {
         console.log(`Server disconnected from a client`);
 
-        const user = 
-        await AppDataSource.getRepository(User).update(
+        const userRepository = AppDataSource.getRepository(User);
+
+        const { userId } = await AppDataSource.getRepository(User).findOne({
+          where: { socketId: socket.id },
+          select: {
+            userId: true,
+            isConfirmed: true,
+            isOnline: true,
+            username: true,
+            email: true,
+            name: true,
+          },
+        });
+
+        await userRepository.update(
           { socketId: socket.id },
           { socketId: null, isOnline: false },
         );
+
+        await AppDataSource.createQueryBuilder()
+          .update(Conversation)
+          .set({
+            isUsersActive: () =>
+              `jsonb_set(isUsersActive, '{userId_${userId}}', 'false')`,
+          })
+          .where('user1Id = :userId OR user2Id = :userId', {
+            userId,
+          })
+          .execute();
       });
     });
     console.log('WebSocket initialized ✔️');
