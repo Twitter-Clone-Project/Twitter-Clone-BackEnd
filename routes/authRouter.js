@@ -12,7 +12,6 @@ const {
 
 const router = express.Router();
 
-
 router
   .route('/signup')
   .post(signupValidationRules, validateRequest, authController.signup);
@@ -26,7 +25,6 @@ router.route('/me').get(authController.requireAuth, authController.getMe);
 router.route('/signout').post(authController.signout);
 
 router.route('/signWithGoogle').post(authController.signWithGoogle);
-router.route('/google/callback').get(authController.oauthGooogleCallback);
 
 router
   .route('/verifyEmail')

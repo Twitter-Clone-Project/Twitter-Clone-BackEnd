@@ -89,14 +89,14 @@ const createAndSendToken = (user, req, res, statusCode) => {
  * @param {string} accessToken - The access token
  * @returns {Object} - User data from the Google API
  */
-const getUserData = async (accessToken) => {
+const getUserDataByGoogleAuth = catchAsync(async (accessToken) => {
   const response = await fetch(
     `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
   );
 
   const userData = await response.json();
   return userData;
-};
+});
 
 /**
  * Creates an OAuth2 client for Google authentication.
@@ -243,57 +243,44 @@ exports.signin = catchAsync(async (req, res, next) => {
  * @param {Object} req - The request object
  * @param {Object} res - The response object
  */
-exports.signWithGoogle = (req, res) => {
-  const oAuth2Client = createOAuth2Client();
+exports.signWithGoogle = catchAsync(async (req, res) => {
+  const { googleAccessToken } = req.body;
 
-  const authorizeUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope:
-      'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid ',
-    prompt: 'consent',
-  });
-
-  res.json({ url: authorizeUrl });
-};
-
-/**
- * Controller for handling the callback from Google OAuth2 authentication.
- * @param {Object} req - The request object
- * @param {Object} res - The response object
- * @param {function} next - The next middleware function
- */
-exports.oauthGooogleCallback = async (req, res, next) => {
-  const { code } = req.query;
-
-  const oAuth2Client = createOAuth2Client();
-
-  const response = await oAuth2Client.getToken(code);
-  oAuth2Client.setCredentials(response.tokens);
-  const userData = await getUserData(oAuth2Client.credentials.access_token);
-
-  const user = await AppDataSource.getRepository(User)
-    .createQueryBuilder()
-    .select(['user.userId', 'user.isConfirmed'])
-    .from(User, 'user')
-    .where('user.email = :email', { email: userData.email })
-    .getOne();
-
-  if (!user) {
-    return next(new AppError('User not found. Please go to sign up'));
+  if (!googleAccessToken) {
+    return next(new AppError('The Google Access Token is required'));
   }
 
-  const token = this.signToken(user.userId);
+  const { given_name, family_name, email, picture, name } =
+    getUserDataByGoogleAuth(googleAccessToken);
 
-  res.cookie('jwt', token, {
-    expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRESIN * 1000 * 24 * 60 * 60,
-    ),
-    httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-  });
+  const existingUser = await AppDataSource.getRepository(User)
+    .createQueryBuilder()
+    .select([
+      'user.username',
+      'user.email',
+      'user.userId',
+      'user.isConfirmed',
+      'user.name',
+      'user.imageUrl',
+      'user.birthDate',
+      'user.website',
+      'user.location',
+      'user.bio',
+      'user.bannerUrl',
+      'user.followingsCount',
+      'user.followersCount',
+      'user.createdAt',
+    ])
+    .from(User, 'user')
+    .where('user.email = :email', { email })
+    .getOne();
 
-  res.redirect(303, `https://127.0.0.1:5173/app`);
-};
+  if (!existingUser) {
+    return next(new AppError('User not found. Please go to sign up', 404));
+  }
+
+  createAndSendToken(existingUser, req, res, 200);
+});
 
 /**
  * Controller for signing out.

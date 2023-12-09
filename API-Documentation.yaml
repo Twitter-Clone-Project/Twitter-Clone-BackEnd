@@ -64,10 +64,6 @@ paths:
       responses:
         '201':
           description: Successful sign-up
-          headers:
-            Set-Cookie:
-              type: string
-              description: Cookie containing the access token
           schema:
             type: object
             properties:
@@ -78,7 +74,6 @@ paths:
                 properties:
                   token:
                     type: string
-                    discription: All user data will return
                   user:
                     type: object
                     properties:
@@ -90,6 +85,26 @@ paths:
                         type: string
                       email:
                         type: string
+                      createdAt:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingsCount:
+                        type: string
+                      bannerUrl:
+                        type: string
+                      bio:
+                        type: string
+                      location:
+                        type: string   
+                      website:
+                        type: string
+                      birthDate:
+                        type: string  
+                      imageUrl:
+                        type: string
+                      name:
+                        type: string 
         '400':
           description: Bad request - something went wrong
           schema:
@@ -155,6 +170,26 @@ paths:
                         type: string
                       email:
                         type: string
+                      createdAt:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingsCount:
+                        type: string
+                      bannerUrl:
+                        type: string
+                      bio:
+                        type: string
+                      location:
+                        type: string   
+                      website:
+                        type: string
+                      birthDate:
+                        type: string  
+                      imageUrl:
+                        type: string
+                      name:
+                        type: string  
         '400':
           description: Bad request - something went wrong
           schema:
@@ -180,44 +215,7 @@ paths:
         - application/json
       responses:
         '200':
-          description: Successful sign-in/up
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              data:
-                type: object
-                properties:
-                  authorizeUrl:
-                    type: string
-                    discription: url that you should navigate to, so that the user can choose from his emails
-        '400':
-          description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: false
-              message: Something went wrong
-  /auth/google/callback:
-    post:
-      tags:
-        - auth
-      summary: The callback api where the user can choose his google account
-      description: Endpoint for user authentication using google. This is the callback api that will redirect you after choosing your google account. the cookie will be sent to browser cookies
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Successful sign-in/up
+          description: Successful sign-in
           headers:
             Set-Cookie:
               type: string
@@ -232,7 +230,6 @@ paths:
                 properties:
                   token:
                     type: string
-                    discription: All user data will return
                   user:
                     type: object
                     properties:
@@ -244,6 +241,92 @@ paths:
                         type: string
                       email:
                         type: string
+                      createdAt:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingsCount:
+                        type: string
+                      bannerUrl:
+                        type: string
+                      bio:
+                        type: string
+                      location:
+                        type: string   
+                      website:
+                        type: string
+                      birthDate:
+                        type: string  
+                      imageUrl:
+                        type: string
+                      name:
+                        type: string 
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+  /auth/me:
+    post:
+      tags:
+        - auth
+      summary: Get Me
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful get me
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      userId:
+                        type: bigint
+                      isConfirmed:
+                        type: boolean
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      createdAt:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingsCount:
+                        type: string
+                      bannerUrl:
+                        type: string
+                      bio:
+                        type: string
+                      location:
+                        type: string   
+                      website:
+                        type: string
+                      birthDate:
+                        type: string  
+                      imageUrl:
+                        type: string
+                      name:
+                        type: string 
         '400':
           description: Bad request - something went wrong
           schema:
@@ -348,7 +431,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /auth/confirmEmail:
+  /auth/verifyEmail:
     post:
       tags:
         - auth
@@ -371,19 +454,52 @@ paths:
                 description: the number sent in the verification email
       responses:
         '200':
-          description: Successful Confirm-Email
+          description: Successful sign-in
+          headers:
+            Set-Cookie:
+              type: string
+              description: Cookie containing the access token
           schema:
             type: object
             properties:
               status:
                 type: boolean
-              message:
-                type: string
-          examples:
-            application/json:
-              status: true
-              message: confirmed
-
+              data:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      userId:
+                        type: bigint
+                      isConfirmed:
+                        type: boolean
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      createdAt:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingsCount:
+                        type: string
+                      bannerUrl:
+                        type: string
+                      bio:
+                        type: string
+                      location:
+                        type: string   
+                      website:
+                        type: string
+                      birthDate:
+                        type: string  
+                      imageUrl:
+                        type: string
+                      name:
+                        type: string 
         '400':
           description: Bad request - something went wrong
           schema:
