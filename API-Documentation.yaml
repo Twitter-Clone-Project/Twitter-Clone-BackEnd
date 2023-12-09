@@ -208,11 +208,21 @@ paths:
       tags:
         - auth
       summary: Sign in/up to the application with google automatically
-      description: Endpoint for user authentication using google. this API will navigate the user to his google emails to choose an email, then will call google APIs to  check the email and return his data from google, then will check if this user registered before? if yes, it will generate an authentication token and send it = `Sign in`. if no, it will add the user to the database and generate an authentication token and send it = `Sign up`
+      description: Endpoint for user authentication using google. 
       consumes:
         - application/json
       produces:
         - application/json
+      parameters:
+        - name: body
+          in: body
+          description: User credentials for authentication
+          required: true
+          schema:
+            type: object
+            properties:
+              googleAccessToken:
+                type: string
       responses:
         '200':
           description: Successful sign-in
@@ -656,24 +666,18 @@ paths:
               status: false
               message: Something went wrong
 
-  /auth/resetPassword/{resetToken}:
+  /auth/resetPassword:
     patch:
       tags:
         - auth
       summary: Reset the password
       description: >-
-        Endpoint that take the token  - sent in the password change email - as
-        request parameters and the new password to set it.
+        Endpoint to set the password after checking otp
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - name: resetToken
-          in: path
-          description: Token for password update
-          required: true
-          type: string
         - name: body
           in: body
           description: User credentials for authentication
@@ -848,7 +852,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/{username}/isFound:
+  /users/{username}/isUsernameFound:
     get:
       tags:
         - auth
@@ -889,7 +893,7 @@ paths:
             application/json:
               status: false
               message: Something went wrong
-  /users/{email}/isFound:
+  /users/{email}/isEmailFound:
     get:
       tags:
         - auth
