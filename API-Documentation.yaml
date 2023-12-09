@@ -1999,6 +1999,64 @@ paths:
             application/json:
               status: false
               message: Unauthorized user    
+              ####################################################
+  /leaveConversation:
+    delete:
+      tags:
+        - profile
+      summary: leave a conversation
+      description: >-
+        Endpoint to leave a conversation
+      consumes:
+        - application/json
+      produces:
+        - application/json 
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            conversationId:
+              type: string
+
+      responses:
+        '200':
+          description: Successful Send
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              messages:
+                type: string
+        '400':
+          description: Bad request - something went wrong
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Something went wrong
+        '401':
+          description: Unauthorized - Should be authorized to complete the request
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+              message:
+                type: string
+          examples:
+            application/json:
+              status: false
+              message: Unauthorized user    
 ######################################################
 
   /conversations/unseenConversationsCnt:

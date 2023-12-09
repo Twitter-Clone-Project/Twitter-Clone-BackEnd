@@ -170,6 +170,7 @@ class SocketService {
       socket.on('disconnect', async () => {
         console.log(`Server disconnected from a client`);
 
+        const user = 
         await AppDataSource.getRepository(User).update(
           { socketId: socket.id },
           { socketId: null, isOnline: false },

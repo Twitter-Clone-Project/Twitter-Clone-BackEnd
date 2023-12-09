@@ -232,3 +232,15 @@ exports.startConversation = catchAsync(async (req, res, next) => {
     data: { newConversation },
   });
 });
+
+exports.leaveConversation = catchAsync(async (req, res, next) => {
+  const { conversationId } = req.body;
+  const conversationRepository = AppDataSource.getRepository(Conversation);
+
+  await conversationRepository.delete({ conversationId });
+
+  res.status(200).json({
+    status: true,
+    message: 'conversation deleted successfully',
+  });
+});

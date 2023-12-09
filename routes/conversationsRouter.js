@@ -5,6 +5,7 @@ const validateRequest = require('../middlewares/validateRequest');
 
 const {
   startChatValidationRules,
+  leaveChatValidationRules,
 } = require('../middlewares/validations/conversation');
 const router = express.Router();
 
@@ -35,4 +36,12 @@ router
     conversationsController.startConversation,
   );
 
+router
+  .route('/leaveConversation')
+  .delete(
+    authController.requireAuth,
+    leaveChatValidationRules,
+    validateRequest,
+    conversationsController.leaveConversation,
+  );
 module.exports = router;
