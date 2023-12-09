@@ -110,8 +110,9 @@ const getUserConversations = async (userId) => {
       return {
         conversationId: conversation.conversationId,
         isConversationSeen,
-        isContactInConversation: conversation.isUsersActive[`userId_${otherUser.userId}`],
         contact: {
+          inConversation:
+            conversation.isUsersActive[`userId_${otherUser.userId}`],
           id: otherUser.userId,
           email: otherUser.email,
           name: otherUser.name,
