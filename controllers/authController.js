@@ -14,6 +14,7 @@ const AppError = require('../services/AppError');
 const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
+const { use } = require('../routes/authRouter');
 
 /**
  * Filters object properties based on specified fields.
@@ -83,20 +84,6 @@ const createAndSendToken = (user, req, res, statusCode) => {
     data: { user: filteredUser, token },
   });
 };
-
-/**
- * Retrieves user data from Google API using an access token.
- * @param {string} accessToken - The access token
- * @returns {Object} - User data from the Google API
- */
-const getUserDataByGoogleAuth = catchAsync(async (accessToken) => {
-  const response = await fetch(
-    `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
-  );
-
-  const userData = await response.json();
-  return userData;
-});
 
 /**
  * Controller for user signup.
@@ -227,15 +214,26 @@ exports.signin = catchAsync(async (req, res, next) => {
  * @param {Object} req - The request object
  * @param {Object} res - The response object
  */
-exports.signWithGoogle = catchAsync(async (req, res) => {
+exports.signWithGoogle = catchAsync(async (req, res, next) => {
   const { googleAccessToken } = req.body;
 
   if (!googleAccessToken) {
-    return next(new AppError('The Google Access Token is required'));
+    return next(new AppError('The Google Access Token is required', 400));
   }
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v3/userinfo`,
+    {
+      headers: {
+        Authorization: `Bearer ${googleAccessToken}`,
+      },
+    },
+  );
 
-  const { given_name, family_name, email, picture, name } =
-    getUserDataByGoogleAuth(googleAccessToken);
+  const { email, name, email_verified } = await response.json();
+
+  if (!email_verified) {
+    return next(new AppError('Google email is not verified', 401));
+  }
 
   const existingUser = await AppDataSource.getRepository(User)
     .createQueryBuilder()
