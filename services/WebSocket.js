@@ -68,17 +68,6 @@ class SocketService {
       });
 
       socket.on('msg-send', async (message) => {
-        // const conversation = await AppDataSource.getRepository(
-        //   Conversation,
-        // ).findOne({
-        //   select: { activeUsersCnt },
-        //   where: { conversationId: message.conversationId },
-        // });
-
-        // if (conversation.activeUsersCnt >= 2) {
-        //   message.isSeen = true;
-        // }
-
         const newMessage = new Message(
           message.conversationId,
           message.senderId,
@@ -124,14 +113,16 @@ class SocketService {
           { isSeen: true },
         );
 
-        // const updatedConv = await AppDataSource.createQueryBuilder()
-        //   .update(Conversation)
-        //   .set({
-        //     activeUsersCnt: () => 'activeUsersCnt + 1',
-        //   })
-        //   .where('conversationId = :id', { id: data.conversationId })
-        //   .returning('*') // Return all columns
-        //   .execute();
+        await AppDataSource.createQueryBuilder()
+          .update(Conversation)
+          .set({
+            isUsersActive: () =>
+              `jsonb_set(isUsersActive, '{userId_${data.userId}}', 'true')`,
+          })
+          .where('conversationId = :conversationId', {
+            conversationId: data.conversationId
+          })
+          .execute();
 
         const receiver = await AppDataSource.getRepository(User).findOne({
           select: { name: true, socketId: true, userId: true },
@@ -164,13 +155,16 @@ class SocketService {
           });
         }
 
-        // await AppDataSource.createQueryBuilder()
-        //   .update(Conversation)
-        //   .set({
-        //     activeUsersCnt: () => 'activeUsersCnt - 1',
-        //   })
-        //   .where('conversationId = :id', { id: data.conversationId })
-        //   .execute();
+        await AppDataSource.createQueryBuilder()
+          .update(Conversation)
+          .set({
+            isUsersActive: () =>
+              `jsonb_set(isUsersActive, '{userId_${data.userId}}', 'false')`,
+          })
+          .where('conversationId = :conversationId', {
+            conversationId: data.conversationId,
+          })
+          .execute();
       });
 
       socket.on('disconnect', async () => {

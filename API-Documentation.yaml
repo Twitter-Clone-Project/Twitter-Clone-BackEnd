@@ -1855,6 +1855,10 @@ paths:
                       properties:
                         conversationId:
                           type: integer 
+                        isContactInConversation:
+                          type: boolean
+                        isConversationSeen:
+                          type: boolean  
                         contact:
                           type: object
                           properties:

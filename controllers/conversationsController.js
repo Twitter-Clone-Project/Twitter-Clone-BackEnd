@@ -16,6 +16,7 @@ const getUserConversations = async (userId) => {
       'user1Id',
       'user2Id',
       'conversationId',
+      'isUsersActive',
       'user1.userId',
       'user1.email',
       'user1.name',
@@ -109,6 +110,7 @@ const getUserConversations = async (userId) => {
       return {
         conversationId: conversation.conversationId,
         isConversationSeen,
+        isContactInConversation: conversation.isUsersActive[`userId_${otherUser.userId}`],
         contact: {
           id: otherUser.userId,
           email: otherUser.email,

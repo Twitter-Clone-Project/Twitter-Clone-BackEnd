@@ -16,10 +16,10 @@ module.exports = new EntitySchema({
     user2Id: {
       type: 'bigint',
     },
-    // activeUsersCnt: {
-    //   type: 'int',
-    //   default: 0,
-    // },
+    isUsersActive: {
+      type: 'jsonb',
+      default: {},
+    },
   },
   uniques: [
     {
