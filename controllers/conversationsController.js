@@ -220,16 +220,22 @@ exports.getUnseenConversationsCnt = catchAsync(async (req, res, next) => {
 });
 
 exports.startConversation = catchAsync(async (req, res, next) => {
-  const { user1Id, user2Id } = req.body;
+  const { userIds } = req.body;
+  const { userId: myId } = req.currentUser;
   const conversationRepository = AppDataSource.getRepository(Conversation);
 
-  const newConversation = new Conversation(user1Id, user2Id);
+  let newConversations = [];
+  for (const userId of userIds) {
+    const newConversation = new Conversation(userId, parseInt(myId));
 
-  await conversationRepository.save(newConversation);
+    await conversationRepository.save(newConversation);
+
+    newConversations.push(newConversation);
+  }
 
   res.status(200).json({
     status: true,
-    data: { newConversation },
+    data: { newConversations },
   });
 });
 

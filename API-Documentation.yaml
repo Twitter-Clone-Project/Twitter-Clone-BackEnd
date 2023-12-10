@@ -2115,7 +2115,7 @@ paths:
               status: false
               message: Unauthorized user    
 ####################################################
-  /startConversation:
+  /conversations/startConversation:
     post:
       tags:
         - profile
@@ -2133,12 +2133,10 @@ paths:
         schema:
           type: object
           properties:
-            user1Id:
-              type: string
-              description: The user's 1 id.
-            user2Id:
-              type: string
-              description: The user's 2 id.
+            userIds:
+              type: array
+              items:
+                type: integer
 
       responses:
         '200':
@@ -2151,16 +2149,24 @@ paths:
               data:
                 type: object
                 properties:  
-                  newConversation:
-                    type: object
-                    properties:
-                      conversationId:
-                        type: string 
-                      user2Id:
-                        type: integer
-                      user1Id: 
-                        type: integer
-
+                  newConversations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        conversationId:
+                          type: string
+                        user2Id:
+                          type: integer
+                        user1Id:
+                          type: integer
+                        isUsersActive:
+                          type: object
+                          properties:
+                            userId_user1Id: 
+                              type: boolean
+                            userId_user2Id: 
+                              type: boolean  
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2188,7 +2194,7 @@ paths:
               status: false
               message: Unauthorized user    
               ####################################################
-  /leaveConversation:
+  /conversations/leaveConversation:
     delete:
       tags:
         - profile
