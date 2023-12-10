@@ -11,9 +11,11 @@ module.exports = new EntitySchema({
       generated: 'increment',
     },
     user1Id: {
+      primary: true,
       type: 'bigint',
     },
     user2Id: {
+      primary: true,
       type: 'bigint',
     },
     isUsersActive: {
@@ -21,12 +23,12 @@ module.exports = new EntitySchema({
       default: {},
     },
   },
-  uniques: [
-    {
-      name: 'unique_user_pair',
-      columns: ['user1Id', 'user2Id'],
-    },
-  ],
+  // uniques: [
+  //   {
+  //     name: 'unique_user_pair',
+  //     columns: ['user1Id', 'user2Id'],
+  //   },
+  // ],
   relations: {
     user1: {
       type: 'many-to-one',
