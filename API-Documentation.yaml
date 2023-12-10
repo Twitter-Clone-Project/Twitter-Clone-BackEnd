@@ -2433,12 +2433,17 @@ paths:
           description: The text of the tweet.
           required: false
 
-        - name: attachments
+        - name: media
           in: formData
           description: The new tweet attachments of max 4.
           required: false
           type: file
           maxItems: 4
+          
+        - name: trends
+          in: formData
+          description: list of trends (hashtags) from the added tweet
+          required: false
       responses:
         '200':
           description: Successful Add
