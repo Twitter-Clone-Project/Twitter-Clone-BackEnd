@@ -26,6 +26,7 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
       email: user.email,
       name: user.name,
       username: user.username,
+      profileImageURL: user.imageUrl,
     };
   });
   let usersRes = await Promise.all(usersPromises);
