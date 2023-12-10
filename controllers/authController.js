@@ -95,6 +95,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
+    
   const userRepository = AppDataSource.getRepository(User);
 
   // if this email signed but not confirmed remove it
@@ -174,7 +175,6 @@ exports.signup = catchAsync(async (req, res, next) => {
  */
 exports.signin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
   const user = await AppDataSource.getRepository(User)
     .createQueryBuilder()
     .select([

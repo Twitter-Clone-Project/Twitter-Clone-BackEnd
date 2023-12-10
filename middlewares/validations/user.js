@@ -19,7 +19,7 @@ exports.signupValidationRules = [
     .isString()
     .isLength({ min: 3 })
     .withMessage('Username must be at least 3 characters'),
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
   body('password')
     .isString()
     .isLength({ min: 6 })
@@ -43,13 +43,12 @@ exports.signupValidationRules = [
  * Validation rules for user signin.
  */
 exports.signinValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
   body('password')
     .isString()
     .isLength({ min: 6 })
     .withMessage('Invalid Password'),
 ];
-
 
 /**
  * Validation rules for OTP verification.
@@ -91,21 +90,21 @@ exports.changePasswordValidationRules = [
  * Validation rules for forgetting the user's password.
  */
 exports.forgetPasswordValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
 ];
 
 /**
  * Validation rules for resending email confirmation.
  */
 exports.resendEmailValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
 ];
 
 /**
  * Validation rules for OTP verification with email.
  */
 exports.otpWithEmailValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
   body('otp')
     .matches(/^[a-z0-9]+$/)
     .isLength({ min: 8, max: 8 })
