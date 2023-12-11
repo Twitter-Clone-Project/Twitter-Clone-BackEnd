@@ -68,15 +68,6 @@ class SocketService {
       });
 
       socket.on('msg-send', async (message) => {
-        const newMessage = new Message(
-          message.conversationId,
-          message.senderId,
-          message.receiverId,
-          message.text,
-          message.isSeen,
-        );
-        await AppDataSource.getRepository(Message).insert(newMessage);
-
         const receiver = await AppDataSource.getRepository(User).findOne({
           select: { name: true, socketId: true, userId: true },
           where: { userId: message.receiverId },
@@ -87,16 +78,35 @@ class SocketService {
           where: { userId: message.senderId },
         });
 
-        if (receiver.socketId) {
-          socket.to(receiver.socketId).emit('msg-receive', message);
+        const isFound = await AppDataSource.getRepository(Conversation).exist({
+          where: { conversationId: message.conversationId },
+        });
 
-          await this.emitNotification(
-            sender.socketId,
-            receiver.socketId,
-            receiver.userId,
-            `${sender.name} sent you a message`,
-            true,
-          );
+        const newMessage = new Message(
+          message.conversationId,
+          message.senderId,
+          message.receiverId,
+          message.text,
+          message.isSeen,
+        );
+
+        if (!isFound && receiver.socketId) {
+          newMessage.text = 'this conversation has been deleted';
+          socket.to(receiver.socketId).emit('msg-receive', newMessage);
+        } else {
+          await AppDataSource.getRepository(Message).insert(newMessage);
+
+          if (receiver.socketId) {
+            socket.to(receiver.socketId).emit('msg-receive', message);
+
+            await this.emitNotification(
+              sender.socketId,
+              receiver.socketId,
+              receiver.userId,
+              `${sender.name} sent you a message`,
+              true,
+            );
+          }
         }
       });
 
