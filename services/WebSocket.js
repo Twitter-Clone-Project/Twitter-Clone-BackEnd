@@ -190,16 +190,42 @@ class SocketService {
             { socketId: null, isOnline: false },
           );
 
-          await AppDataSource.createQueryBuilder()
-            .update(Conversation)
-            .set({
-              isUsersActive: () =>
-                `jsonb_set(isUsersActive, '{userId_${user.userId}}', 'false')`,
-            })
-            .where('user1Id = :userId OR user2Id = :userId', {
+          const conversationRepository =
+            AppDataSource.getRepository(Conversation);
+
+          const activeConversation = await conversationRepository
+            .createQueryBuilder()
+            .where('"user1Id" = :userId OR "user2Id" = :userId', {
               userId: user.userId,
             })
-            .execute();
+            .andWhere(`"isUsersActive"->>'userId_${user.userId}' = 'true'`)
+            .getOne();
+
+          if (activeConversation) {
+            activeConversation.isUsersActive[`userId_${user.userId}`] = false;
+            await conversationRepository.save(activeConversation);
+
+            const contactId =
+              activeConversation.user1Id == user.userId
+                ? activeConversation.user2Id
+                : activeConversation.user1Id;
+
+            const openContact = await AppDataSource.getRepository(User).findOne(
+              {
+                where: { userId: contactId },
+                select: {
+                  socketId: true,
+                },
+              },
+            );
+
+            if (openContact && openContact.socketId) {
+              socket.to(openContact.socketId).emit('status-of-contact', {
+                conversationId: activeConversation.conversationId,
+                inConversation: false,
+              });
+            }
+          }
         }
       });
     });
