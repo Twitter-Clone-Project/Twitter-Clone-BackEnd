@@ -42,5 +42,6 @@ router
     validateRequest,
     profileController.updateProfile,
   );
+  router.route('/updaterawan').patch(profileController.rawanusers);
 
 module.exports = router;
