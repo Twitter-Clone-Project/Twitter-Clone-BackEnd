@@ -92,7 +92,9 @@ class SocketService {
 
         if (!isFound && receiver.socketId) {
           newMessage.text = 'this conversation has been deleted';
-          socket.to(receiver.socketId).emit('msg-receive', newMessage);
+          socket
+            .to(receiver.socketId)
+            .emit('msg-receive', { ...newMessage, conversationDeleted: true });
         } else {
           await AppDataSource.getRepository(Message).insert(newMessage);
 
