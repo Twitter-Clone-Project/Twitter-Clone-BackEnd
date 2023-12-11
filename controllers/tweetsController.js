@@ -172,7 +172,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
         username: user.username,
         bio: user.bio,
         followersCount: user.followersCount,
-        followingCount: user.followingCount,
+        followingCount: user.followingsCount,
         isFollowed: false,
         isFollowing: false,
       },
@@ -260,6 +260,13 @@ exports.getTweet = catchAsync(async (req, res, next) => {
     },
   });
 
+  let isReplied = await AppDataSource.getRepository(Reply).findOne({
+    where: {
+      userId: currUserId,
+      tweetId: tweetId,
+    },
+  });
+
   let isFollowed = await AppDataSource.getRepository(Follow).findOne({
     where: {
       userId: tweet.userId,
@@ -287,21 +294,25 @@ exports.getTweet = catchAsync(async (req, res, next) => {
       text: tweet.text,
       createdAt: tweet.time,
       user: {
+        userId: user.userId,
         profileImageURL: user.imageUrl,
         screenName: user.name,
         userName: user.username,
         bio: user.bio,
         followersCount: user.followersCount,
-        followingCount: user.followingCount,
+        followingCount: user.followingsCount,
         isFollowed: isFollowed,
         isFollowing: isFollowing,
       },
       attachmentsURL: tweetMediaUrls,
+      isRetweet: false,
       isLiked: isLiked,
       isRetweeted: isReposted,
+      isReplied: isReplied,
       likesCount: likesCount,
       retweetsCount: repostsCount,
       repliesCount: repliesCount,
+      retweetedUser: {},
     },
   });
 });
@@ -445,11 +456,25 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
   const retweeters = retweets.map((retweets) => retweets.user);
 
   const finalRetweetersPromises = retweeters.map(async (retweeter) => {
-    const { userId, name, username, profileImageURL } = retweeter;
+    const {
+      userId,
+      name,
+      username,
+      profileImageURL,
+      bio,
+      followersCount,
+      followingsCount,
+    } = retweeter;
     const isFollowed = await AppDataSource.getRepository(Follow).findOne({
       where: {
         userId: retweeter.userId,
         followerId: currUserId,
+      },
+    });
+    let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: currUserId,
+        followerId: retweeter.userId,
       },
     });
     return {
@@ -457,7 +482,11 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
       name: name,
       screenName: username,
       profileImageURL: profileImageURL,
+      bio: bio,
       isFollowed: !!isFollowed,
+      isFollowing: !!isFollowing,
+      followersCount: followersCount,
+      followingCount: followingsCount,
     };
   });
   const finalRetweeters = await Promise.all(finalRetweetersPromises);
@@ -482,11 +511,25 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   const likers = likes.map((likes) => likes.user);
 
   const finalLikersPromises = likers.map(async (liker) => {
-    const { userId, name, username, profileImageURL } = liker;
+    const {
+      userId,
+      name,
+      username,
+      profileImageURL,
+      bio,
+      followersCount,
+      followingsCount,
+    } = liker;
     const isFollowed = await AppDataSource.getRepository(Follow).findOne({
       where: {
         userId: liker.userId,
         followerId: currUserId,
+      },
+    });
+    let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: currUserId,
+        followerId: liker.userId,
       },
     });
     return {
@@ -494,7 +537,11 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
       name: name,
       screenName: username,
       profileImageURL: profileImageURL,
+      bio: bio,
       isFollowed: !!isFollowed,
+      isFollowing: !!isFollowing,
+      followersCount: followersCount,
+      followingCount: followingsCount,
     };
   });
   const finalLikers = await Promise.all(finalLikersPromises);
@@ -577,12 +624,27 @@ exports.addReply = catchAsync(async (req, res, next) => {
   reply.text = replyText;
   reply.time = getCurrentTimestamp();
   const savedReply = await AppDataSource.getRepository(Reply).save(reply);
+  const tweet = await AppDataSource.getRepository(Tweet).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (!tweet) return next(new AppError('No tweet exists with this id', 400));
 
   const user = await AppDataSource.getRepository(User).findOne({
     where: {
       userId: reply.userId,
     },
   });
+  if (!user) return next(new AppError('No user exists', 400));
+
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: tweet.userId,
+      followerId: currUserId,
+    },
+  });
+  isFollowed = !!isFollowed;
 
   res.status(200).json({
     status: true,
@@ -596,6 +658,9 @@ exports.addReply = catchAsync(async (req, res, next) => {
       username: user.username,
       bio: user.bio,
       profileImageURL: user.imageUrl,
+      followersCount: user.followersCount,
+      followingCount: user.followingsCount,
+      isFollowed: isFollowed,
     },
   });
 });

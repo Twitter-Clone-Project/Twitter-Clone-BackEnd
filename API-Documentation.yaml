@@ -96,15 +96,15 @@ paths:
                       bio:
                         type: string
                       location:
-                        type: string   
+                        type: string
                       website:
                         type: string
                       birthDate:
-                        type: string  
+                        type: string
                       imageUrl:
                         type: string
                       name:
-                        type: string 
+                        type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -181,15 +181,15 @@ paths:
                       bio:
                         type: string
                       location:
-                        type: string   
+                        type: string
                       website:
                         type: string
                       birthDate:
-                        type: string  
+                        type: string
                       imageUrl:
                         type: string
                       name:
-                        type: string  
+                        type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -208,7 +208,7 @@ paths:
       tags:
         - auth
       summary: Sign in/up to the application with google automatically
-      description: Endpoint for user authentication using google. 
+      description: Endpoint for user authentication using google.
       consumes:
         - application/json
       produces:
@@ -262,15 +262,15 @@ paths:
                       bio:
                         type: string
                       location:
-                        type: string   
+                        type: string
                       website:
                         type: string
                       birthDate:
-                        type: string  
+                        type: string
                       imageUrl:
                         type: string
                       name:
-                        type: string 
+                        type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -328,15 +328,15 @@ paths:
                       bio:
                         type: string
                       location:
-                        type: string   
+                        type: string
                       website:
                         type: string
                       birthDate:
-                        type: string  
+                        type: string
                       imageUrl:
                         type: string
                       name:
-                        type: string 
+                        type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -501,15 +501,15 @@ paths:
                       bio:
                         type: string
                       location:
-                        type: string   
+                        type: string
                       website:
                         type: string
                       birthDate:
-                        type: string  
+                        type: string
                       imageUrl:
                         type: string
                       name:
-                        type: string 
+                        type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1559,18 +1559,20 @@ paths:
               status:
                 type: boolean
               data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        email:
-                          type: string
-                        name:
-                          type: string
-                        username:
-                          type: string
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    email:
+                      type: string
+                    name:
+                      type: string
+                    username:
+                      type: string
+                    profileImageURL:
+                      type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -1791,17 +1793,17 @@ paths:
           description: The user's website.
           required: false
         - name: location
-          in : formData
+          in: formData
           description: The user's location.
           required: false
-        - name : birthDate
+        - name: birthDate
           in: formData
           description: The user's birthDate.
-          required : false
-        - name : isUpdated
+          required: false
+        - name: isUpdated
           in: formData
           description: if the user updated or deleted or not banner photo .
-          required : true
+          required: true
       responses:
         '200':
           description: Successful Update
@@ -1818,8 +1820,8 @@ paths:
                   username:
                     type: string
                     description: the user's username.
-                  isConfirmed: 
-                    type: boolean 
+                  isConfirmed:
+                    type: boolean
                   email:
                     type: string
                   name:
@@ -1912,7 +1914,7 @@ paths:
                   birthdate:
                     type: date
                   isConfirmed:
-                    type: boolean 
+                    type: boolean
                   isFollowed:
                     type: boolean
                     description: Is the current user follow this user profile.
@@ -1923,10 +1925,10 @@ paths:
                     type: boolean
                     description: Is the current user mutes this user.
                   isBlocked:
-                    type: boolean 
+                    type: boolean
                     description: is the current user blocks this user.
                   isBlockingMe:
-                    type: boolean 
+                    type: boolean
                     description: is the current user blocked by this user.
                   followersCount:
                     type: integer
@@ -1984,7 +1986,7 @@ paths:
                         isSeen:
                           type: boolean
                         isFromMe:
-                          type: boolean  
+                          type: boolean
                         time:
                           type: string
         '400':
@@ -2013,7 +2015,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-####################################################
+  ####################################################
   /conversations:
     get:
       tags:
@@ -2024,7 +2026,7 @@ paths:
       consumes:
         - application/json
       produces:
-        - application/json 
+        - application/json
       responses:
         '200':
           description: Successful Send
@@ -2035,17 +2037,17 @@ paths:
                 type: boolean
               data:
                 type: object
-                properties:  
+                properties:
                   conversations:
                     type: array
                     items:
                       type: object
                       properties:
                         conversationId:
-                          type: integer 
+                          type: integer
                         isConversationSeen:
-                          type: boolean  
-                        contact:                     
+                          type: boolean
+                        contact:
                           type: object
                           properties:
                             InConversation:
@@ -2056,17 +2058,17 @@ paths:
                               type: string
                               description: The user's ID.
                             email:
-                              type: string 
+                              type: string
                             name:
                               type: string
                               description: The user's name.
                             username:
                               type: string
-                              description: The user's name. 
-                            commonFollowersCnt: 
-                              type: integer  
+                              description: The user's name.
+                            commonFollowersCnt:
+                              type: integer
                             commonFollowers:
-                              type: array  
+                              type: array
                               items:
                                 type: object
                                 properties:
@@ -2075,19 +2077,19 @@ paths:
                                   username:
                                     type: string
                                   name:
-                                    type: string  
+                                    type: string
                         lastMessage:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: integer
                             isSeen:
                               type: boolean
-                            timestamp: 
+                            timestamp:
                               type: string
-                              example: "2023-11-20T14:14:37.588Z"
-                            text: 
-                              type: string            
+                              example: '2023-11-20T14:14:37.588Z'
+                            text:
+                              type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2113,8 +2115,8 @@ paths:
           examples:
             application/json:
               status: false
-              message: Unauthorized user    
-####################################################
+              message: Unauthorized user
+  ####################################################
   /conversations/startConversation:
     post:
       tags:
@@ -2125,18 +2127,18 @@ paths:
       consumes:
         - application/json
       produces:
-        - application/json 
+        - application/json
       parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            userIds:
-              type: array
-              items:
-                type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              userIds:
+                type: array
+                items:
+                  type: integer
 
       responses:
         '200':
@@ -2148,7 +2150,7 @@ paths:
                 type: boolean
               data:
                 type: object
-                properties:  
+                properties:
                   newConversations:
                     type: array
                     items:
@@ -2163,10 +2165,10 @@ paths:
                         isUsersActive:
                           type: object
                           properties:
-                            userId_user1Id: 
+                            userId_user1Id:
                               type: boolean
-                            userId_user2Id: 
-                              type: boolean  
+                            userId_user2Id:
+                              type: boolean
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2192,7 +2194,7 @@ paths:
           examples:
             application/json:
               status: false
-              message: Unauthorized user    
+              message: Unauthorized user
               ####################################################
   /conversations/leaveConversation:
     delete:
@@ -2204,16 +2206,16 @@ paths:
       consumes:
         - application/json
       produces:
-        - application/json 
+        - application/json
       parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            conversationId:
-              type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              conversationId:
+                type: string
 
       responses:
         '200':
@@ -2250,8 +2252,8 @@ paths:
           examples:
             application/json:
               status: false
-              message: Unauthorized user    
-######################################################
+              message: Unauthorized user
+  ######################################################
 
   /conversations/unseenConversationsCnt:
     get:
@@ -2305,7 +2307,7 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-###################################################          
+  ###################################################
   /notifications:
     post:
       tags:
@@ -2364,8 +2366,8 @@ paths:
           examples:
             application/json:
               status: false
-              message: Unauthorized user   
-###################################################              
+              message: Unauthorized user
+  ###################################################
   /notifications/unseenNotificationsCnt:
     post:
       tags:
@@ -2433,12 +2435,17 @@ paths:
           description: The text of the tweet.
           required: false
 
-        - name: attachments
+        - name: media
           in: formData
           description: The new tweet attachments of max 4.
           required: false
           type: file
           maxItems: 4
+
+        - name: trends
+          in: formData
+          description: list of trends (hashtags) from the added tweet
+          required: false
       responses:
         '200':
           description: Successful Add
@@ -2462,6 +2469,8 @@ paths:
                   user:
                     type: object
                     properties:
+                      userId:
+                        type: integer
                       profileImageURL:
                         type: string
                         description: The profile of the user that create the tweet.
@@ -2471,10 +2480,37 @@ paths:
                       userName:
                         type: string
                         description: The username that create the tweet.
+                      bio:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingCount:
+                        type: string
+                      isFollowed:
+                        type: boolean
+                      isFollowing:
+                        type: boolean
                   attachmentsURL:
                     type: array
                     items:
                       type: string
+                  isRetweet:
+                    type: boolean
+                  isLiked:
+                    type: boolean
+                  isRetweeted:
+                    type: boolean
+                  isReplied:
+                    type: boolean
+                  likesCount:
+                    type: integer
+                  retweetsCount:
+                    type: integer
+                  repliesCount:
+                    type: integer
+                  retweetedUser:
+                    type: object
+
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2560,34 +2596,47 @@ paths:
                   user:
                     type: object
                     properties:
+                      userId:
+                        type: integer
                       profileImageURL:
                         type: string
-                        description: The profile picture of the user that create the tweet .
+                        description: The profile of the user that create the tweet.
                       screenName:
                         type: string
-                        description: The screen name of the user that make the tweet.
+                        description: The screen name of the user that create the tweet.
                       userName:
                         type: string
-                        description: The username of the user that create the tweet.
+                        description: The username that create the tweet.
+                      bio:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingCount:
+                        type: string
+                      isFollowed:
+                        type: boolean
+                      isFollowing:
+                        type: boolean
                   attachmentsURL:
                     type: array
                     items:
                       type: string
+                  isRetweet:
+                    type: boolean
                   isLiked:
                     type: boolean
-                    description: Is the current user liked this tweet.
                   isRetweeted:
                     type: boolean
-                    description: Is the current user retweeted this tweet.
+                  isReplied:
+                    type: boolean
                   likesCount:
                     type: integer
-                    description: Total number of likes on tweet.
                   retweetsCount:
                     type: integer
-                    description: Total number of likes on tweet.
                   repliesCount:
                     type: integer
-                    description: Total number of replies on tweet.
+                  retweetedUser:
+                    type: object
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2639,7 +2688,7 @@ paths:
                       type: string
                       description: The text of the reply.
                     createdAt:
-                      type: "2023-11-27 02:17:25"
+                      type: '2023-11-27 02:17:25'
                       description: The date and time the reply was created.
                     userName:
                       type: string
@@ -2718,7 +2767,7 @@ paths:
                     replyText:
                       type: string
                     createdAt:
-                      type: "2023-11-27 02:17:25"
+                      type: '2023-11-27 02:17:25'
                     userName:
                       type: string
                       description: The name of the user that make reply.
@@ -2728,6 +2777,12 @@ paths:
                     profileImageURL:
                       type: string
                       description: The image of the user that make reply.
+                    followersCount:
+                      type: integer
+                    followingCount:
+                      type: integer
+                    isFollowed:
+                      type: boolean
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3068,9 +3123,17 @@ paths:
                     profileImageURL:
                       type: string
                       description: The profile of the user that retweet.
+                    bio:
+                      type: string
                     isFollowed:
                       type: boolean
                       description: Is the user follow this user or not.
+                    isFollowing:
+                      type: boolean
+                    followersCount:
+                      type: integer
+                    followingCount:
+                      type: integer
         '400':
           description: Bad request - something went wrong
           schema:
@@ -3120,20 +3183,27 @@ paths:
                   properties:
                     id:
                       type: string
-                      description: The ID of the liker.
+                      description: The ID of the retweeter.
                     name:
                       type: string
-                      description: The name of the liker.
+                      description: The name of the retweeter.
                     screenName:
                       type: string
-                      description: The screen name of the liker.
+                      description: The screen name of the retweeter.
                     profileImageURL:
                       type: string
-                      description: The profile of the liker.
+                      description: The profile of the user that retweet.
+                    bio:
+                      type: string
                     isFollowed:
                       type: boolean
-                      description: Is the liker follow the user that make tweet
-
+                      description: Is the user follow this user or not.
+                    isFollowing:
+                      type: boolean
+                    followersCount:
+                      type: integer
+                    followingCount:
+                      type: integer
         '400':
           description: Bad request - something went wrong.
           schema:
