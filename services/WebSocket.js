@@ -90,11 +90,11 @@ class SocketService {
           message.isSeen,
         );
 
-        if (!isFound && receiver.socketId) {
-          newMessage.text = 'this conversation has been deleted';
-          socket
-            .to(receiver.socketId)
-            .emit('msg-receive', { ...newMessage, conversationDeleted: true });
+        if (!isFound) {
+          socket.emit('status-of-contact', {
+            conversationId: message.conversationId,
+            inConversation: false,
+          });
         } else {
           await AppDataSource.getRepository(Message).insert(newMessage);
 
