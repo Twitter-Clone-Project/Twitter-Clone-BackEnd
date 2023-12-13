@@ -3971,7 +3971,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /trends/{trendName}/tweets:
+  /trends/{trendName}/tweets/{pageNum}:
     get:
       tags:
         - trends
@@ -3987,6 +3987,12 @@ paths:
           description: The name of the trend to get tweets for.
           required: true
           type: string
+          
+        - name: pageNum
+          in: path
+          description: page number for tweet pagination
+          required: true
+          type: string  
       responses:
         '200':
           description: Successful request.

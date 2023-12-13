@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.route('/').get(trendsController.getTrends);
 router
-  .route('/:trendName/tweets')
+  .route('/:trendName/tweets/:pageNum')
   .get(authController.requireAuth, trendsController.getTweetsForTrend);
 
 module.exports = router;
