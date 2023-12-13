@@ -72,7 +72,7 @@
 
 - **Purpose**: Sends the status of the other contact in a conversation.
 - **Payload**:
-  - `status` - Object containing `conversationId` and `inConversation`.
+  - `status` - Object containing `conversationId`, `isLeaved` and `inConversation`.
 - **Action**: Emits the status of the other contact.
 
 ## `mark-notifications-as-seen` Event
