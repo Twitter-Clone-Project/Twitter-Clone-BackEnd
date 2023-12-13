@@ -216,7 +216,7 @@ exports.getTrends = catchAsync(async (req, res, next) => {
   const trends = await AppDataSource.getRepository(Trend)
     .createQueryBuilder('trend')
     .orderBy('trend.count', 'DESC')
-    .select('trend.name')
+    .select(['trend.trendId', 'trend.name', 'trend.count'])
     .getMany();
 
   res.status(200).json({
