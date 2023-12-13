@@ -94,6 +94,7 @@ class SocketService {
           socket.emit('status-of-contact', {
             conversationId: message.conversationId,
             inConversation: false,
+            isLeaved: true,
           });
         } else {
           await AppDataSource.getRepository(Message).insert(newMessage);
@@ -145,6 +146,7 @@ class SocketService {
           socket.to(receiver.socketId).emit('status-of-contact', {
             conversationId: data.conversationId,
             inConversation: true,
+            isLeaved: false,
           });
         }
 
@@ -164,6 +166,7 @@ class SocketService {
           socket.to(receiver.socketId).emit('status-of-contact', {
             conversationId: data.conversationId,
             inConversation: false,
+            isLeaved: false,
           });
         }
 
@@ -235,6 +238,7 @@ class SocketService {
               socket.to(openContact.socketId).emit('status-of-contact', {
                 conversationId: activeConversation.conversationId,
                 inConversation: false,
+                isLeaved: false,
               });
             }
           }
