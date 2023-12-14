@@ -29,7 +29,7 @@ class SocketService {
       this.io.sockets.sockets
         .get(senderSocketId)
         .to(receiverSocketId)
-        .emit('chat-notification-receive', notification);
+        .emit('notification-receive', notification);
     }
   }
 

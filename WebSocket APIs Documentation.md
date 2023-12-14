@@ -10,7 +10,7 @@
 - **Purpose**: Adds a user to the online user list and updates their socket ID and online status.
 - **Payload**:
   - `userData` - Object containing user information
-     - `userId` - ID of the user connected to the socket.
+    - `userId` - ID of the user connected to the socket.
 - **Action**:
   - Updates the user's `socketId` and sets `isOnline` to `true` in the database.
   - Retrieves a list of online users and emits it to the newly connected user.
@@ -88,7 +88,7 @@
 - **Purpose**: Retrieves the list of online users.
 - **Action**: Queries the database for users with `isOnline` set to `true` and emits the list to the connected user.
 
-## `chat-notification-receive` Event
+## `notification-receive` Event
 
 - **Purpose**: Notifies the receiver about a new chat message.
 - **Payload**:
