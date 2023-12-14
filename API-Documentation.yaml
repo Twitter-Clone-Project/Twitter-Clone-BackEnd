@@ -2341,6 +2341,11 @@ paths:
                           type: string
                         isSeen:
                           type: boolean
+                        timestamp:
+                          type: date
+                          example: '2023-11-20T14:14:37.588Z'
+                        senderImgUrl:
+                          type: string
         '400':
           description: Bad request - something went wrong
           schema:

@@ -14,7 +14,8 @@ const AppError = require('../services/AppError');
 const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
-const { use } = require('../routes/authRouter');
+const socketService = require('../services/WebSocket');
+
 
 /**
  * Filters object properties based on specified fields.
@@ -313,6 +314,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.isOnline',
+      'user.socketId',
     ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: payload.id })
@@ -333,6 +335,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.getMe = catchAsync(async (req, res, next) => {
+  // await socketService.emitNotification(res.currentUser.socketId,,)
   const user = await AppDataSource.getRepository(User).findOne({
     where: { userId: req.currentUser.userId },
     select: {

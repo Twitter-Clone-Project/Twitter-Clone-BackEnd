@@ -95,8 +95,9 @@
   - `notification` - Object containing information about the notification.
     - `notificationId` - ID of the notification.
     - `content` - Content of the notification.
-    - `userId` - ID of the user associated with the notification.
+    - `timestamp` - timestamp for the notification.
     - `isSeen` - Indicates whether the notification is seen.
+    - `senderImgUrl` - Image url for the user who sent the message or triggered the notification.
 - **Action**: Emits the notification to the receiver's socket.
 
 ## `disconnect` Event
