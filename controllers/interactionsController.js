@@ -1,6 +1,7 @@
 const { AppDataSource } = require('../dataSource');
 const catchAsync = require('../middlewares/catchAsync');
 const AppError = require('../services/AppError');
+const socketService = require('../services/WebSocket');
 
 const Follow = require('../models/relations/Follow');
 const Mute = require('../models/relations/Mute');
@@ -200,6 +201,7 @@ exports.follow = catchAsync(async (req, res, next) => {
       console.error('Transaction failed. Changes rolled back:', error);
     }
 
+    await socketService.emitNotification(currUserId, user.userId, 'Follow');
     res.status(200).json({
       status: true,
       message: 'follow is added successfully',
@@ -279,6 +281,8 @@ exports.unFollow = catchAsync(async (req, res, next) => {
     } catch (error) {
       console.error('Transaction failed. Changes rolled back:', error);
     }
+
+    await socketService.emitNotification(currUserId, user.userId, 'unFollow');
     res.status(200).json({
       status: true,
       message: 'unfollow is done successfully',

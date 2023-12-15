@@ -28,7 +28,7 @@ module.exports = new EntitySchema({
     },
     type: {
       type: 'enum',
-      enum: ['CHAT', 'MENTION', 'FOLLOW'],
+      enum: ['CHAT', 'MENTION', 'FOLLOW', 'UNFOLLOW'],
     },
   },
   relations: {

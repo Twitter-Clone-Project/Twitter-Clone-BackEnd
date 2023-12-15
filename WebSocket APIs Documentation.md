@@ -75,14 +75,6 @@
   - `status` - Object containing `conversationId`, `isLeaved` and `inConversation`.
 - **Action**: Emits the status of the other contact.
 
-## `mark-notifications-as-seen` Event
-
-- **Purpose**: Marks all notifications as seen. When the user goes out of the notifications page or unmounts it, this event should be emitted to mark the notifications as seen.
-- **Payload**:
-  - `data` - Object containing information about the notifications.
-    - `userId` - ID of the current user who opened the chat.
-- **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
-
 ## `getOnlineUsers` Event
 
 - **Purpose**: Retrieves the list of online users.

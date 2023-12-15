@@ -1,6 +1,7 @@
 class Notification {
-  constructor(userId, content, isSeen = false, type) {
+  constructor(userId, senderId, content, isSeen = false, type) {
     this.userId = userId;
+    this.senderId = senderId;
     this.content = content;
     this.type = type;
     this.isSeen = isSeen;

@@ -2,6 +2,7 @@ const User = require('../models/entites/User');
 const Message = require('../models/entites/Message');
 const Notification = require('../models/entites/Notification');
 const Conversation = require('../models/entites/Conversation');
+const AppError = require('./AppError');
 
 class SocketService {
   constructor() {
@@ -10,7 +11,7 @@ class SocketService {
     this.socket = null;
   }
 
-  async emitNotification(senderId, receiverId, type) {
+  async emitNotification(senderId, receiverId, type = '') {
     type = type.toUpperCase();
     const userRepository = this.AppDataSource.getRepository(User);
 
@@ -35,12 +36,20 @@ class SocketService {
       case 'FOLLOW':
         content = `${sender.name} followed you`;
         break;
-      default:
-        content = `a notification from ${sender.name}`;
+      case 'UNFOLLOW':
+        content = `${sender.name} unfollowed you`;
         break;
+      default:
+        throw new AppError('Unknown notification type: ' + type);
     }
 
-    const notification = new Notification(receiverId, content, type);
+    const notification = new Notification(
+      receiverId,
+      senderId,
+      content,
+      false,
+      type,
+    );
     await this.AppDataSource.getRepository(Notification).insert(notification);
 
     if (receiver.socketId && sender.socketId) {
@@ -121,16 +130,9 @@ class SocketService {
           if (receiver.socketId) {
             socket.to(receiver.socketId).emit('msg-receive', message);
 
-            await this.emitNotification(message.userId, receiver.userId);
+            // await this.emitNotification(message.userId, receiver.userId);
           }
         }
-      });
-
-      socket.on('mark-notifications-as-seen', async (data) => {
-        await AppDataSource.getRepository(Notification).update(
-          { isSeen: false, userId: data.userId },
-          { isSeen: true },
-        );
       });
 
       socket.on('chat-opened', async (data) => {
