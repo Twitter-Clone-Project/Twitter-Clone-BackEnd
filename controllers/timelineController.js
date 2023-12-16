@@ -148,7 +148,7 @@ async function getFirstTweets(userId) {
         profileImageURL: tweet.user.imageUrl,
         bio: tweet.user.bio,
         followersCount: tweet.user.followersCount,
-        followingCount: tweet.user.followingCount,
+        followingCount: tweet.user.followingsCount,
         isFollowed: tweeterInfo.isFollowed,
         isFollowing: tweeterInfo.isFollowing,
       },
