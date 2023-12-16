@@ -1569,10 +1569,20 @@ paths:
                       type: string
                     name:
                       type: string
-                    username:
+                    userName:
                       type: string
                     profileImageURL:
                       type: string
+                    bio:
+                      type: string
+                    followersCount:
+                      type: string
+                    followingCount:
+                      type: string
+                    isFollowed:
+                      type: boolean
+                    isFollowing:
+                      type: boolean
         '400':
           description: Bad request - something went wrong
           schema:
@@ -3242,13 +3252,13 @@ paths:
                 properties:
                   id:
                     type: string
-                    description: The ID of the tweet.
+                    description: The ID of the new tweet.
                   text:
                     type: string
-                    description: The text of the tweet.
+                    description: The text of the new tweet.
                   createdAt:
                     type: string
-                    description: The date and time the tweet.
+                    description: The date and time the tweet was created.
                   user:
                     type: object
                     properties:
@@ -3256,13 +3266,13 @@ paths:
                         type: integer
                       profileImageURL:
                         type: string
-                        description: The profile of the user that created the tweet.
+                        description: The profile of the user that create the tweet.
                       screenName:
                         type: string
-                        description: The screen name of the user that created the tweet.
+                        description: The screen name of the user that create the tweet.
                       userName:
                         type: string
-                        description: The username that created the tweet.
+                        description: The username that create the tweet.
                       bio:
                         type: string
                       followersCount:

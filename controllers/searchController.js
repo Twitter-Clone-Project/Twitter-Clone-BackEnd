@@ -5,7 +5,10 @@ const AppError = require('../services/AppError');
 const Tweet = require('../models/entites/Tweet');
 const User = require('../models/entites/User');
 const Media = require('../models/entites/Media');
-
+const Reply = require('../models/entites/Reply');
+const Like = require('../models/relations/Like');
+const Repost = require('../models/relations/Repost');
+const Follow = require('../models/relations/Follow');
 async function getTweetInfo(tweetId, userId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
@@ -58,10 +61,34 @@ async function getTweetInfo(tweetId, userId) {
   };
 }
 
+async function getUserInfo(userId, currUserId) {
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: userId,
+      followerId: currUserId,
+    },
+  });
+
+  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: currUserId,
+      followerId: userId,
+    },
+  });
+
+  isFollowed = !!isFollowed;
+  isFollowing = !!isFollowing;
+
+  return {
+    isFollowed,
+    isFollowing,
+  };
+}
+
 exports.searchUsers = catchAsync(async (req, res, next) => {
   const { query } = req.query;
-  const currUserUsername = req.currentUser.username;
-  const currUserName = req.currentUser.name;
+  const currUser = req.currentUser;
+  console.log(currUser);
 
   if (!query) {
     return next(new AppError('No tweet exists with this id', 400));
@@ -70,23 +97,28 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
   const users = await AppDataSource.getRepository(User).find();
   const matchingUsers = users.filter(
     (user) =>
-      (user.username.toLowerCase().includes(query.toLowerCase()) &&
-        query.toLowerCase() != currUserUsername.toLowerCase()) ||
-      (user.name.toLowerCase().includes(query.toLowerCase()) &&
-        query.toLowerCase() != currUserName.toLowerCase()),
+      user.username.toLowerCase().includes(query.toLowerCase()) ||
+      user.name.toLowerCase().includes(query.toLowerCase()),
   );
 
   const usersPromises = matchingUsers.map(async (user) => {
-    return {
-      id: user.userId,
-      email: user.email,
-      name: user.name,
-      username: user.username,
-      profileImageURL: user.imageUrl,
-    };
+    const userInfo = await getUserInfo(user.userId, currUser.userId);
+    if (user.userId != currUser.userId)
+      return {
+        id: user.userId,
+        email: user.email,
+        name: user.name,
+        userName: user.username,
+        profileImageURL: user.imageUrl,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingsCount,
+        isFollowed: userInfo.isFollowed,
+        isFollowing: userInfo.isFollowing,
+      };
   });
   let usersRes = await Promise.all(usersPromises);
-  if (usersRes.length) {
+  if (usersRes.length && usersRes[0] != null) {
     res.status(200).json({
       status: true,
       data: usersRes,
@@ -101,6 +133,7 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
 
 exports.searchTweets = catchAsync(async (req, res, next) => {
   const { query } = req.query;
+  const currUserId = req.currentUser.userId;
 
   if (!query) {
     return next(new AppError('No tweet exists with this id', 400));
@@ -114,12 +147,6 @@ exports.searchTweets = catchAsync(async (req, res, next) => {
       'user',
       'user.userId = tweet.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .getMany();
 
   const matchingTweets = tweets.filter((tweet) =>
@@ -127,18 +154,30 @@ exports.searchTweets = catchAsync(async (req, res, next) => {
   );
 
   const tweetsPromises = matchingTweets.map(async (tweet) => {
-    const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsURL: tweet.attachmentsUrl,
       user: {
-        id: tweet.user.userId,
-        email: tweet.user.email,
-        name: tweet.user.name,
-        username: tweet.user.username,
+        userId: tweet.user.userId,
+        profileImageURL: tweet.user.profileImageURL,
+        screenName: tweet.user.name,
+        userName: tweet.user.username,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
+      attachmentsURL: tweetMediaUrls,
       isRetweet: false,
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -146,10 +185,11 @@ exports.searchTweets = catchAsync(async (req, res, next) => {
       likesCount: tweetInfo.likesCount,
       retweetsCount: tweetInfo.repostsCount,
       repliesCount: tweetInfo.repliesCount,
+      retweetedUser: {},
     };
   });
   let tweetsRes = await Promise.all(tweetsPromises);
-  if (tweetsRes.length) {
+  if (tweetsRes.length && tweetsRes[0] != null) {
     res.status(200).json({
       status: true,
       data: tweetsRes,

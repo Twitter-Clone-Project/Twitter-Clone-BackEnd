@@ -17,9 +17,9 @@ const Support = require('../models/relations/Support');
 const multer = require('multer');
 
 // Set up multer storage and limits
-const storage = multer.memoryStorage(); // You can change this based on your requirements
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-exports.uploadFiles = upload.fields([{ name: 'media', maxCount: 4 }]);
+exports.uploadFiles = upload.fields([{ name: 'media' }]);
 
 function getCurrentTimestamp() {
   const date = new Date(Date.now());
@@ -43,42 +43,62 @@ async function checkTweet(tweetId, next) {
   if (!tweet) return next(new AppError('No tweet exists with this id', 400));
 }
 
-function getImagesUrls(req, next) {
-  AWS.config.update({
-    accessKeyId: 'YOUR_ACCESS_KEY_ID',
-    secretAccessKey: 'YOUR_SECRET_ACCESS_KEY',
-    region: 'YOUR_REGION',
+async function uploadMedia(mediaArray) {
+  const s3 = new AWS.S3({
+    credentials: {
+      accessKeyId: 'AKIAWK2IJRF55BVEYPX4',
+      secretAccessKey: 'dG/6VvXq20pfZi8DUuK1AN2/tXgISj2OOsHAaWjo',
+    },
   });
 
-  const s3 = new AWS.S3();
+  const uploadPromises = mediaArray.map(async (media) => {
+    const uploadParams = {
+      Bucket: 'kady-twitter-images',
+      Key: Date.now() + media.originalname,
+      Body: Buffer.from(media.buffer),
+      ContentType: media.mimetype,
+      ACL: 'public-read',
+    };
 
-  const params = {
-    Bucket: 'your-s3-bucket-name',
-    Key: 'unique-key-for-image.jpg',
-    Body: req.file.buffer,
-    ACL: 'public-read',
-  };
-
-  s3.upload(params, (err, data) => {
-    if (err) {
-      return next(
-        new AppError('Error while uploading media to the cloud', 400),
-      );
+    try {
+      const data = await s3.upload(uploadParams).promise();
+      console.log('Upload Success', data.Location);
+      return data.Location;
+    } catch (err) {
+      console.error('Error uploading media:', err);
+      throw err; // Re-throw the error to be caught by the calling code
     }
-    // data.Location contains the public URL of the uploaded image
-    const imageUrls = data.Location;
-    return imageUrls;
   });
+
+  try {
+    // Wait for all uploads to complete
+    const locations = await Promise.all(uploadPromises);
+    return locations;
+  } catch (err) {
+    console.error('Error uploading media:', err);
+    throw err; // Re-throw the error to be caught by the calling code
+  }
 }
 
 exports.addTweet = catchAsync(async (req, res, next) => {
-  const { tweetText, trends } = req.body;
+  let { tweetText } = req.body;
+  const { trends } = req.body;
   const files = req.files;
-  console.log(files);
-  let trendsArray = [];
-  if (trends) {
-    trendsArray = trends.split(',');
+  let validMedia = true;
+  if (!files || !files.media) {
+    validMedia = false;
   }
+  if (!validMedia && (!tweetText || tweetText == '')) {
+    return next(new AppError('tweet can not be empty', 400));
+  }
+  if (validMedia && (!tweetText || tweetText == '')) {
+    tweetText = '';
+  }
+  if (validMedia && files.media.length > 4)
+    return next(
+      new AppError('tweet can not have more than 4 attachments', 400),
+    );
+  trendsArray = Array.isArray(trends) ? trends : trends ? [trends] : [];
   const userId = req.currentUser.userId;
 
   const tweet = new Tweet();
@@ -93,17 +113,18 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       userId: userId,
     },
   });
+  let attachments = [];
+  if (validMedia) {
+    attachments = await uploadMedia(files.media);
+  }
 
-  const attachments = [];
-  if (attachments.length > 4)
-    return next(
-      new AppError('tweet can not have more than 4 attachments', 400),
-    );
-  const media = new Media();
-  media.tweetId = savedTweet.tweetId;
-  media.url = attachments;
-  media.type = 'image';
-  const savedMedia = await AppDataSource.getRepository(Media).save(media);
+  for (const m of attachments) {
+    const media = new Media();
+    media.tweetId = savedTweet.tweetId;
+    media.url = m;
+    media.type = 'image';
+    const savedMedia = await AppDataSource.getRepository(Media).save(media);
+  }
 
   //add trends
   for (const trend of trendsArray) {
@@ -129,6 +150,15 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       await AppDataSource.getRepository(Support).save(support);
   }
 
+  const tweetMedia = await AppDataSource.getRepository(Media).find({
+    where: {
+      tweetId: savedTweet.tweetId,
+    },
+  });
+  let tweetMediaUrls = [];
+  if (validMedia) {
+    tweetMediaUrls = tweetMedia.map((media) => media.url);
+  }
   res.status(200).json({
     status: true,
     data: {
@@ -136,16 +166,25 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       text: savedTweet.text,
       createdAt: savedTweet.time,
       user: {
+        userId: user.userId,
         profileImageURL: user.imageUrl,
         screenName: user.name,
-        userName: user.username,
+        username: user.username,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingsCount,
+        isFollowed: false,
+        isFollowing: false,
       },
-      attachmentsURL: attachments,
+      attachmentsUrl: tweetMediaUrls,
+      isRetweet: false,
       isLiked: false,
       isRetweeted: false,
+      isReplied: false,
       likesCount: 0,
       retweetsCount: 0,
       repliesCount: 0,
+      retweetedUser: {},
     },
   });
 });
@@ -186,7 +225,7 @@ exports.getTweet = catchAsync(async (req, res, next) => {
     },
   });
   if (!user) return next(new AppError('No user exists', 400));
-  const attachments = await AppDataSource.getRepository(Media).findOne({
+  const attachments = await AppDataSource.getRepository(Media).find({
     where: {
       tweetId: tweetId,
     },
@@ -221,9 +260,33 @@ exports.getTweet = catchAsync(async (req, res, next) => {
     },
   });
 
+  let isReplied = await AppDataSource.getRepository(Reply).findOne({
+    where: {
+      userId: currUserId,
+      tweetId: tweetId,
+    },
+  });
+
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: tweet.userId,
+      followerId: currUserId,
+    },
+  });
+
+  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: currUserId,
+      followerId: tweet.userId,
+    },
+  });
+
+  isFollowed = !!isFollowed;
+  isFollowing = !!isFollowing;
+
   isLiked = !!isLiked;
   isReposted = !!isReposted;
-
+  const tweetMediaUrls = attachments.map((media) => media.url);
   res.status(200).json({
     status: true,
     data: {
@@ -231,16 +294,25 @@ exports.getTweet = catchAsync(async (req, res, next) => {
       text: tweet.text,
       createdAt: tweet.time,
       user: {
-        profileImageURL: user.c,
+        userId: user.userId,
+        profileImageURL: user.imageUrl,
         screenName: user.name,
         userName: user.username,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        followingCount: user.followingsCount,
+        isFollowed: isFollowed,
+        isFollowing: isFollowing,
       },
-      attachmentsURL: attachments,
+      attachmentsURL: tweetMediaUrls,
+      isRetweet: false,
       isLiked: isLiked,
       isRetweeted: isReposted,
+      isReplied: isReplied,
       likesCount: likesCount,
       retweetsCount: repostsCount,
       repliesCount: repliesCount,
+      retweetedUser: {},
     },
   });
 });
@@ -289,37 +361,61 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.addMedia = catchAsync(async (req, res, next) => {
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return res.status(400).json({ status: false, errors: errors.array() });
-//   }
-//   const { tweetId } = req.params;
-//   const { media } = req.fields;
-//   console.log(media);
+exports.addMedia = catchAsync(async (req, res, next) => {
+  const { tweetId } = req.params;
+  let validMedia = true;
+  const files = req.files;
+  if (!files || !files.media) {
+    validMedia = false;
+  }
+  checkTweet(tweetId, next);
+  const tweetRepository = AppDataSource.getRepository(Tweet);
+  const tweet = await AppDataSource.getRepository(Tweet).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  const media = await AppDataSource.getRepository(Media).find({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (validMedia && media.length + files.media.length > 4)
+    return next(
+      new AppError('tweet can not have more than 4 attachments', 400),
+    );
+  let uploadMed = [];
+  if (validMedia) {
+    uploadMed = await uploadMedia(files.media);
+  }
 
-//   checkTweet(tweetId, next);
-//   const attachments = await AppDataSource.getRepository(Media).find({
-//     where: {
-//       tweetId: tweetId,
-//     },
-//   });
-//   if (attachments.length + media.length > 4)
-//     return next(
-//       new AppError('tweet can not have more than 4 attachments', 400),
-//     );
+  if (!media || media.length === 0) {
+    for (const m of uploadMed) {
+      const med = new Media();
+      med.tweetId = tweetId;
+      med.url = m;
+      med.type = 'image';
+      const savedMedia = await AppDataSource.getRepository(Media).save(med);
+    }
+  } else {
+    for (const m of uploadMed) {
+      const med = new Media();
+      med.tweetId = tweetId;
+      med.url = m;
+      med.type = 'image';
+      const savedMedia = await AppDataSource.getRepository(Media).save(med);
+    }
+  }
 
-//   const med = new Media();
-//   med.tweetId = tweetId;
-//   med.url = media;
-//   med.type = 'image';
-//   await AppDataSource.getRepository(Media).save(med);
-
-//   res.status(200).json({
-//     status: true,
-//     message: 'media is added successfully',
-//   });
-// });
+  if (validMedia) {
+    res.status(200).json({
+      status: true,
+      message: 'media is added successfully',
+    });
+  } else {
+    return next(new AppError('No media provided', 400));
+  }
+});
 
 exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
@@ -330,10 +426,11 @@ exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
       tweetId: tweetId,
     },
   });
-  if (attachments.length > 0) {
+  const tweetMediaUrls = attachments.map((media) => media.url);
+  if (tweetMediaUrls.length > 0) {
     res.status(200).json({
       status: true,
-      data: attachments,
+      data: tweetMediaUrls,
     });
   } else {
     return next(new AppError('there is no attachments for this tweet', 400));
@@ -359,11 +456,25 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
   const retweeters = retweets.map((retweets) => retweets.user);
 
   const finalRetweetersPromises = retweeters.map(async (retweeter) => {
-    const { userId, name, username, profileImageURL } = retweeter;
+    const {
+      userId,
+      name,
+      username,
+      profileImageURL,
+      bio,
+      followersCount,
+      followingsCount,
+    } = retweeter;
     const isFollowed = await AppDataSource.getRepository(Follow).findOne({
       where: {
         userId: retweeter.userId,
         followerId: currUserId,
+      },
+    });
+    let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: currUserId,
+        followerId: retweeter.userId,
       },
     });
     return {
@@ -371,7 +482,11 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
       name: name,
       screenName: username,
       profileImageURL: profileImageURL,
+      bio: bio,
       isFollowed: !!isFollowed,
+      isFollowing: !!isFollowing,
+      followersCount: followersCount,
+      followingCount: followingsCount,
     };
   });
   const finalRetweeters = await Promise.all(finalRetweetersPromises);
@@ -396,11 +511,25 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   const likers = likes.map((likes) => likes.user);
 
   const finalLikersPromises = likers.map(async (liker) => {
-    const { userId, name, username, profileImageURL } = liker;
+    const {
+      userId,
+      name,
+      username,
+      profileImageURL,
+      bio,
+      followersCount,
+      followingsCount,
+    } = liker;
     const isFollowed = await AppDataSource.getRepository(Follow).findOne({
       where: {
         userId: liker.userId,
         followerId: currUserId,
+      },
+    });
+    let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: currUserId,
+        followerId: liker.userId,
       },
     });
     return {
@@ -408,7 +537,11 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
       name: name,
       screenName: username,
       profileImageURL: profileImageURL,
+      bio: bio,
       isFollowed: !!isFollowed,
+      isFollowing: !!isFollowing,
+      followersCount: followersCount,
+      followingCount: followingsCount,
     };
   });
   const finalLikers = await Promise.all(finalLikersPromises);
@@ -436,32 +569,29 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
     .getMany();
 
   const repliesPromises = replies.map(async (reply) => {
-    const likesCount = await AppDataSource.getRepository(LikeReply).count({
-      where: {
-        replyId: reply.replyId,
-      },
-    });
+    // const likesCount = await AppDataSource.getRepository(LikeReply).count({
+    //   where: {
+    //     replyId: reply.replyId,
+    //   },
+    // });
     return {
-      id: reply.replyId,
-      text: reply.text,
+      replyId: reply.replyId,
+      replyTweetId: reply.tweetId,
+      replyUserId: reply.userId,
+      replyText: reply.text,
+      createdAt: reply.time,
       username: reply.user.username,
       bio: reply.user.bio,
       profileImageURL: reply.user.imageUrl,
-      createdAt: reply.time,
-      likesCount: likesCount,
     };
   });
   let repliesRes = await Promise.all(repliesPromises);
   repliesRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  if (replies.length > 0) {
-    res.status(200).json({
-      status: true,
-      data: repliesRes,
-    });
-  } else {
-    return next(new AppError('There is no replies for this tweet', 404));
-  }
+  res.status(200).json({
+    status: true,
+    data: repliesRes,
+  });
 });
 
 exports.retweet = catchAsync(async (req, res, next) => {
@@ -493,11 +623,45 @@ exports.addReply = catchAsync(async (req, res, next) => {
   reply.tweetId = tweetId;
   reply.text = replyText;
   reply.time = getCurrentTimestamp();
-  const savedRerply = await AppDataSource.getRepository(Reply).save(reply);
+  const savedReply = await AppDataSource.getRepository(Reply).save(reply);
+  const tweet = await AppDataSource.getRepository(Tweet).findOne({
+    where: {
+      tweetId: tweetId,
+    },
+  });
+  if (!tweet) return next(new AppError('No tweet exists with this id', 400));
+
+  const user = await AppDataSource.getRepository(User).findOne({
+    where: {
+      userId: reply.userId,
+    },
+  });
+  if (!user) return next(new AppError('No user exists', 400));
+
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: tweet.userId,
+      followerId: currUserId,
+    },
+  });
+  isFollowed = !!isFollowed;
 
   res.status(200).json({
     status: true,
     message: 'Reply is added successfully',
+    data: {
+      replyId: savedReply.replyId,
+      replyTweetId: savedReply.tweetId,
+      replyUserId: savedReply.userId,
+      replyText: savedReply.text,
+      createdAt: savedReply.time,
+      username: user.username,
+      bio: user.bio,
+      profileImageURL: user.imageUrl,
+      followersCount: user.followersCount,
+      followingCount: user.followingsCount,
+      isFollowed: isFollowed,
+    },
   });
 });
 

@@ -1,18 +1,12 @@
 class Message {
-  constructor(
-    conversationId,
-    senderId,
-    receiverId,
-    text,
-    time,
-    isSeen = false,
-  ) {
+  constructor(conversationId, senderId, receiverId, text, isSeen) {
     this.conversationId = conversationId;
-    this.senderI = senderId;
+    this.senderId = senderId;
     this.receiverId = receiverId;
     this.text = text;
-    this.time = time;
+    this.time = new Date();
     this.isSeen = isSeen;
   }
 }
+
 module.exports = Message;

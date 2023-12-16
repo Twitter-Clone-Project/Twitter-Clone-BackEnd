@@ -12,12 +12,16 @@ module.exports = new EntitySchema({
       nullable: false,
     },
     conversationId: {
+      nullable: true,
       type: 'bigint',
     },
     senderId: {
+      nullable: true,
       type: 'bigint',
     },
     receiverId: {
+      nullable: true,
+
       type: 'bigint',
     },
     time: {
@@ -36,7 +40,7 @@ module.exports = new EntitySchema({
       target: 'Conversation',
       joinColumn: { name: 'conversationId' },
       cascade: true,
-      onDelete: 'CASCADE',
+      onDelete: 'SET NULL', // TODO SET NULL OR CASCADE
     },
     sender: {
       type: 'many-to-one',

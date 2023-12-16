@@ -8,9 +8,12 @@
     "start:dev": "(SET NODE_ENV=development) & nodemon server.js",
     "start:prod": "(SET NODE_ENV=production)  & node server.js",
     "debug": "ndb server.js",
-    "test": "(SET NODE_ENV=testing) & jest --watchAll --no-cache "
+    "test": "(SET NODE_ENV=testing) & jest --watchAll --no-cache --runInBand"
   },
   "jest": {
+    "testMatch": [
+      "**/*.test.js"
+    ],
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./test/setup.js"
@@ -41,6 +44,7 @@
     "helmet": "^7.0.0",
     "hpp": "^0.2.3",
     "html-to-text": "^9.0.5",
+    "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb-memory-server": "^9.0.1",
     "mongoose": "^8.0.0",
@@ -54,6 +58,7 @@
     "pug": "^3.0.2",
     "react-html-email": "^3.0.0",
     "request": "^2.88.2",
+    "socket.io": "^4.7.2",
     "typeorm": "^0.3.17",
     "uuid": "^9.0.1",
     "xss-clean": "^0.1.4"

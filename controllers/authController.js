@@ -1,3 +1,8 @@
+/**
+ * File: authController.js
+ * Description: This file contains the authentication-related controllers for user signup, signin, and OAuth2 authentication.
+ */
+
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const { promisify } = require('util');
@@ -9,6 +14,14 @@ const AppError = require('../services/AppError');
 const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
+const { use } = require('../routes/authRouter');
+
+/**
+ * Filters object properties based on specified fields.
+ * @param {Object} obj - The object to be filtered
+ * @param {...string} fields - The fields to include in the filtered object
+ * @returns {Object} - The filtered object
+ */
 
 const filterObj = (obj, ...fields) => {
   const filteredObj = {};
@@ -20,13 +33,25 @@ const filterObj = (obj, ...fields) => {
   return filteredObj;
 };
 
-const signToken = (id) =>
+/**
+ * Generates a JWT token for a given user ID.
+ * @param {string} id - The user ID
+ * @returns {string} - The generated JWT token
+ */
+exports.signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_TOKEN_EXPIRESIN,
   });
 
+/**
+ * Creates and sends a JWT token along with user data in the response.
+ * @param {Object} user - The user object
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {number} statusCode - The HTTP status code for the response
+ */
 const createAndSendToken = (user, req, res, statusCode) => {
-  const token = signToken(user.userId);
+  const token = this.signToken(user.userId);
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -38,11 +63,21 @@ const createAndSendToken = (user, req, res, statusCode) => {
 
   const filteredUser = filterObj(
     user,
+    'username',
+    'email',
     'userId',
     'isConfirmed',
-    'username',
+    'isOnline',
     'name',
-    'email',
+    'imageUrl',
+    'birthDate',
+    'website',
+    'location',
+    'bio',
+    'bannerUrl',
+    'followingsCount',
+    'followersCount',
+    'createdAt',
   );
 
   res.status(statusCode).json({
@@ -51,31 +86,24 @@ const createAndSendToken = (user, req, res, statusCode) => {
   });
 };
 
-const getUserData = async (accessToken) => {
-  const response = await fetch(
-    `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
-  );
-
-  const userData = await response.json();
-  return userData;
-};
-
-const createOAuth2Client = () => {
-  const redirectUrl = 'https://ticketing.dev/api/users/auth/google/callback';
-
-  const oAuth2Client = new OAuth2Client(
-    process.env.CLIENT_ID_GOOGLE,
-    process.env.CLIENT_SECRET_GOOGLE,
-    redirectUrl,
-  );
-
-  return oAuth2Client;
-};
-
+/**
+ * Controller for user signup.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
+    
   const userRepository = AppDataSource.getRepository(User);
+
+  // if this email signed but not confirmed remove it
+  await userRepository.delete({
+    isConfirmed: false,
+    email,
+    username,
+  });
 
   if (process.env.NODE_ENV === 'production') {
     const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
@@ -86,7 +114,6 @@ exports.signup = catchAsync(async (req, res, next) => {
         'Content-Type': 'application/json',
       },
     });
-
     if (response.ok) {
       const result = await response.json();
       if (!result.success) {
@@ -112,18 +139,42 @@ exports.signup = catchAsync(async (req, res, next) => {
         .where('isConfirmed = false AND email = :email', { email: user.email })
         .execute();
     },
-    10 * 60 * 1000,
+    2 * 60 * 1000,
   );
 
   res.status(201).json({
     status: true,
-    data: { user: filterObj(user, 'name', 'userId', 'email') },
+    data: {
+      user: filterObj(
+        user,
+        'username',
+        'isOnline',
+        'email',
+        'userId',
+        'isConfirmed',
+        'createdAt',
+        'name',
+        'imageUrl',
+        'birthDate',
+        'website',
+        'location',
+        'bio',
+        'bannerUrl',
+        'followingsCount',
+        'followersCount',
+      ),
+    },
   });
 });
 
+/**
+ * Controller for user signin.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.signin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
   const user = await AppDataSource.getRepository(User)
     .createQueryBuilder()
     .select([
@@ -132,6 +183,16 @@ exports.signin = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.name',
+      'user.imageUrl',
+      'user.birthDate',
+      'user.website',
+      'user.location',
+      'user.bio',
+      'user.bannerUrl',
+      'user.followingsCount',
+      'user.followersCount',
+      'user.createdAt',
+      'user.isOnline',
     ])
     .from(User, 'user')
     .where('user.email = :email', { email })
@@ -150,63 +211,78 @@ exports.signin = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
-exports.signWithGoogle = (req, res) => {
-  const oAuth2Client = createOAuth2Client();
+/**
+ * Controller for initiating Google OAuth2 authentication.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
+exports.signWithGoogle = catchAsync(async (req, res, next) => {
+  const { googleAccessToken } = req.body;
 
-  const authorizeUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope:
-      'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid ',
-    prompt: 'consent',
-  });
+  if (!googleAccessToken) {
+    return next(new AppError('The Google Access Token is required', 400));
+  }
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v3/userinfo`,
+    {
+      headers: {
+        Authorization: `Bearer ${googleAccessToken}`,
+      },
+    },
+  );
 
-  res.json({ url: authorizeUrl });
-};
+  const { email, name } = await response.json();
 
-exports.oauthGooogleCallback = async (req, res, next) => {
-  const { code } = req.query;
-
-  const oAuth2Client = createOAuth2Client();
-
-  const response = await oAuth2Client.getToken(code);
-  oAuth2Client.setCredentials(response.tokens);
-  const userData = await getUserData(oAuth2Client.credentials.access_token);
-
-  const user = await AppDataSource.getRepository(User)
+  const existingUser = await AppDataSource.getRepository(User)
     .createQueryBuilder()
-    .select(['user.userId', 'user.isConfirmed'])
+    .select([
+      'user.username',
+      'user.email',
+      'user.isOnline',
+      'user.userId',
+      'user.isConfirmed',
+      'user.name',
+      'user.imageUrl',
+      'user.birthDate',
+      'user.website',
+      'user.location',
+      'user.bio',
+      'user.bannerUrl',
+      'user.followingsCount',
+      'user.followersCount',
+      'user.createdAt',
+    ])
     .from(User, 'user')
-    .where('user.email = :email', { email: userData.email })
+    .where('user.email = :email', { email })
     .getOne();
 
-  if (!user) {
-    return next(new AppError('User not found. Please go to sign up'));
+  if (!existingUser) {
+    return next(new AppError('User not found. Please go to sign up', 404));
   }
 
-  const token = signToken(user.userId);
+  createAndSendToken(existingUser, req, res, 200);
+});
 
-  res.cookie('jwt', token, {
-    expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRESIN * 1000 * 24 * 60 * 60,
-    ),
-    httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-  });
-
-  res.redirect(303, `${req.protocol}://${req.get('host')}/app`);
-};
-
+/**
+ * Controller for signing out.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ */
 exports.signout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 5 * 1000),
     httpOnly: true,
   });
 
-  res
-    .status(200)
-    .json({ status: 'success', message: 'Signed out successfully' });
+  res.status(200).json({ status: true, message: 'Signed out successfully' });
 };
 
+/**
+ * Middleware to check if the user is authenticated.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.requireAuth = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -231,7 +307,13 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
 
   const user = await AppDataSource.getRepository(User)
     .createQueryBuilder()
-    .select(['user.username', 'user.email', 'user.userId', 'user.isConfirmed'])
+    .select([
+      'user.username',
+      'user.email',
+      'user.userId',
+      'user.isConfirmed',
+      'user.isOnline',
+    ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: payload.id })
     .getOne();
@@ -244,15 +326,31 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Controller for getting user information.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.getMe = catchAsync(async (req, res, next) => {
   const user = await AppDataSource.getRepository(User).findOne({
     where: { userId: req.currentUser.userId },
     select: {
       userId: true,
+      createdAt: true,
       isConfirmed: true,
+      isOnline: true,
       username: true,
       email: true,
       name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
+      bannerUrl: true,
+      followingsCount: true,
+      followersCount: true,
     },
   });
 
@@ -262,15 +360,31 @@ exports.getMe = catchAsync(async (req, res, next) => {
       user: filterObj(
         user,
         'username',
-        'name',
         'email',
         'userId',
         'isConfirmed',
+        'name',
+        'createdAt',
+        'imageUrl',
+        'birthDate',
+        'website',
+        'location',
+        'bio',
+        'bannerUrl',
+        'followingsCount',
+        'followersCount',
+        'isOnline',
       ),
     },
   });
 });
 
+/**
+ * Middleware to check the provided OTP for email confirmation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.checkOTP = catchAsync(async (req, res, next) => {
   const { otp, email } = req.body;
   const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
@@ -281,13 +395,23 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
       email,
     },
     select: {
-      otpExpires: true,
-      name: true,
-      username: true,
-      otp: true,
-      isConfirmed: true,
-      email: true,
       userId: true,
+      isConfirmed: true,
+      otpExpires: true,
+      createdAt: true,
+      otp: true,
+      username: true,
+      isOnline: true,
+      email: true,
+      name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
+      bannerUrl: true,
+      followingsCount: true,
+      followersCount: true,
     },
   });
 
@@ -313,6 +437,12 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Controller for confirming user email after OTP validation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.confirmEmail = catchAsync(async (req, res, next) => {
   const { userRepository, user } = res.locals;
 
@@ -322,6 +452,12 @@ exports.confirmEmail = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
+/**
+ * Controller for resending email confirmation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
@@ -329,13 +465,26 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
     where: { email },
     select: {
       userId: true,
+      createdAt: true,
       isConfirmed: true,
+      isOnline: true,
       username: true,
       email: true,
       name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
+      bannerUrl: true,
+      followingsCount: true,
+      followersCount: true,
     },
   });
 
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
   const userRepository = AppDataSource.getRepository(User);
 
   const otp = user.createOTP();
@@ -349,6 +498,12 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Controller for changing the user's password.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.changePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
 
@@ -361,7 +516,17 @@ exports.changePassword = catchAsync(async (req, res, next) => {
       'user.email',
       'user.userId',
       'user.isConfirmed',
+      'user.createdAt',
+      'user.isOnline',
       'user.name',
+      'user.imageUrl',
+      'user.birthDate',
+      'user.website',
+      'user.location',
+      'user.bio',
+      'user.bannerUrl',
+      'user.followingsCount',
+      'user.followersCount',
     ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: req.currentUser.userId })
@@ -386,6 +551,12 @@ exports.changePassword = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
+/**
+ * Controller for initiating the password reset process.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.forgetPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
@@ -418,6 +589,12 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Controller for resetting the user's password after the reset request.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { newPassword } = req.body;
 
@@ -426,10 +603,20 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     where: { email: req.currentUser.email },
     select: {
       userId: true,
-      username: true,
       isConfirmed: true,
+      createdAt: true,
+      username: true,
+      isOnline: true,
       email: true,
       name: true,
+      imageUrl: true,
+      birthDate: true,
+      bio: true,
+      location: true,
+      website: true,
+      bannerUrl: true,
+      followingsCount: true,
+      followersCount: true,
     },
   });
 

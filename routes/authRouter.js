@@ -4,16 +4,13 @@ const validateRequest = require('../middlewares/validateRequest');
 const {
   signupValidationRules,
   signinValidationRules,
-  otpValidationRules,
   changePasswordValidationRules,
   resetPasswordValidationRules,
   forgetPasswordValidationRules,
-  resetCodeValidationRules,
   otpWithEmailValidationRules,
 } = require('../middlewares/validations/user');
 
 const router = express.Router();
-
 
 router
   .route('/signup')
@@ -28,7 +25,6 @@ router.route('/me').get(authController.requireAuth, authController.getMe);
 router.route('/signout').post(authController.signout);
 
 router.route('/signWithGoogle').post(authController.signWithGoogle);
-router.route('/google/callback').get(authController.oauthGooogleCallback);
 
 router
   .route('/verifyEmail')

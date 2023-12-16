@@ -33,6 +33,13 @@ module.exports = new EntitySchema({
     imageUrl: {
       type: 'varchar',
       nullable: true,
+      default:
+        'https://kady-twitter-images.s3.amazonaws.com/defaultProfile.jpg',
+    },
+    bannerUrl: {
+      type: 'varchar',
+      nullable: true,
+      default: 'https://kady-twitter-images.s3.amazonaws.com/DefaultBanner.png',
     },
     bio: {
       type: 'varchar',
@@ -65,13 +72,30 @@ module.exports = new EntitySchema({
       type: 'timestamptz',
       nullable: true,
     },
+    isOnline: {
+      type: 'boolean',
+      default: false,
+    },
+    socketId: {
+      unique: true,
+      nullable: true,
+      type: 'varchar',
+      length: 150,
+    },
     followersCount: {
       type: 'bigint',
       nullable: true,
+      default: 0,
     },
     followingsCount: {
       type: 'bigint',
       nullable: true,
+      default: 0,
+    },
+    createdAt: {
+      nullable: false,
+      type: 'timestamptz',
+      createDate: true,
     },
   },
 });

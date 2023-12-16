@@ -69,6 +69,30 @@ async function getTweetInfo(tweetId, userId) {
   };
 }
 
+async function getUserInfo(userId, currUserId) {
+  let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: userId,
+      followerId: currUserId,
+    },
+  });
+
+  let isFollowing = await AppDataSource.getRepository(Follow).findOne({
+    where: {
+      userId: currUserId,
+      followerId: userId,
+    },
+  });
+
+  isFollowed = !!isFollowed;
+  isFollowing = !!isFollowing;
+
+  return {
+    isFollowed,
+    isFollowing,
+  };
+}
+
 async function getFirstTweets(userId) {
   const tweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
@@ -78,12 +102,6 @@ async function getFirstTweets(userId) {
       User,
       'user',
       'user.userId = tweet.userId',
-    )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
     )
     .where('follow.followerId = :userId', { userId })
     .getMany();
@@ -104,29 +122,35 @@ async function getFirstTweets(userId) {
       'userRetweeter',
       'userRetweeter.userId = repost.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .where('follow.followerId = :userId', { userId })
     .getMany();
 
   const tweetsPromises = tweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const tweeterInfo = await getUserInfo(tweet.userId, userId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -140,23 +164,41 @@ async function getFirstTweets(userId) {
 
   const retweetsPromises = retweets.map(async (tweet) => {
     const retweetInfo = await getTweetInfo(tweet.tweetId, userId);
+    const tweeterInfo = await getUserInfo(tweet.userId, userId);
+    const retweeterInfo = await getUserInfo(tweet.retweeter.userId, userId);
+    const retweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const retweetMediaUrls = retweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: true,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: retweetMediaUrls,
       retweetedUser: {
         userId: tweet.retweeter.userId,
         username: tweet.retweeter.username,
         screenName: tweet.retweeter.name,
         profileImageURL: tweet.retweeter.imageUrl,
+        bio: tweet.retweeter.bio,
+        followersCount: tweet.retweeter.followersCount,
+        followingCount: tweet.retweeter.followingsCount,
+        isFollowed: retweeterInfo.isFollowed,
+        isFollowing: retweeterInfo.isFollowing,
       },
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: retweetInfo.isLiked,
       isRetweeted: retweetInfo.isReposted,
@@ -175,7 +217,7 @@ async function getFirstTweets(userId) {
 exports.getTweets = catchAsync(async (req, res, next) => {
   const { pageNum } = req.params;
   const userId = req.currentUser.userId;
-
+  console.log(userId);
   if (parseInt(pageNum, 10) === 1) {
     await getFirstTweets(userId);
   }
@@ -191,7 +233,12 @@ exports.getTweets = catchAsync(async (req, res, next) => {
   });
 });
 
-async function getFirstUserTweets(userId, currUserId) {
+async function getFirstUserTweets(username, currUserId) {
+  const { userId } = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
   const userTweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoinAndMapOne(
@@ -199,12 +246,6 @@ async function getFirstUserTweets(userId, currUserId) {
       User,
       'user',
       'user.userId = tweet.userId',
-    )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
     )
     .where('tweet.userId = :userId', { userId })
     .getMany();
@@ -224,29 +265,35 @@ async function getFirstUserTweets(userId, currUserId) {
       'userRetweeter',
       'userRetweeter.userId = repost.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .where('repost.userId = :userId', { userId })
     .getMany();
 
   const tweetsPromises = userTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -260,23 +307,41 @@ async function getFirstUserTweets(userId, currUserId) {
 
   const retweetsPromises = userRetweets.map(async (tweet) => {
     const retweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+    const retweeterInfo = await getUserInfo(tweet.retweeter.userId, currUserId);
+    const retweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const retweetMediaUrls = retweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: true,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: retweetMediaUrls,
       retweetedUser: {
         userId: tweet.retweeter.userId,
         username: tweet.retweeter.username,
         screenName: tweet.retweeter.name,
         profileImageURL: tweet.retweeter.imageUrl,
+        bio: tweet.retweeter.bio,
+        followersCount: tweet.retweeter.followersCount,
+        followingCount: tweet.retweeter.followingsCount,
+        isFollowed: retweeterInfo.isFollowed,
+        isFollowing: retweeterInfo.isFollowing,
       },
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: retweetInfo.isLiked,
       isRetweeted: retweetInfo.isReposted,
@@ -295,12 +360,12 @@ async function getFirstUserTweets(userId, currUserId) {
 }
 
 exports.getUserTweets = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const { pageNum } = req.params;
   const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstUserTweets(userId, currUserId);
+    await getFirstUserTweets(username, currUserId);
   }
 
   const resTweets = userTweetsTotalRes.slice(
@@ -314,7 +379,12 @@ exports.getUserTweets = catchAsync(async (req, res, next) => {
   });
 });
 
-async function getFirstUserMentions(userId, currUserId) {
+async function getFirstUserMentions(username, currUserId) {
+  const { userId } = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
   const userMentionsTweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoin(Mention, 'mention', 'mention.tweetId = tweet.tweetId')
@@ -324,29 +394,35 @@ async function getFirstUserMentions(userId, currUserId) {
       'user',
       'user.userId = tweet.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .where('mention.mentionedId = :userId', { userId })
     .getMany();
 
   const tweetsPromises = userMentionsTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -365,12 +441,12 @@ async function getFirstUserMentions(userId, currUserId) {
 }
 
 exports.getUserMentions = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const { pageNum } = req.params;
   const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstUserMentions(userId, currUserId);
+    await getFirstUserMentions(username, currUserId);
   }
 
   const resTweets = userMentionsTotalRes.slice(
@@ -384,7 +460,12 @@ exports.getUserMentions = catchAsync(async (req, res, next) => {
   });
 });
 
-async function getFirstUserLikes(userId, currUserId) {
+async function getFirstUserLikes(username, currUserId) {
+  const { userId } = await AppDataSource.getRepository(User).findOne({
+    where: {
+      username: username,
+    },
+  });
   const userLikesTweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
     .innerJoin(Like, 'like', 'like.tweetId = tweet.tweetId')
@@ -394,29 +475,35 @@ async function getFirstUserLikes(userId, currUserId) {
       'user',
       'user.userId = tweet.userId',
     )
-    .innerJoinAndMapOne(
-      'tweet.attachmentsUrl',
-      Media,
-      'mediaTweet',
-      'mediaTweet.tweetId = tweet.tweetId',
-    )
     .where('like.userId = :userId', { userId })
     .getMany();
 
   const tweetsPromises = userLikesTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+    const tweetMedia = await AppDataSource.getRepository(Media).find({
+      where: {
+        tweetId: tweet.tweetId,
+      },
+    });
+    const tweetMediaUrls = tweetMedia.map((media) => media.url);
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
       createdAt: tweet.time,
-      attachmentsUrl: tweet.attachmentsUrl.url,
+      attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
         userId: tweet.user.userId,
         username: tweet.user.username,
         screenName: tweet.user.name,
         profileImageURL: tweet.user.imageUrl,
+        bio: tweet.user.bio,
+        followersCount: tweet.user.followersCount,
+        followingCount: tweet.user.followingsCount,
+        isFollowed: tweeterInfo.isFollowed,
+        isFollowing: tweeterInfo.isFollowing,
       },
       isLiked: tweetInfo.isLiked,
       isRetweeted: tweetInfo.isReposted,
@@ -435,12 +522,12 @@ async function getFirstUserLikes(userId, currUserId) {
 }
 
 exports.getUserLikes = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
   const { pageNum } = req.params;
   const currUserId = req.currentUser.userId;
 
   if (parseInt(pageNum, 10) === 1) {
-    await getFirstUserLikes(userId, currUserId);
+    await getFirstUserLikes(username, currUserId);
   }
 
   const resTweets = userLikesTotalRes.slice(

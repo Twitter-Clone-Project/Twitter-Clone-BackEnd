@@ -1,5 +1,14 @@
+/**
+ * userValidationRules.js
+ *
+ * This module exports validation rules for various user-related actions,
+ */
+
 const { body } = require('express-validator');
 
+/**
+ * Validation rules for user signup.
+ */
 exports.signupValidationRules = [
   body('name')
     .isString()
@@ -10,7 +19,7 @@ exports.signupValidationRules = [
     .isString()
     .isLength({ min: 3 })
     .withMessage('Username must be at least 3 characters'),
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
   body('password')
     .isString()
     .isLength({ min: 6 })
@@ -30,14 +39,20 @@ exports.signupValidationRules = [
     .withMessage('Recaptcha response is required'),
 ];
 
+/**
+ * Validation rules for user signin.
+ */
 exports.signinValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
   body('password')
     .isString()
     .isLength({ min: 6 })
     .withMessage('Invalid Password'),
 ];
 
+/**
+ * Validation rules for OTP verification.
+ */
 exports.otpValidationRules = [
   body('otp')
     .matches(/^[a-z0-9]+$/)
@@ -47,6 +62,9 @@ exports.otpValidationRules = [
     .withMessage('Invalid OTP'),
 ];
 
+/**
+ * Validation rules for changing the user's password.
+ */
 exports.changePasswordValidationRules = [
   body('currentPassword')
     .not()
@@ -68,14 +86,25 @@ exports.changePasswordValidationRules = [
   }),
 ];
 
+/**
+ * Validation rules for forgetting the user's password.
+ */
 exports.forgetPasswordValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
 ];
+
+/**
+ * Validation rules for resending email confirmation.
+ */
 exports.resendEmailValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
 ];
+
+/**
+ * Validation rules for OTP verification with email.
+ */
 exports.otpWithEmailValidationRules = [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
   body('otp')
     .matches(/^[a-z0-9]+$/)
     .isLength({ min: 8, max: 8 })
@@ -84,6 +113,9 @@ exports.otpWithEmailValidationRules = [
     .withMessage('Invalid OTP'),
 ];
 
+/**
+ * Validation rules for resetting the user's password.
+ */
 exports.resetPasswordValidationRules = [
   body('newPassword')
     .not()

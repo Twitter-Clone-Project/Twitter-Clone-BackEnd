@@ -5,7 +5,7 @@ module.exports = new EntitySchema({
   name: 'Conversation',
   target: Conversation,
   columns: {
-    ConversationId: {
+    conversationId: {
       primary: true,
       type: 'bigint',
       generated: 'increment',
@@ -16,7 +16,17 @@ module.exports = new EntitySchema({
     user2Id: {
       type: 'bigint',
     },
+    isUsersActive: {
+      type: 'jsonb',
+      default: {},
+    },
   },
+  uniques: [
+    {
+      name: 'unique_user_pair',
+      columns: ['user1Id', 'user2Id'],
+    },
+  ],
   relations: {
     user1: {
       type: 'many-to-one',

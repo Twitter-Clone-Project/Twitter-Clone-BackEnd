@@ -9,15 +9,19 @@ class User {
     this.password = password;
     this.birthDate = birthDate;
     this.isConfirmed = false;
-    this.imageUrl = undefined;
-    this.bio = undefined;
-    this.location = undefined;
-    this.website = undefined;
+    this.imageUrl = null;
+    this.bio = null;
+    this.location = null;
+    this.website = null;
     this.otp = undefined;
     this.otpExpires = undefined;
     this.userId = undefined;
     this.followersCount = undefined;
     this.followingsCount = undefined;
+    this.bannerUrl = undefined;
+    this.socketId = undefined;
+    this.isOnline = false;
+    this.createdAt = undefined;
   }
 
   createOTP() {
