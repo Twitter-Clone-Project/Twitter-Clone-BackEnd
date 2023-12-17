@@ -14,7 +14,6 @@ const AppError = require('../services/AppError');
 const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
-const socketService = require('../services/WebSocket');
 
 /**
  * Filters object properties based on specified fields.

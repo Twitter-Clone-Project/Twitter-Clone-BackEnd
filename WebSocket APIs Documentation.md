@@ -92,6 +92,14 @@
     - `senderImgUrl` - Image url for the user who sent the message or triggered the notification.
 - **Action**: Emits the notification to the receiver's socket.
 
+## `mark-notifications-as-seen` Event
+
+- **Purpose**: Marks all notifications as seen. When the user goes out of the notifications page or unmounts it, this event should be emitted to mark the notifications as seen.
+- **Payload**:
+  - `data` - Object containing information about the notifications.
+    - `userId` - ID of the current user who opened the chat.
+- **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
+
 ## `disconnect` Event
 
 - **Purpose**: Handles the disconnection of a client (user).

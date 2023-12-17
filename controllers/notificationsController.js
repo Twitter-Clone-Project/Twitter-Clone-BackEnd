@@ -15,13 +15,9 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
       'content',
       'sender.name',
       'sender.imageUrl',
+      'sender.username',
     ],
   });
-
-  await AppDataSource.getRepository(Notification).update(
-    { isSeen: false, userId },
-    { isSeen: true },
-  );
 
   res.status(200).json({
     status: true,
@@ -32,7 +28,8 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
           timestamp: notification.timestamp,
           isSeen: notification.isSeen,
           content: notification.content,
-          senderImgUrl: notification.sender.name,
+          senderImgUrl: notification.sender.imageUrl,
+          senderUsername: notification.sender.username,
         };
       }),
     },

@@ -61,6 +61,7 @@ class SocketService {
           content: notification.content,
           timestamp: notification.timestamp,
           senderImgUrl: sender.imageUrl,
+          senderUsername: sender.username,
           isSeen: notification.isSeen,
         });
     }
@@ -190,6 +191,13 @@ class SocketService {
             conversationId: data.conversationId,
           })
           .execute();
+      });
+
+      socket.on('mark-notifications-as-seen', async (data) => {
+        await AppDataSource.getRepository(Notification).update(
+          { isSeen: false, userId: data.userId },
+          { isSeen: true },
+        );
       });
 
       socket.on('disconnect', async () => {
