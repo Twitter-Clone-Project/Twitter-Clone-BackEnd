@@ -1,8 +1,13 @@
 const express = require('express');
 const searchController = require('../controllers/searchController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
-router.route('/users/search').get(searchController.searchUsers);
-router.route('/tweets/search').get(searchController.searchTweets);
+router
+  .route('/users/search')
+  .get(authController.requireAuth, searchController.searchUsers);
+router
+  .route('/tweets/search')
+  .get(authController.requireAuth, searchController.searchTweets);
 
 module.exports = router;

@@ -1569,10 +1569,20 @@ paths:
                       type: string
                     name:
                       type: string
-                    username:
+                    userName:
                       type: string
                     profileImageURL:
                       type: string
+                    bio:
+                      type: string
+                    followersCount:
+                      type: string
+                    followingCount:
+                      type: string
+                    isFollowed:
+                      type: boolean
+                    isFollowing:
+                      type: boolean
         '400':
           description: Bad request - something went wrong
           schema:
@@ -3243,38 +3253,61 @@ paths:
               status:
                 type: boolean
               data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: The ID of the tweet.
-                    text:
-                      type: string
-                      description: The text of the tweet.
-                    createdAt:
-                      type: string
-                      description: The date and time the tweet was created.
-                    attachmentsURL:
-                      type: array
-                      items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the new tweet.
+                  text:
+                    type: string
+                    description: The text of the new tweet.
+                  createdAt:
+                    type: string
+                    description: The date and time the tweet was created.
+                  user:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                      profileImageURL:
                         type: string
-                    user:
-                      type: object
-                      properties:
-                        userId:
-                          type: string
-                          description: The ID of the user who posted the tweet.
-                        userName:
-                          type: string
-                          description: The name of the user who posted the tweet.
-                        screenName:
-                          type: string
-                          description: The screen name of the user who posted the tweet.
-                        profileImageURL:
-                          type: string
-                          description: The profile picture of the user who posted the tweet.
+                        description: The profile of the user that create the tweet.
+                      screenName:
+                        type: string
+                        description: The screen name of the user that create the tweet.
+                      userName:
+                        type: string
+                        description: The username that create the tweet.
+                      bio:
+                        type: string
+                      followersCount:
+                        type: string
+                      followingCount:
+                        type: string
+                      isFollowed:
+                        type: boolean
+                      isFollowing:
+                        type: boolean
+                  attachmentsURL:
+                    type: array
+                    items:
+                      type: string
+                  isRetweet:
+                    type: boolean
+                  isLiked:
+                    type: boolean
+                  isRetweeted:
+                    type: boolean
+                  isReplied:
+                    type: boolean
+                  likesCount:
+                    type: integer
+                  retweetsCount:
+                    type: integer
+                  repliesCount:
+                    type: integer
+                  retweetedUser:
+                    type: object
         '400':
           description: Bad request - something went wrong.
           schema:
@@ -3976,7 +4009,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /trends/{trendName}/tweets:
+  /trends/{trendName}/tweets/{pageNum}:
     get:
       tags:
         - trends
@@ -3990,6 +4023,12 @@ paths:
         - name: trendName
           in: path
           description: The name of the trend to get tweets for.
+          required: true
+          type: string
+
+        - name: pageNum
+          in: path
+          description: page number for tweet pagination
           required: true
           type: string
       responses:
