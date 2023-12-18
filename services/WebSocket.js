@@ -63,6 +63,7 @@ class SocketService {
           senderImgUrl: sender.imageUrl,
           senderUsername: sender.username,
           isSeen: notification.isSeen,
+          type: notification.type,
         });
     }
   }

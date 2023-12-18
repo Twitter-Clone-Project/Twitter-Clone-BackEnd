@@ -8,10 +8,12 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
   const notifications = await AppDataSource.getRepository(Notification).find({
     relations: ['sender'],
     where: { userId },
+    order: { timestamp: 'DESC' },
     select: [
       'notificationId',
       'timestamp',
       'isSeen',
+      'type',
       'content',
       'sender.name',
       'sender.imageUrl',
@@ -27,6 +29,7 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
           notificationId: notification.notificationId,
           timestamp: notification.timestamp,
           isSeen: notification.isSeen,
+          type: notification.type,
           content: notification.content,
           senderImgUrl: notification.sender.imageUrl,
           senderUsername: notification.sender.username,
