@@ -48,6 +48,7 @@ class SocketService {
       console.log('socket connected');
 
       socket.on('add-user', async (userData) => {
+        console.log("user added: ", userData);
         await AppDataSource.getRepository(User).update(
           { userId: userData.userId },
           { socketId: socket.id, isOnline: true },
