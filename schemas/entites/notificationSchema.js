@@ -42,7 +42,7 @@ module.exports = new EntitySchema({
     sender: {
       type: 'many-to-one',
       target: 'User',
-      joinColumn: { name: 'userId' },
+      joinColumn: { name: 'senderId' },
       cascade: true,
       onDelete: 'CASCADE',
     },
