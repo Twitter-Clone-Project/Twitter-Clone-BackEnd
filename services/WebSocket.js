@@ -21,7 +21,7 @@ class SocketService {
     });
 
     const sender = await userRepository.findOne({
-      select: { name: true, socketId: true, imageUrl: true, name: true },
+      select: { name: true, socketId: true, imageUrl: true, username: true },
       where: { userId: senderId },
     });
 
