@@ -4,10 +4,10 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 router
-  .route('/users/search')
+  .route('/users/search/:pageNum')
   .get(authController.requireAuth, searchController.searchUsers);
 router
-  .route('/tweets/search')
+  .route('/tweets/search/:pageNum')
   .get(authController.requireAuth, searchController.searchTweets);
 
 module.exports = router;

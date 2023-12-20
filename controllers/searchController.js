@@ -9,6 +9,11 @@ const Reply = require('../models/entites/Reply');
 const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
+
+let usersRes = [];
+let tweetsRes = [];
+const numResultsPerPage = 10;
+
 async function getTweetInfo(tweetId, userId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
@@ -85,10 +90,9 @@ async function getUserInfo(userId, currUserId) {
   };
 }
 
-exports.searchUsers = catchAsync(async (req, res, next) => {
+exports.searchFirstUsers = catchAsync(async (req) => {
   const { query } = req.query;
   const currUser = req.currentUser;
-  console.log(currUser);
 
   if (!query) {
     return next(new AppError('No tweet exists with this id', 400));
@@ -107,8 +111,8 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
       return {
         id: user.userId,
         email: user.email,
-        name: user.name,
-        userName: user.username,
+        screenName: user.name,
+        username: user.username,
         profileImageURL: user.imageUrl,
         bio: user.bio,
         followersCount: user.followersCount,
@@ -117,21 +121,29 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
         isFollowing: userInfo.isFollowing,
       };
   });
-  let usersRes = await Promise.all(usersPromises);
-  if (usersRes.length && usersRes[0] != null) {
-    res.status(200).json({
-      status: true,
-      data: usersRes,
-    });
-  } else {
-    res.status(404).json({
-      status: true,
-      message: 'Nothing found',
-    });
-  }
+  const usersList = await Promise.all(usersPromises);
+  if (usersList[0] != null) usersRes = usersList;
+  else usersRes = [];
 });
 
-exports.searchTweets = catchAsync(async (req, res, next) => {
+exports.searchUsers = catchAsync(async (req, res, next) => {
+  const { pageNum } = req.params;
+  if (parseInt(pageNum, 10) === 1) {
+    await this.searchFirstUsers(req);
+  }
+
+  const users = usersRes.slice(
+    (pageNum - 1) * numResultsPerPage,
+    pageNum * numResultsPerPage,
+  );
+  res.status(200).json({
+    status: true,
+    data: users,
+    total: usersRes.length,
+  });
+});
+
+exports.searchFirstTweets = catchAsync(async (req) => {
   const { query } = req.query;
   const currUserId = req.currentUser.userId;
 
@@ -168,9 +180,9 @@ exports.searchTweets = catchAsync(async (req, res, next) => {
       createdAt: tweet.time,
       user: {
         userId: tweet.user.userId,
-        profileImageURL: tweet.user.profileImageURL,
+        profileImageURL: tweet.user.imageUrl,
         screenName: tweet.user.name,
-        userName: tweet.user.username,
+        username: tweet.user.username,
         bio: tweet.user.bio,
         followersCount: tweet.user.followersCount,
         followingCount: tweet.user.followingsCount,
@@ -188,16 +200,24 @@ exports.searchTweets = catchAsync(async (req, res, next) => {
       retweetedUser: {},
     };
   });
-  let tweetsRes = await Promise.all(tweetsPromises);
-  if (tweetsRes.length && tweetsRes[0] != null) {
-    res.status(200).json({
-      status: true,
-      data: tweetsRes,
-    });
-  } else {
-    res.status(404).json({
-      status: true,
-      message: 'Nothing found',
-    });
+  let tweetsList = await Promise.all(tweetsPromises);
+  if (tweetsList[0] != null) tweetsRes = tweetsList;
+  else tweetsRes = [];
+});
+
+exports.searchTweets = catchAsync(async (req, res, next) => {
+  const { pageNum } = req.params;
+  if (parseInt(pageNum, 10) === 1) {
+    await this.searchFirstTweets(req);
   }
+
+  const tweets = tweetsRes.slice(
+    (pageNum - 1) * numResultsPerPage,
+    pageNum * numResultsPerPage,
+  );
+  res.status(200).json({
+    status: true,
+    data: tweets,
+    total: tweetsRes.length,
+  });
 });
