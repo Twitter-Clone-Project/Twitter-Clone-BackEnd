@@ -458,6 +458,7 @@ exports.confirmEmail = catchAsync(async (req, res, next) => {
  * @param {Object} res - The response object
  * @param {function} next - The next middleware function
  */
+
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 

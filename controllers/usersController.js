@@ -29,11 +29,9 @@ exports.isUsernameFound = catchAsync(async (req, res, next) => {
       where: { username },
     });
   }
-
-  res.status(isFound ? 200 : 404).json({
-    status: true,
-    data: { isFound },
-  });
+  console.log('called1');
+  res.status(isFound ? 200 : 404);
+  console.log('called2');
 });
 
 /**

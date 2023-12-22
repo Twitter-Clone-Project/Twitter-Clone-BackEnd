@@ -16,7 +16,9 @@ const User = require('../models/entites/User');
 const { signToken } = require('../controllers/authController');
 const Password = require('../services/Password');
 
+
 jest.mock('../services/Email.js');
+// jest.mock('../dataSource', () => MockAppDataSource);
 
 beforeAll(async () => {
   await AppDataSource.initialize();
@@ -24,10 +26,6 @@ beforeAll(async () => {
   if (AppDataSource.isInitialized) {
     console.log('Test db connected');
   }
-});
-beforeEach(async () => {
-  // Clear all tables before each test
-  // await clearDatabase();
 });
 
 afterAll(async () => {
