@@ -5,17 +5,6 @@
 - **Purpose**: Initializes when a new client (user) connects to the server. This event should be emitted when a user enters the website or when marked as online.
 - **Action**: Sets up event listeners for the connected socket, including `add-user`, `send-msg`, `mark-notifications-as-seen`, and `disconnect.
 
-## `add-user` Event
-
-- **Purpose**: Adds a user to the online user list and updates their socket ID and online status.
-- **Payload**:
-  - `userData` - Object containing user information
-    - `userId` - ID of the user connected to the socket.
-- **Action**:
-  - Updates the user's `socketId` and sets `isOnline` to `true` in the database.
-  - Retrieves a list of online users and emits it to the newly connected user.
-- **Emits**: `getOnlineUsers` - Sends a list of online users to the connected user.
-
 ## `msg-send` Event
 
 - **Purpose**: Sends a message from one user to another.
@@ -83,11 +72,6 @@
   - `data` - Object containing information about the notifications.
     - `userId` - ID of the current user who opened the chat.
 - **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
-
-## `getOnlineUsers` Event
-
-- **Purpose**: Retrieves the list of online users.
-- **Action**: Queries the database for users with `isOnline` set to `true` and emits the list to the connected user.
 
 ## `notification-receive` Event
 

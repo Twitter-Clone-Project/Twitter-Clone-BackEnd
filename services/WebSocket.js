@@ -3,6 +3,8 @@ const User = require('../models/entites/User');
 const Notification = require('../models/entites/Notification');
 const Conversation = require('../models/entites/Conversation');
 const AppError = require('./AppError');
+const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 
 function getKeyByObjectValue(map, searchProperty, searchValue) {
   for (const [key, obj] of map.entries()) {
@@ -85,185 +87,189 @@ class SocketService {
     this.io = require('socket.io')(this.server, {
       cors: {
         origin: '*',
-        credentials: true,
       },
+      credentials: true,
+      allowedHeaders: ['token'],
     });
 
-    this.io.on('connection', (socket) => {
-      console.log('socket connected');
+    this.io
+      .use(async (socket, next) => {
+        if (!socket.handshake.headers && !socket.handshake.headers.token)
+          return new AppError('user is not logged in', 401);
 
-      socket.on('add-user', async ({ userId, name }) => {
-        if (!userId || !name)
-          throw new AppError('userId and name are required', 400);
-
-        userId = userId.toString();
-        if (this.onlineUsers.has(userId)) {
-          return;
-        }
-
-        this.onlineUsers.set(userId, {
-          socketId: socket.id,
-          name,
-          userId,
-        });
-
-        socket.emit('getOnlineUsers', this.onlineUsers.values());
-      });
-
-      socket.on(
-        'msg-send',
-        async ({ receiverId, senderId, conversationId, text, isSeen }) => {
-          if (!receiverId || !senderId || !conversationId || !text)
-            throw new AppError('message data are required', 400);
-
-          const receiver = this.onlineUsers.get(receiverId);
-
-          const isFound = await AppDataSource.getRepository(Conversation).exist(
-            {
-              where: { conversationId: conversationId },
-            },
-          );
-
-          const newMessage = new Message(
-            conversationId,
-            senderId,
-            receiverId,
-            text,
-            isSeen,
-          );
-
-          if (!isFound) {
-            socket.emit('status-of-contact', {
-              conversationId: conversationId,
-              inConversation: false,
-              isLeaved: true,
-            });
-          } else {
-            await AppDataSource.getRepository(Message).insert(newMessage);
-
-            if (receiver.socketId) {
-              socket.to(receiver.socketId).emit('msg-receive', newMessage);
-            }
-          }
-        },
-      );
-
-      socket.on('mark-notifications-as-seen', async ({ userId }) => {
-        if (!userId) {
-          throw new AppError('userId are required', 400);
-        }
-        await AppDataSource.getRepository(Notification).update(
-          { isSeen: false, userId },
-          { isSeen: true },
+        const payload = await promisify(jwt.verify)(
+          socket.handshake.headers.token,
+          process.env.JWT_SECRET_KEY,
         );
-      });
+        socket.authPayload = payload;
 
-      socket.on(
-        'chat-opened',
-        async ({ userId, conversationId, contactId }) => {
-          if (!userId || !conversationId || !contactId)
-            throw new AppError('chat data is required', 400);
+        const userId = payload.id.toString();
+        if (!this.onlineUsers.has(userId)) {
+          this.onlineUsers.set(userId, {
+            socketId: socket.id,
+            userId,
+          });
+        }
+        console.log(this.onlineUsers);
+        next();
+      })
+      .on('connection', (socket) => {
+        console.log('socket connected');
 
-          await AppDataSource.createQueryBuilder()
-            .update(Conversation)
-            .set({
-              isUsersActive: () =>
-                `jsonb_set(isUsersActive, '{userId_${userId}}', 'true')`,
-            })
-            .where('conversationId = :conversationId', {
-              conversationId,
-            })
-            .execute();
+        socket.on(
+          'msg-send',
+          async ({ receiverId, senderId, conversationId, text, isSeen }) => {
+            if (!receiverId || !senderId || !conversationId || !text)
+              throw new AppError('message data are required', 400);
 
-          const receiver = this.onlineUsers.get(contactId);
+            const receiver = this.onlineUsers.get(receiverId);
 
-          if (receiver.socketId) {
-            socket.to(receiver.socketId).emit('status-of-contact', {
-              conversationId,
-              inConversation: true,
-              isLeaved: false,
+            const isFound = await AppDataSource.getRepository(
+              Conversation,
+            ).exist({
+              where: { conversationId: conversationId },
             });
-          }
 
-          await AppDataSource.getRepository(Message).update(
-            { conversationId, receiverId: userId },
+            const newMessage = new Message(
+              conversationId,
+              senderId,
+              receiverId,
+              text,
+              isSeen,
+            );
+
+            if (!isFound) {
+              socket.emit('status-of-contact', {
+                conversationId: conversationId,
+                inConversation: false,
+                isLeaved: true,
+              });
+            } else {
+              await AppDataSource.getRepository(Message).insert(newMessage);
+
+              if (receiver.socketId) {
+                socket.to(receiver.socketId).emit('msg-receive', newMessage);
+              }
+            }
+          },
+        );
+
+        socket.on('mark-notifications-as-seen', async ({ userId }) => {
+          if (!userId) {
+            throw new AppError('userId are required', 400);
+          }
+          await AppDataSource.getRepository(Notification).update(
+            { isSeen: false, userId },
             { isSeen: true },
           );
-        },
-      );
+        });
 
-      socket.on(
-        'chat-closed',
-        async ({ contactId, conversationId, userId }) => {
-          if (!contactId || !conversationId || !userId)
-            throw new AppError('chat data are required', 400);
-          const receiver = this.onlineUsers.get(contactId);
+        socket.on(
+          'chat-opened',
+          async ({ userId, conversationId, contactId }) => {
+            if (!userId || !conversationId || !contactId)
+              throw new AppError('chat data is required', 400);
 
-          if (receiver.socketId) {
-            socket.to(receiver.socketId).emit('status-of-contact', {
-              conversationId,
-              inConversation: false,
-              isLeaved: false,
-            });
-          }
+            await AppDataSource.createQueryBuilder()
+              .update(Conversation)
+              .set({
+                isUsersActive: () =>
+                  `jsonb_set(isUsersActive, '{userId_${userId}}', 'true')`,
+              })
+              .where('conversationId = :conversationId', {
+                conversationId,
+              })
+              .execute();
 
-          await AppDataSource.createQueryBuilder()
-            .update(Conversation)
-            .set({
-              isUsersActive: () =>
-                `jsonb_set(isUsersActive, '{userId_${userId}}', 'false')`,
-            })
-            .where('conversationId = :conversationId', {
-              conversationId,
-            })
-            .execute();
-        },
-      );
+            const receiver = this.onlineUsers.get(contactId);
 
-      socket.on('disconnect', async () => {
-        console.log(`Server disconnected from a client`);
+            if (receiver.socketId) {
+              socket.to(receiver.socketId).emit('status-of-contact', {
+                conversationId,
+                inConversation: true,
+                isLeaved: false,
+              });
+            }
 
-        const user = getKeyByObjectValue(
-          this.onlineUsers,
-          'socketId',
-          socket.id,
+            await AppDataSource.getRepository(Message).update(
+              { conversationId, receiverId: userId },
+              { isSeen: true },
+            );
+          },
         );
 
-        if (!user) return;
-        this.onlineUsers.delete(user.userId);
+        socket.on(
+          'chat-closed',
+          async ({ contactId, conversationId, userId }) => {
+            if (!contactId || !conversationId || !userId)
+              throw new AppError('chat data are required', 400);
+            const receiver = this.onlineUsers.get(contactId);
 
-        const conversationRepository =
-          AppDataSource.getRepository(Conversation);
+            if (receiver.socketId) {
+              socket.to(receiver.socketId).emit('status-of-contact', {
+                conversationId,
+                inConversation: false,
+                isLeaved: false,
+              });
+            }
 
-        const activeConversation = await conversationRepository
-          .createQueryBuilder()
-          .where('"user1Id" = :userId OR "user2Id" = :userId', {
-            userId: user.userId,
-          })
-          .andWhere(`"isUsersActive"->>'userId_${user.userId}' = 'true'`)
-          .getOne();
+            await AppDataSource.createQueryBuilder()
+              .update(Conversation)
+              .set({
+                isUsersActive: () =>
+                  `jsonb_set(isUsersActive, '{userId_${userId}}', 'false')`,
+              })
+              .where('conversationId = :conversationId', {
+                conversationId,
+              })
+              .execute();
+          },
+        );
 
-        if (activeConversation) {
-          activeConversation.isUsersActive[`userId_${user.userId}`] = false;
-          await conversationRepository.save(activeConversation);
+        socket.on('disconnect', async () => {
+          console.log(`Server disconnected from a client`);
 
-          const contactId =
-            activeConversation.user1Id == user.userId
-              ? activeConversation.user2Id
-              : activeConversation.user1Id;
+          const user = getKeyByObjectValue(
+            this.onlineUsers,
+            'socketId',
+            socket.id,
+          );
 
-          const openContact = this.onlineUsers.get(contactId);
+          if (!user) return;
+          this.onlineUsers.delete(user.userId);
 
-          if (openContact && openContact.socketId) {
-            socket.to(openContact.socketId).emit('status-of-contact', {
-              conversationId: activeConversation.conversationId,
-              inConversation: false,
-              isLeaved: false,
-            });
+          const conversationRepository =
+            AppDataSource.getRepository(Conversation);
+
+          const activeConversation = await conversationRepository
+            .createQueryBuilder()
+            .where('"user1Id" = :userId OR "user2Id" = :userId', {
+              userId: user.userId,
+            })
+            .andWhere(`"isUsersActive"->>'userId_${user.userId}' = 'true'`)
+            .getOne();
+
+          if (activeConversation) {
+            activeConversation.isUsersActive[`userId_${user.userId}`] = false;
+            await conversationRepository.save(activeConversation);
+
+            const contactId =
+              activeConversation.user1Id == user.userId
+                ? activeConversation.user2Id
+                : activeConversation.user1Id;
+
+            const openContact = this.onlineUsers.get(contactId);
+
+            if (openContact && openContact.socketId) {
+              socket.to(openContact.socketId).emit('status-of-contact', {
+                conversationId: activeConversation.conversationId,
+                inConversation: false,
+                isLeaved: false,
+              });
+            }
           }
-        }
+        });
       });
-    });
     console.log('WebSocket initialized ✔️');
   }
 }
