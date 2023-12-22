@@ -383,10 +383,27 @@ exports.getListOfMutes = catchAsync(async (req, res, next) => {
       'user.name',
       'user.bio',
       'user.imageUrl',
+      'user.followersCount',
+      'user.followingsCount',
     ])
     .groupBy('user.userId')
     .getMany();
-  let mutesList = filterObj(mutesQuery);
+
+  const isFollowedQuery = await AppDataSource.getRepository(User)
+    .createQueryBuilder('user')
+    .where('follow.followerId = :userId', { userId: currUserId })
+    .innerJoin(Follow, 'follow', 'follow.userId = user.userId')
+    .select(['user.userId'])
+    .getMany();
+  const isFollowingQuery = await AppDataSource.getRepository(Follow)
+    .createQueryBuilder('follow')
+    .where('follow.userId = :userId', { userId: currUserId })
+    .select(['follow.followerId'])
+    .getMany();
+
+  let mutesList = markFollowedUsers(mutesQuery, isFollowedQuery);
+  mutesList = markFollowingUsers(mutesList, isFollowingQuery);
+  mutesList = filterObj(mutesList);
   res.status(200).json({
     status: true,
     data: {
@@ -578,10 +595,27 @@ exports.getListOfBlocks = catchAsync(async (req, res, next) => {
       'user.name',
       'user.bio',
       'user.imageUrl',
+      'user.followersCount',
+      'user.followingsCount',
     ])
     .groupBy('user.userId')
     .getMany();
-  let blocksList = filterObj(blocksQuery);
+  const isFollowedQuery = await AppDataSource.getRepository(User)
+    .createQueryBuilder('user')
+    .where('follow.followerId = :userId', { userId: currUserId })
+    .innerJoin(Follow, 'follow', 'follow.userId = user.userId')
+    .select(['user.userId'])
+    .getMany();
+  const isFollowingQuery = await AppDataSource.getRepository(Follow)
+    .createQueryBuilder('follow')
+    .where('follow.userId = :userId', { userId: currUserId })
+    .select(['follow.followerId'])
+    .getMany();
+
+  let blocksList = markFollowedUsers(blocksQuery, isFollowedQuery);
+  blocksList = markFollowingUsers(blocksList, isFollowingQuery);
+  blocksList = filterObj(blocksList);
+
   res.status(200).json({
     status: true,
     data: {
