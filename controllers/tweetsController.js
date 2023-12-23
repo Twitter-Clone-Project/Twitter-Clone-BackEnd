@@ -449,7 +449,10 @@ exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
       data: tweetMediaUrls,
     });
   } else {
-    return next(new AppError('there is no attachments for this tweet', 400));
+    res.status(200).json({
+      status: true,
+      data: [],
+    });
   }
 });
 
