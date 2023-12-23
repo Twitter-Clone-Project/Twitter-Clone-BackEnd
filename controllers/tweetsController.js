@@ -21,19 +21,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 exports.uploadFiles = upload.fields([{ name: 'media' }]);
 
-function getCurrentTimestamp() {
-  const date = new Date(Date.now());
-  const pad = (n) => (n < 10 ? `0${n}` : n);
-
-  const formattedDate = `${date.getFullYear()}-${pad(
-    date.getMonth() + 1,
-  )}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(
-    date.getMinutes(),
-  )}:${pad(date.getSeconds())}`;
-
-  return formattedDate;
-}
-
 async function checkTweet(tweetId, next) {
   const tweet = await AppDataSource.getRepository(Tweet).findOne({
     where: {
@@ -117,7 +104,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
 
   tweet.userId = userId;
   tweet.text = tweetText;
-  tweet.time = getCurrentTimestamp();
+  tweet.time = new Date(Date.now());
 
   const savedTweet = await AppDataSource.getRepository(Tweet).save(tweet);
 
@@ -172,12 +159,13 @@ exports.addTweet = catchAsync(async (req, res, next) => {
   if (validMedia) {
     tweetMediaUrls = tweetMedia.map((media) => media.url);
   }
+  tweetTime = new Date(savedTweet.time + 'UTC');
   res.status(200).json({
     status: true,
     data: {
       id: savedTweet.tweetId,
       text: savedTweet.text,
-      createdAt: savedTweet.time,
+      createdAt: tweetTime,
       user: {
         userId: user.userId,
         imageUrl: user.imageUrl,
@@ -593,12 +581,13 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
     //     replyId: reply.replyId,
     //   },
     // });
+    replyTime = new Date(reply.time + 'UTC');
     return {
       replyId: reply.replyId,
       replyTweetId: reply.tweetId,
       replyUserId: reply.userId,
       replyText: reply.text,
-      createdAt: reply.time,
+      createdAt: replyTime,
       username: reply.user.username,
       screenName: reply.user.name,
       bio: reply.user.bio,
@@ -642,7 +631,7 @@ exports.addReply = catchAsync(async (req, res, next) => {
   reply.userId = currUserId;
   reply.tweetId = tweetId;
   reply.text = replyText;
-  reply.time = getCurrentTimestamp();
+  reply.time = new Date(Date.now());
   const savedReply = await AppDataSource.getRepository(Reply).save(reply);
   const tweet = await AppDataSource.getRepository(Tweet).findOne({
     where: {
@@ -665,7 +654,7 @@ exports.addReply = catchAsync(async (req, res, next) => {
     },
   });
   isFollowed = !!isFollowed;
-
+  replyTime = new Date(savedReply.time + 'UTC');
   res.status(200).json({
     status: true,
     message: 'Reply is added successfully',
@@ -674,7 +663,7 @@ exports.addReply = catchAsync(async (req, res, next) => {
       replyTweetId: savedReply.tweetId,
       replyUserId: savedReply.userId,
       replyText: savedReply.text,
-      createdAt: savedReply.time,
+      createdAt: replyTime,
       username: user.username,
       screenName: user.name,
       bio: user.bio,
