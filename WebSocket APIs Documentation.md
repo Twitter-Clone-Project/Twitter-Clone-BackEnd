@@ -7,11 +7,11 @@
 
 ## `msg-send` Event
 
+- `Emit`
 - **Purpose**: Sends a message from one user to another.
 - **Payload**:
   - `message` - Object containing information about the message.
     - `conversationId` - ID of the conversation.
-    - `senderId` - ID of the message sender.
     - `receiverId` - ID of the message receiver.
     - `isSeen` - Indicates whether the message is seen.
     - `text` - The content of the message.
@@ -25,6 +25,7 @@
 
 ## `msg-receive` Event
 
+- `Listen`
 - **Purpose**: Sends a chat message to the receiver's socket.
 - **Payload**:
   - `message` - Object containing information about the message.
@@ -36,10 +37,10 @@
 
 ## `chat-opened` Event
 
+- `Emit`
 - **Purpose**: Updates the status of notifications and messages when a chat is opened.
 - **Payload**:
   - `data` - Object containing information about the chat.
-    - `userId` - ID of the current user who opened the chat.
     - `contactId` - ID of the contact in the conversation.
     - `conversationId` - ID of the conversation.
 - **Action**:
@@ -49,40 +50,40 @@
 
 ## `chat-closed` Event
 
+- `Emit`
 - **Purpose**: Emits it when a chat with a user is closed.
 - **Payload**:
   - `data` - Object containing information about the chat.
     - `conversationId` - ID of the conversation.
     - `contactId` - ID of the contact in the conversation.
-    - `userId` - ID of the current user.
 - **Action**:
   - Emits a `status-of-contact` event.
 
 ## `status-of-contact` Event
 
+- `Listen`
 - **Purpose**: Sends the status of the other contact in a conversation.
 - **Payload**:
   - `status` - Object containing `conversationId`, `isLeaved` and `inConversation`.
 - **Action**: Emits the status of the other contact.
 
-## `mark-notifications-as-seen` Event
-
-- **Purpose**: Marks all notifications as seen. When the user goes out of the notifications page or unmounts it, this event should be emitted to mark the notifications as seen.
-- **Payload**:
-  - `data` - Object containing information about the notifications.
-    - `userId` - ID of the current user who opened the chat.
-- **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
-
 ## `notification-receive` Event
 
+- `Listen`
 - **Purpose**: Notifies the receiver about a new chat message.
 - **Payload**:
   - `notification` - Object containing information about the notification.
     - `notificationId` - ID of the notification.
     - `content` - Content of the notification.
-    - `userId` - ID of the user associated with the notification.
+    - `timestamp` - timestamp for the notification.
     - `isSeen` - Indicates whether the notification is seen.
+    - `senderImgUrl` - Image url for the user who sent the message or triggered the notification.
 - **Action**: Emits the notification to the receiver's socket.
+
+## `mark-notifications-as-seen` Event
+
+- **Purpose**: Marks all notifications as seen. When the user goes out of the notifications page or unmounts it, this event should be emitted to mark the notifications as seen.
+- **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
 
 ## `disconnect` Event
 
