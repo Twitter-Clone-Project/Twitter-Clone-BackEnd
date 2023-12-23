@@ -90,7 +90,7 @@ async function getUserInfo(userId, currUserId) {
   };
 }
 
-exports.searchFirstUsers = catchAsync(async (req) => {
+async function searchFirstUsers(req) {
   const { query } = req.query;
   const currUser = req.currentUser;
 
@@ -124,12 +124,12 @@ exports.searchFirstUsers = catchAsync(async (req) => {
   const usersList = await Promise.all(usersPromises);
   if (usersList[0] != null) usersRes = usersList;
   else usersRes = [];
-});
+}
 
 exports.searchUsers = catchAsync(async (req, res, next) => {
   const { pageNum } = req.params;
   if (parseInt(pageNum, 10) === 1) {
-    await this.searchFirstUsers(req);
+    await searchFirstUsers(req);
   }
 
   const users = usersRes.slice(
@@ -143,7 +143,7 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.searchFirstTweets = catchAsync(async (req) => {
+async function searchFirstTweets(req) {
   const { query } = req.query;
   const currUserId = req.currentUser.userId;
 
@@ -203,12 +203,12 @@ exports.searchFirstTweets = catchAsync(async (req) => {
   let tweetsList = await Promise.all(tweetsPromises);
   if (tweetsList[0] != null) tweetsRes = tweetsList;
   else tweetsRes = [];
-});
+}
 
 exports.searchTweets = catchAsync(async (req, res, next) => {
   const { pageNum } = req.params;
   if (parseInt(pageNum, 10) === 1) {
-    await this.searchFirstTweets(req);
+    await searchFirstTweets(req);
   }
 
   const tweets = tweetsRes.slice(
