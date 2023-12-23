@@ -9,7 +9,7 @@ const Follow = require('../models/relations/Follow');
 const Mute = require('../models/relations/Mute');
 const Block = require('../models/relations/Block');
 const Email = require('../services/Email');
-const authController = require('../controllers/authController');
+const {createAndSendToken} = require('../controllers/authController');
 
 // Set up multer storage and limits
 const storage = multer.memoryStorage();
@@ -190,10 +190,6 @@ exports.updateEmail = catchAsync(async (req, res, next) => {
   const user = await userRepository.findOne({
     where: { userId: currUserId },
   });
-
-  //const savedUser = await AppDataSource.getRepository(User).save(user);
-  console.log(user);
-
   const otp = user.createOTP();
   await userRepository.save(user);
   user.email = newEmail;
@@ -216,7 +212,7 @@ exports.confirmUpdateEmail = catchAsync(async (req, res, next) => {
   user.email = newEmail;
   await userRepository.save(user);
 
-  authController.createAndSendToken(user, req, res, 200);
+  createAndSendToken(user, req, res, 200);
 });
 
 exports.updateProfile = catchAsync(async (req, res, next) => {

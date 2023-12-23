@@ -49,7 +49,7 @@ exports.signToken = (id) =>
  * @param {Object} res - The response object
  * @param {number} statusCode - The HTTP status code for the response
  */
-exports.createAndSendToken = (user, req, res, statusCode) => {
+const createAndSendToken = (user, req, res, statusCode) => {
   const token = this.signToken(user.userId);
 
   res.cookie('jwt', token, {
@@ -636,3 +636,5 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     message: 'Password reseted  successfully',
   });
 });
+
+module.exports.createAndSendToken = createAndSendToken ;
