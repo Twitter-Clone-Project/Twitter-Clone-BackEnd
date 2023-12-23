@@ -40,6 +40,7 @@
     "express-rate-limit": "^7.1.1",
     "express-validator": "^7.0.1",
     "formidable": "^3.5.1",
+    "fs": "^0.0.1-security",
     "google-auth-library": "^9.2.0",
     "helmet": "^7.0.0",
     "hpp": "^0.2.3",

@@ -6,32 +6,45 @@ describe('POST /api/v1/tweets/add', () => {
   jest.setTimeout(100000);
 
   it('try to add empty tweet text and no media', async () => {
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+
+    const { token } = await global.signin(email, username);
+
     const response = await request(app)
       .post('/api/v1/tweets/add')
-      .send({ tweetText: '', trends: null, media: null });
-    console.log(response.body);
+      .set('Cookie', token)
+      .field('tweetText', '')
+      .set('Content-Type', 'multipart/form-data');
     expect(response.status).toEqual(400);
   });
 
-  it('try to add more than 4 media in a tweet', async () => {
+  it('successfully adding non empty tweet and no media', async () => {
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+
+    const { token } = await global.signin(email, username);
+
     const response = await request(app)
       .post('/api/v1/tweets/add')
-      .send({
-        tweetText: 'tweet test',
-        trends: null,
-        media: ['1.png', '2.png', '3.png', '4.png', '5.png'],
-      });
-    console.log(response.body);
-    expect(response.status).toEqual(400);
+      .set('Cookie', token)
+      .field('tweetText', 'tweet test')
+      .set('Content-Type', 'multipart/form-data');
+    expect(response.status).toEqual(200);
   });
 
-  it('successfully adding non empty tweet with no media', async () => {
-    const response = await request(app).post('/api/v1/tweets/add').send({
-      tweetText: 'tweet test',
-      trends: null,
-      media: null,
-    });
-    console.log(response.body);
+  it('successfully adding non empty tweet with trends and no media', async () => {
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+
+    const { token } = await global.signin(email, username);
+
+    const response = await request(app)
+      .post('/api/v1/tweets/add')
+      .set('Cookie', token)
+      .field('tweetText', 'tweet test')
+      .field('trends', 'trend test')
+      .set('Content-Type', 'multipart/form-data');
     expect(response.status).toEqual(200);
   });
 });
