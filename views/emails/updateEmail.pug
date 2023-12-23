@@ -1,0 +1,11 @@
+extends baseEmail
+
+block content
+  h2  Confirm your email address
+  p There's one quick step you need to complete in order to confirm your email address.
+  p Please enter this verification code on Twitter when prompted
+  strong(style='color: blue;') Your OTP is #{data.otp}
+  p It's valid for 10 minutes
+  hr
+  p If you need any help, please don't hesitate to contact us!
+  p X Support Team

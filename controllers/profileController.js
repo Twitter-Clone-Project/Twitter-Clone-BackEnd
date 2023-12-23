@@ -8,6 +8,8 @@ const User = require('../models/entites/User');
 const Follow = require('../models/relations/Follow');
 const Mute = require('../models/relations/Mute');
 const Block = require('../models/relations/Block');
+const Email = require('../services/Email');
+const authController = require('../controllers/authController');
 
 // Set up multer storage and limits
 const storage = multer.memoryStorage();
@@ -184,20 +186,39 @@ exports.updateUsername = catchAsync(async (req, res, next) => {
 exports.updateEmail = catchAsync(async (req, res, next) => {
   const currUserId = req.currentUser.userId;
   const { newEmail } = req.body;
-  const user = await AppDataSource.getRepository(User).findOne({
+  const userRepository = AppDataSource.getRepository(User);
+  const user = await userRepository.findOne({
     where: { userId: currUserId },
   });
+
+  //const savedUser = await AppDataSource.getRepository(User).save(user);
+  console.log(user);
+
+  const otp = user.createOTP();
+  await userRepository.save(user);
   user.email = newEmail;
 
-  const savedUser = await AppDataSource.getRepository(User).save(user);
+  await new Email(user, { otp }).sendEmail(
+    'updateEmail',
+    'Confirm your email on X',
+  );
 
   res.status(200).json({
     status: true,
-    data: {
-      newEmail: newEmail,
-    },
+    message: 'Email with otp send successfully',
   });
 });
+
+exports.confirmUpdateEmail = catchAsync(async (req, res, next) => {
+  const { userRepository, user, newEmail } = res.locals;
+
+  user.setIsConfirmed(true);
+  user.email = newEmail;
+  await userRepository.save(user);
+
+  authController.createAndSendToken(user, req, res, 200);
+});
+
 exports.updateProfile = catchAsync(async (req, res, next) => {
   const { name, bio, website, location, birthDate, isUpdated } = req.body;
   let image = null;

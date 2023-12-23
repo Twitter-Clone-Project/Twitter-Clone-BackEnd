@@ -49,7 +49,7 @@ exports.signToken = (id) =>
  * @param {Object} res - The response object
  * @param {number} statusCode - The HTTP status code for the response
  */
-const createAndSendToken = (user, req, res, statusCode) => {
+exports.createAndSendToken = (user, req, res, statusCode) => {
   const token = this.signToken(user.userId);
 
   res.cookie('jwt', token, {
@@ -387,13 +387,13 @@ exports.getMe = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.checkOTP = catchAsync(async (req, res, next) => {
-  const { otp, email } = req.body;
+  const { otp, email, newEmail } = req.body;
   const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
 
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
     where: {
-      email,
+      email: email,
     },
     select: {
       userId: true,
@@ -435,6 +435,7 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
 
   res.locals.userRepository = userRepository;
   res.locals.user = user;
+  res.locals.newEmail = newEmail;
   next();
 });
 

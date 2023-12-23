@@ -7,6 +7,7 @@ const {
   updateEmailValidationRules,
   updateProfileValidationRules,
   imagesValidation,
+  otpWithEmailValidationRules
 } = require('../middlewares/validations/profile');
 
 const router = express.Router();
@@ -44,4 +45,14 @@ router
   );
   router.route('/updaterawan').patch(profileController.rawanusers);
 
+  router
+    .route('/verifyEmail')
+    .post(
+      authController.requireAuth,
+      otpWithEmailValidationRules,
+      validateRequest,
+      authController.checkOTP,
+      profileController.confirmUpdateEmail,
+    );
+    
 module.exports = router;

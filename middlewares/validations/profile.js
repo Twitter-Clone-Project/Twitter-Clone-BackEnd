@@ -95,3 +95,14 @@ exports.imagesValidation = [
       return true;
     }),
 ];
+
+exports.otpWithEmailValidationRules = [
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
+  body('newEmail').toLowerCase().isEmail().withMessage('Invalid email address'),
+  body('otp')
+    .matches(/^[a-z0-9]+$/)
+    .isLength({ min: 8, max: 8 })
+    .not()
+    .isEmpty()
+    .withMessage('Invalid OTP'),
+];
