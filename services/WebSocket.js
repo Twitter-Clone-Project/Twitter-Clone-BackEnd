@@ -55,7 +55,7 @@ class SocketService {
     );
     await this.AppDataSource.getRepository(Notification).insert(notification);
 
-    if (receiver.socketId && sender.socketId) {
+    if (receiver && sender && receiver.socketId && sender.socketId) {
       this.io.sockets.sockets
         .get(sender.socketId)
         .to(receiver.socketId)
@@ -74,6 +74,7 @@ class SocketService {
   updateAppDataSource(dataSource) {
     this.AppDataSource = dataSource;
   }
+
   initializeSocket(server, AppDataSource) {
     this.server = server;
     this.AppDataSource = AppDataSource;
@@ -84,8 +85,8 @@ class SocketService {
           callback(null, true);
         },
         credentials: true,
+        allowedHeaders: ['token'],
       },
-      allowedHeaders: ['token'],
     });
 
     this.io
@@ -106,6 +107,7 @@ class SocketService {
             userId,
           });
         }
+
         next();
       })
       .on('connection', (socket) => {
@@ -132,7 +134,7 @@ class SocketService {
               text,
               isSeen,
             );
-            console.log(isFound);
+
             if (!isFound) {
               socket.emit('status-of-contact', {
                 conversationId: conversationId,
@@ -142,7 +144,7 @@ class SocketService {
             } else {
               await AppDataSource.getRepository(Message).insert(newMessage);
 
-              if (receiver.socketId) {
+              if (receiver && receiver.socketId) {
                 socket.to(receiver.socketId).emit('msg-receive', newMessage);
               }
             }
@@ -175,7 +177,7 @@ class SocketService {
 
           const receiver = this.onlineUsers.get(contactId);
 
-          if (receiver.socketId) {
+          if (receiver && receiver.socketId) {
             socket.to(receiver.socketId).emit('status-of-contact', {
               conversationId,
               inConversation: true,
@@ -196,7 +198,7 @@ class SocketService {
 
           const receiver = this.onlineUsers.get(contactId);
 
-          if (receiver.socketId) {
+          if (receiver && receiver.socketId) {
             socket.to(receiver.socketId).emit('status-of-contact', {
               conversationId,
               inConversation: false,
