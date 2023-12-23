@@ -65,6 +65,7 @@
   - `data` - Object containing information about the chat.
     - `conversationId` - ID of the conversation.
     - `contactId` - ID of the contact in the conversation.
+    - `userId` - ID of the current user.
 - **Action**:
   - Emits a `status-of-contact` event.
 
