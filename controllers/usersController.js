@@ -30,7 +30,7 @@ exports.isUsernameFound = catchAsync(async (req, res, next) => {
     });
   }
 
-  res.status(isFound ? 200 : 404).json({
+  res.status(200).json({
     status: true,
     data: { isFound },
   });
@@ -60,7 +60,7 @@ exports.isEmailFound = catchAsync(async (req, res, next) => {
     });
   }
 
-  res.status(isFound ? 200 : 404).json({
+  res.status(200).json({
     status: true,
     data: { isFound },
   });
