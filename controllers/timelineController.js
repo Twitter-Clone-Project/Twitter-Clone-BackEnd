@@ -217,7 +217,7 @@ async function getFirstTweets(userId) {
 exports.getTweets = catchAsync(async (req, res, next) => {
   const { pageNum } = req.params;
   const userId = req.currentUser.userId;
-  console.log(userId);
+
   if (parseInt(pageNum, 10) === 1) {
     await getFirstTweets(userId);
   }

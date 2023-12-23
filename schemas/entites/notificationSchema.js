@@ -13,6 +13,9 @@ module.exports = new EntitySchema({
     userId: {
       type: 'bigint',
     },
+    senderId: {
+      type: 'bigint',
+    },
     content: {
       type: 'varchar',
     },
@@ -20,9 +23,12 @@ module.exports = new EntitySchema({
       type: 'boolean',
       default: false,
     },
-    isFromChat: {
-      type: 'boolean',
-      default: false,
+    timestamp: {
+      type: 'timestamptz',
+    },
+    type: {
+      type: 'enum',
+      enum: ['CHAT', 'MENTION', 'FOLLOW', 'UNFOLLOW'],
     },
   },
   relations: {
@@ -30,6 +36,13 @@ module.exports = new EntitySchema({
       type: 'many-to-one',
       target: 'User',
       joinColumn: { name: 'userId' },
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
+    sender: {
+      type: 'many-to-one',
+      target: 'User',
+      joinColumn: { name: 'senderId' },
       cascade: true,
       onDelete: 'CASCADE',
     },

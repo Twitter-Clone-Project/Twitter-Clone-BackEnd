@@ -28,10 +28,7 @@ const AppDataSource = new DataSource({
     process.env.NODE_ENV === 'testing'
       ? process.env.DATABASE_TEST_NAME
       : process.env.DATABASE_NAME,
-  synchronize:
-    process.env.NODE_ENV === 'testing' ||
-    process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'production',
+  synchronize: true,
   logging: false,
   ssl: process.env.SSL === 'TRUE',
   extra: {

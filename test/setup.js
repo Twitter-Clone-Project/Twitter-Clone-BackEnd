@@ -36,7 +36,6 @@ afterAll(async () => {
 });
 
 global.signin = async (email, username) => {
-
   const hashedPassword = await Password.hashPassword('password');
   const user = new User(
     username,
@@ -54,5 +53,12 @@ global.signin = async (email, username) => {
 
   const token = signToken(user2.identifiers[0].userId);
 
-  return { token: `jwt=${token}`, otp };
+  const userData = await userRepository.findOne({
+    select: {
+      userId: true,
+    },
+    where: { email },
+  });
+
+  return { token: `jwt=${token}`, otp, userId: userData.userId };
 };

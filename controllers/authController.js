@@ -14,7 +14,6 @@ const AppError = require('../services/AppError');
 const Password = require('../services/Password');
 const User = require('../models/entites/User');
 const Email = require('../services/Email');
-const { use } = require('../routes/authRouter');
 
 /**
  * Filters object properties based on specified fields.
@@ -95,7 +94,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
-    
+
   const userRepository = AppDataSource.getRepository(User);
 
   // if this email signed but not confirmed remove it
@@ -313,6 +312,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.isOnline',
+      'user.socketId',
     ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: payload.id })
@@ -333,6 +333,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.getMe = catchAsync(async (req, res, next) => {
+  // await socketService.emitNotification(62, req.currentUser.userId, 'Follow');
   const user = await AppDataSource.getRepository(User).findOne({
     where: { userId: req.currentUser.userId },
     select: {

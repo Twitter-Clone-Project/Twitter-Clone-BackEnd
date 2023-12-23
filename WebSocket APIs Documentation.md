@@ -10,7 +10,7 @@
 - **Purpose**: Adds a user to the online user list and updates their socket ID and online status.
 - **Payload**:
   - `userData` - Object containing user information
-     - `userId` - ID of the user connected to the socket.
+    - `userId` - ID of the user connected to the socket.
 - **Action**:
   - Updates the user's `socketId` and sets `isOnline` to `true` in the database.
   - Retrieves a list of online users and emits it to the newly connected user.
@@ -75,6 +75,23 @@
   - `status` - Object containing `conversationId`, `isLeaved` and `inConversation`.
 - **Action**: Emits the status of the other contact.
 
+## `getOnlineUsers` Event
+
+- **Purpose**: Retrieves the list of online users.
+- **Action**: Queries the database for users with `isOnline` set to `true` and emits the list to the connected user.
+
+## `notification-receive` Event
+
+- **Purpose**: Notifies the receiver about a new chat message.
+- **Payload**:
+  - `notification` - Object containing information about the notification.
+    - `notificationId` - ID of the notification.
+    - `content` - Content of the notification.
+    - `timestamp` - timestamp for the notification.
+    - `isSeen` - Indicates whether the notification is seen.
+    - `senderImgUrl` - Image url for the user who sent the message or triggered the notification.
+- **Action**: Emits the notification to the receiver's socket.
+
 ## `mark-notifications-as-seen` Event
 
 - **Purpose**: Marks all notifications as seen. When the user goes out of the notifications page or unmounts it, this event should be emitted to mark the notifications as seen.
@@ -82,22 +99,6 @@
   - `data` - Object containing information about the notifications.
     - `userId` - ID of the current user who opened the chat.
 - **Action**: Updates the `isSeen` status of all notifications from `false` to `true` in the database.
-
-## `getOnlineUsers` Event
-
-- **Purpose**: Retrieves the list of online users.
-- **Action**: Queries the database for users with `isOnline` set to `true` and emits the list to the connected user.
-
-## `chat-notification-receive` Event
-
-- **Purpose**: Notifies the receiver about a new chat message.
-- **Payload**:
-  - `notification` - Object containing information about the notification.
-    - `notificationId` - ID of the notification.
-    - `content` - Content of the notification.
-    - `userId` - ID of the user associated with the notification.
-    - `isSeen` - Indicates whether the notification is seen.
-- **Action**: Emits the notification to the receiver's socket.
 
 ## `disconnect` Event
 

@@ -1532,14 +1532,14 @@ paths:
             application/json:
               status: false
               message: Unauthorized user
-  /users/search?query="string":
+  /users/search/pageNum?query="string":
     get:
       tags:
         - search
       summary: >-
         Search for matching users using their username or screen name (or part
         of them).
-      description: Endpoint to search for users by username or screen name.
+      description: Endpoint to search for users by username or screen name and get 10 as max in array.
       consumes:
         - application/json
       produces:
@@ -1548,6 +1548,11 @@ paths:
         - name: query
           in: query
           description: The username or screen name to search for.
+          required: true
+          type: string
+        - name: pageNum
+          in: path
+          description: The pageNum of the tweets of user.
           required: true
           type: string
       responses:
@@ -1567,9 +1572,9 @@ paths:
                       type: string
                     email:
                       type: string
-                    name:
+                    screenName:
                       type: string
-                    userName:
+                    username:
                       type: string
                     profileImageURL:
                       type: string
@@ -2351,6 +2356,11 @@ paths:
                           type: string
                         isSeen:
                           type: boolean
+                        timestamp:
+                          type: date
+                          example: '2023-11-20T14:14:37.588Z'
+                        senderImgUrl:
+                          type: string
         '400':
           description: Bad request - something went wrong
           schema:
@@ -2487,7 +2497,7 @@ paths:
                       screenName:
                         type: string
                         description: The screen name of the user that create the tweet.
-                      userName:
+                      username:
                         type: string
                         description: The username that create the tweet.
                       bio:
@@ -2614,7 +2624,7 @@ paths:
                       screenName:
                         type: string
                         description: The screen name of the user that create the tweet.
-                      userName:
+                      username:
                         type: string
                         description: The username that create the tweet.
                       bio:
@@ -2700,9 +2710,11 @@ paths:
                     createdAt:
                       type: '2023-11-27 02:17:25'
                       description: The date and time the reply was created.
-                    userName:
+                    username:
                       type: string
                       description: The name of the user that make reply.
+                    screenName:
+                      type: string
                     bio:
                       type: string
                       description: The bio of the user that make reply.
@@ -2711,15 +2723,6 @@ paths:
                       description: The image of the user that make reply.
         '400':
           description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-        '404':
-          description: No replies for this tweet
           schema:
             type: object
             properties:
@@ -2778,9 +2781,11 @@ paths:
                       type: string
                     createdAt:
                       type: '2023-11-27 02:17:25'
-                    userName:
+                    username:
                       type: string
                       description: The name of the user that make reply.
+                    screenName:
+                      type: string
                     bio:
                       type: string
                       description: The bio of the user that make reply.
@@ -2936,7 +2941,7 @@ paths:
                         userId:
                           type: string
                           description: The ID of the user who retweeted.
-                        userName:
+                        username:
                           type: string
                           description: The name of the user who retweeted.
                         screenName:
@@ -2951,7 +2956,7 @@ paths:
                         userId:
                           type: string
                           description: The ID of the user who retweeted.
-                        userName:
+                        username:
                           type: string
                           description: The username of the user that create the tweet.
                         screenName:
@@ -3223,7 +3228,7 @@ paths:
                 type: boolean
               message:
                 type: string
-  /tweets/search?query="string":
+  /tweets/search/pageNum?query="string":
     get:
       tags:
         - search
@@ -3237,6 +3242,11 @@ paths:
         - name: searchString
           in: query
           description: The string to search for.
+          required: true
+          type: string
+        - name: pageNum
+          in: path
+          description: The pageNum of the tweets of user.
           required: true
           type: string
       responses:
@@ -3270,7 +3280,7 @@ paths:
                       screenName:
                         type: string
                         description: The screen name of the user that create the tweet.
-                      userName:
+                      username:
                         type: string
                         description: The username that create the tweet.
                       bio:
