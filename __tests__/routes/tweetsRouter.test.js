@@ -36,7 +36,6 @@ describe('POST /api/v1/tweets/add', () => {
   it('successfully adding non empty tweet with trends and no media', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
-
     const { token } = await global.signin(email, username);
 
     const response = await request(app)

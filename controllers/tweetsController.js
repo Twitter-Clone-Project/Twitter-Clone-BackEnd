@@ -287,12 +287,15 @@ exports.getTweet = catchAsync(async (req, res, next) => {
   isLiked = !!isLiked;
   isReposted = !!isReposted;
   const tweetMediaUrls = attachments.map((media) => media.url);
+
+  tweetTime = new Date(tweet.time + 'UTC');
+
   res.status(200).json({
     status: true,
     data: {
       id: tweet.tweetId,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       user: {
         userId: user.userId,
         profileImageURL: user.imageUrl,
