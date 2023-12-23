@@ -80,9 +80,11 @@ class SocketService {
 
     this.io = require('socket.io')(this.server, {
       cors: {
-        origin: '*',
+        origin: (origin, callback) => {
+          callback(null, true);
+        },
+        credentials: true,
       },
-      credentials: true,
       allowedHeaders: ['token'],
     });
 
@@ -104,7 +106,6 @@ class SocketService {
             userId,
           });
         }
-
         next();
       })
       .on('connection', (socket) => {
