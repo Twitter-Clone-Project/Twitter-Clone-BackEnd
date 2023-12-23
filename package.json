@@ -8,7 +8,7 @@
     "start:dev": "(SET NODE_ENV=development) & nodemon server.js",
     "start:prod": "(SET NODE_ENV=production)  & node server.js",
     "debug": "ndb server.js",
-    "test": "(SET NODE_ENV=testing) & jest --watchAll --no-cache --runInBand"
+    "test": "(SET NODE_ENV=testing) & jest --watchAll --no-cache --runInBand "
   },
   "jest": {
     "testMatch": [

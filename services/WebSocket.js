@@ -71,6 +71,9 @@ class SocketService {
     }
   }
 
+  updateAppDataSource(dataSource) {
+    this.AppDataSource = dataSource;
+  }
   initializeSocket(server, AppDataSource) {
     this.server = server;
     this.AppDataSource = AppDataSource;
@@ -112,7 +115,7 @@ class SocketService {
           async ({ receiverId, conversationId, text, isSeen }) => {
             if (!receiverId || !conversationId || !text)
               throw new AppError('message data are required', 400);
-
+            const { userId } = socket;
             const receiver = this.onlineUsers.get(receiverId);
 
             const isFound = await AppDataSource.getRepository(
@@ -123,12 +126,12 @@ class SocketService {
 
             const newMessage = new Message(
               conversationId,
-              socket.userId,
+              userId,
               receiverId,
               text,
               isSeen,
             );
-
+            console.log(isFound);
             if (!isFound) {
               socket.emit('status-of-contact', {
                 conversationId: conversationId,

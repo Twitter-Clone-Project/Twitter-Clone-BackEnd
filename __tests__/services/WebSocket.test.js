@@ -12,7 +12,13 @@ describe('SocketService', () => {
     httpServer.listen(() => {
       socketService.initializeSocket(httpServer, MockAppDataSource);
       const port = httpServer.address().port;
-      clientSocket = ioc(`http://localhost:${port}`);
+      clientSocket = ioc(`http://localhost:${port}`, {
+        withCredential: true,
+        extraHeaders: {
+          token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyIiwiaWF0IjoxNzAzMjY5NDk0LCJleHAiOjE3MDQxMzM0OTR9.yCd1m_DOWYnHTcP4-A3LIdYt8pVYnd7n19lkYYVabTM',
+        },
+      });
       clientSocket.on('connect', () => {
         done();
       });
@@ -24,18 +30,57 @@ describe('SocketService', () => {
     done();
   });
 
-  test('should handle add-user event', (done) => {
-    const email = `testuser_${uuid.v4()}@example.com`;
-    const username = `user_${uuid.v4()}`;
+  describe('msg-send-receive', () => {
+    test('send a status-of-contact if the other conversation leaved', (done) => {
+      const receiverId = 'receiverUserId'; // Replace with a valid user ID
+      const conversationId = 'conversationId'; // Replace with a valid conversation ID
+      const text = 'Hello, this is a test message';
+      const isSeen = false;
 
-    // const { userId } = global.signin(email, username);
+      MockAppDataSource.getRepository().exist = jest
+        .fn()
+        .mockResolvedValue(false);
+      socketService.updateAppDataSource(MockAppDataSource);
 
-    clientSocket.emit('add-user', { userId: 30, name: 'testuser' });
-    clientSocket.on('getOnlineUsers', (dt) => {
-      console.log(dt);
-      done();
+      clientSocket.on('status-of-contact', (data) => {
+        expect(data).toEqual({
+          conversationId,
+          inConversation: false,
+          isLeaved: true,
+        });
+        done();
+      });
+
+      clientSocket.emit('msg-send', {
+        receiverId,
+        conversationId,
+        text,
+        isSeen,
+      });
+    });
+
+    test('receive the message', () => {
+      const receiverId = 'receiverUserId'; // Replace with a valid user ID
+      const conversationId = 'conversationId'; // Replace with a valid conversation ID
+      const text = 'Hello, this is a test message';
+      const isSeen = false;
+
+      MockAppDataSource.getRepository().exist = jest
+        .fn()
+        .mockResolvedValue(true);
+      socketService.updateAppDataSource(MockAppDataSource);
+
+      clientSocket.on('msg-receive', (data) => {
+        expect(data.text).toEqual(text);
+        done();
+      });
+
+      clientSocket.emit('msg-send', {
+        receiverId,
+        conversationId,
+        text,
+        isSeen,
+      });
     });
   });
-
-  test('handle msg-send-receive event', async () => {});
 });
