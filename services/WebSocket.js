@@ -136,8 +136,13 @@ class SocketService {
 
           if (receiver.socketId) {
             socket.to(receiver.socketId).emit('msg-receive', {
-              ...message,
+              senderId: newMessage.senderId,
+              messageId: newMessage.messageId,
+              isSeen: newMessage.isSeen,
+              time: newMessage.time,
+              text: newMessage.text,
               senderUsername: sender.username,
+              isFromMe: false,
             });
 
             // await this.emitNotification(message.userId, receiver.userId);

@@ -135,6 +135,7 @@ const getUserConversations = async (userId) => {
               text: lastMessage.text,
               timestamp: lastMessage.time,
               isSeen: lastMessage.isSeen,
+              isFromMe: lastMessage.senderId === userId,
             }
           : null,
       };
