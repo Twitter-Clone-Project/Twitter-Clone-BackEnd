@@ -92,7 +92,7 @@ class SocketService {
     this.io
       .use(async (socket, next) => {
         if (!socket.handshake.headers && !socket.handshake.headers.token)
-          return new AppError('user is not logged in', 401);
+          throw new AppError('user is not logged in', 401);
 
         const payload = await promisify(jwt.verify)(
           socket.handshake.headers.token,
@@ -101,12 +101,14 @@ class SocketService {
         socket.userId = payload.id;
 
         const userId = payload.id.toString();
-        if (!this.onlineUsers.has(userId)) {
-          this.onlineUsers.set(userId, {
-            socketId: socket.id,
-            userId,
-          });
-        }
+        // if (!this.onlineUsers.has(userId)) {
+        //   this.onlineUsers.set(userId, {
+        //     socketId: socket.id,
+        //     userId,
+        //   });
+        // }
+
+        socket.join(`user_${userId}_room`);
 
         next();
       })
@@ -119,7 +121,7 @@ class SocketService {
             if (!receiverId || !conversationId || !text)
               throw new AppError('message data are required', 400);
             const { userId } = socket;
-            const receiver = this.onlineUsers.get(receiverId);
+            // const receiver = this.onlineUsers.get(receiverId);
 
             const isFound = await AppDataSource.getRepository(
               Conversation,
@@ -144,8 +146,16 @@ class SocketService {
             } else {
               await AppDataSource.getRepository(Message).insert(newMessage);
 
-              if (receiver && receiver.socketId) {
-                socket.to(receiver.socketId).emit('msg-receive', newMessage);
+              if (receiverId) {
+                socket
+                  .to(`user_${receiverId}_room`)
+                  .emit('msg-receive', newMessage);
+              }
+
+              if (userId) {
+                socket.broadcast
+                  .to(`user_${userId}_room`)
+                  .emit('msg-broadcast', newMessage);
               }
             }
           },
@@ -175,10 +185,10 @@ class SocketService {
             })
             .execute();
 
-          const receiver = this.onlineUsers.get(contactId);
+          // const receiver = this.onlineUsers.get(contactId);
 
-          if (receiver && receiver.socketId) {
-            socket.to(receiver.socketId).emit('status-of-contact', {
+          if (contactId) {
+            socket.to(`user_${contactId}_room`).emit('status-of-contact', {
               conversationId,
               inConversation: true,
               isLeaved: false,
@@ -196,10 +206,10 @@ class SocketService {
             throw new AppError('chat data are required', 400);
           const { userId } = socket;
 
-          const receiver = this.onlineUsers.get(contactId);
+          // const receiver = this.onlineUsers.get(contactId);
 
-          if (receiver && receiver.socketId) {
-            socket.to(receiver.socketId).emit('status-of-contact', {
+          if (contactId) {
+            socket.to(`user_${contactId}_room`).emit('status-of-contact', {
               conversationId,
               inConversation: false,
               isLeaved: false,
@@ -223,7 +233,7 @@ class SocketService {
           const { userId } = socket;
 
           if (!userId) return;
-          this.onlineUsers.delete(userId);
+          // this.onlineUsers.delete(userId);
 
           const conversationRepository =
             AppDataSource.getRepository(Conversation);
@@ -245,10 +255,8 @@ class SocketService {
                 ? activeConversation.user2Id
                 : activeConversation.user1Id;
 
-            const openContact = this.onlineUsers.get(contactId);
-
-            if (openContact && openContact.socketId) {
-              socket.to(openContact.socketId).emit('status-of-contact', {
+            if (contactId) {
+              socket.to(`user_${contactId}_room`).emit('status-of-contact', {
                 conversationId: activeConversation.conversationId,
                 inConversation: false,
                 isLeaved: false,
