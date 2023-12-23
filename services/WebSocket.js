@@ -108,6 +108,11 @@ class SocketService {
           where: { userId: message.receiverId },
         });
 
+        const sender = await AppDataSource.getRepository(User).findOne({
+          select: { name: true, userId: true, username: true },
+          where: { userId: message.senderId },
+        });
+
         const isFound = await AppDataSource.getRepository(Conversation).exist({
           where: { conversationId: message.conversationId },
         });
@@ -130,7 +135,10 @@ class SocketService {
           await AppDataSource.getRepository(Message).insert(newMessage);
 
           if (receiver.socketId) {
-            socket.to(receiver.socketId).emit('msg-receive', message);
+            socket.to(receiver.socketId).emit('msg-receive', {
+              ...message,
+              senderUsername: sender.username,
+            });
 
             // await this.emitNotification(message.userId, receiver.userId);
           }
