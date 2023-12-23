@@ -19,6 +19,7 @@ describe('SocketService', () => {
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyIiwiaWF0IjoxNzAzMjY5NDk0LCJleHAiOjE3MDQxMzM0OTR9.yCd1m_DOWYnHTcP4-A3LIdYt8pVYnd7n19lkYYVabTM',
         },
       });
+
       clientSocket.on('connect', () => {
         done();
       });

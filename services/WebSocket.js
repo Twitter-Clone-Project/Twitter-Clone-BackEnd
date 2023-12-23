@@ -255,6 +255,7 @@ class SocketService {
                 ? activeConversation.user2Id
                 : activeConversation.user1Id;
 
+            // bug: should send it to one only, can solve this by maping each userId with array of sockets and set with each socket an identifier for the window rhat the user connected to it.
             if (contactId) {
               socket.to(`user_${contactId}_room`).emit('status-of-contact', {
                 conversationId: activeConversation.conversationId,
