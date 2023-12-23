@@ -80,11 +80,23 @@ async function uploadMedia(mediaArray) {
   }
 }
 
+function getFileType(url) {
+  const extension = url.split('.').pop().toLowerCase();
+  if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+    return 'image';
+  } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(extension)) {
+    return 'video';
+  } else {
+    return 'unknown';
+  }
+}
+
 exports.addTweet = catchAsync(async (req, res, next) => {
   let { tweetText } = req.body;
   const { trends } = req.body;
   const files = req.files;
   let validMedia = true;
+
   if (!files || !files.media) {
     validMedia = false;
   }
@@ -99,9 +111,10 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       new AppError('tweet can not have more than 4 attachments', 400),
     );
   trendsArray = Array.isArray(trends) ? trends : trends ? [trends] : [];
-  const userId = req.currentUser.userId;
 
+  const userId = req.currentUser.userId;
   const tweet = new Tweet();
+
   tweet.userId = userId;
   tweet.text = tweetText;
   tweet.time = getCurrentTimestamp();
@@ -117,12 +130,12 @@ exports.addTweet = catchAsync(async (req, res, next) => {
   if (validMedia) {
     attachments = await uploadMedia(files.media);
   }
-
+  //add media
   for (const m of attachments) {
     const media = new Media();
     media.tweetId = savedTweet.tweetId;
     media.url = m;
-    media.type = 'image';
+    media.type = getFileType(m);
     const savedMedia = await AppDataSource.getRepository(Media).save(media);
   }
 
@@ -167,7 +180,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       createdAt: savedTweet.time,
       user: {
         userId: user.userId,
-        profileImageURL: user.imageUrl,
+        imageUrl: user.imageUrl,
         screenName: user.name,
         username: user.username,
         bio: user.bio,
@@ -298,7 +311,7 @@ exports.getTweet = catchAsync(async (req, res, next) => {
       createdAt: tweetTime,
       user: {
         userId: user.userId,
-        profileImageURL: user.imageUrl,
+        imageUrl: user.imageUrl,
         screenName: user.name,
         username: user.username,
         bio: user.bio,
@@ -484,7 +497,7 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
       id: userId,
       name: name,
       screenName: username,
-      profileImageURL: imageUrl,
+      imageUrl: imageUrl,
       bio: bio,
       isFollowed: !!isFollowed,
       isFollowing: !!isFollowing,
@@ -539,7 +552,7 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
       id: userId,
       name: name,
       screenName: username,
-      profileImageURL: imageUrl,
+      imageUrl: imageUrl,
       bio: bio,
       isFollowed: !!isFollowed,
       isFollowing: !!isFollowing,
@@ -586,7 +599,7 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
       username: reply.user.username,
       screenName: reply.user.name,
       bio: reply.user.bio,
-      profileImageURL: reply.user.imageUrl,
+      imageUrl: reply.user.imageUrl,
     };
   });
   let repliesRes = await Promise.all(repliesPromises);
@@ -662,7 +675,7 @@ exports.addReply = catchAsync(async (req, res, next) => {
       username: user.username,
       screenName: user.name,
       bio: user.bio,
-      profileImageURL: user.imageUrl,
+      imageUrl: user.imageUrl,
       followersCount: user.followersCount,
       followingCount: user.followingsCount,
       isFollowed: isFollowed,
