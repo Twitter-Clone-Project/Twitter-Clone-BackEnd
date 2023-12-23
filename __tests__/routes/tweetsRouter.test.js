@@ -121,3 +121,33 @@ describe('GET /api/v1/tweets/:tweetId', () => {
     expect(response.status).toEqual(400);
   });
 });
+
+describe('GET /api/v1/tweets/:tweetId/media', () => {
+  jest.setTimeout(100000);
+
+  it('successfully retrieved media of a tweet with existing tweet ID', async () => {
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+
+    const { token, tweetId } = await createTestTweet(email, username);
+
+    const response = await request(app)
+      .get(`/api/v1/tweets/${tweetId}/media`)
+      .set('Cookie', token);
+
+    expect(response.status).toEqual(200);
+  });
+  it('attempt to get media of a non-existing tweet ID', async () => {
+    const fakeTweetId = '50000';
+
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+    const { token } = await global.signin(email, username);
+
+    const response = await request(app)
+      .get(`/api/v1/tweets/${fakeTweetId}/media`)
+      .set('Cookie', token);
+
+    expect(response.status).toEqual(400);
+  });
+});
