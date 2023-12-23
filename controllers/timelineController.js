@@ -134,11 +134,12 @@ async function getFirstTweets(userId) {
       },
     });
     const tweetMediaUrls = tweetMedia.map((media) => media.url);
+    tweetTime = new Date(tweet.time + 'UTC');
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
@@ -172,11 +173,12 @@ async function getFirstTweets(userId) {
       },
     });
     const retweetMediaUrls = retweetMedia.map((media) => media.url);
+    tweetTime = new Date(tweet.time + 'UTC');
     return {
       id: tweet.tweetId,
       isRetweet: true,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       attachmentsUrl: retweetMediaUrls,
       retweetedUser: {
         userId: tweet.retweeter.userId,
@@ -277,11 +279,12 @@ async function getFirstUserTweets(username, currUserId) {
       },
     });
     const tweetMediaUrls = tweetMedia.map((media) => media.url);
+    tweetTime = new Date(tweet.time + 'UTC');
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
@@ -315,11 +318,12 @@ async function getFirstUserTweets(username, currUserId) {
       },
     });
     const retweetMediaUrls = retweetMedia.map((media) => media.url);
+    tweetTime = new Date(tweet.time + 'UTC');
     return {
       id: tweet.tweetId,
       isRetweet: true,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       attachmentsUrl: retweetMediaUrls,
       retweetedUser: {
         userId: tweet.retweeter.userId,
@@ -406,11 +410,12 @@ async function getFirstUserMentions(username, currUserId) {
       },
     });
     const tweetMediaUrls = tweetMedia.map((media) => media.url);
+    tweetTime = new Date(tweet.time + 'UTC');
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
@@ -487,11 +492,12 @@ async function getFirstUserLikes(username, currUserId) {
       },
     });
     const tweetMediaUrls = tweetMedia.map((media) => media.url);
+    tweetTime = new Date(tweet.time + 'UTC');
     return {
       id: tweet.tweetId,
       isRetweet: false,
       text: tweet.text,
-      createdAt: tweet.time,
+      createdAt: tweetTime,
       attachmentsUrl: tweetMediaUrls,
       retweetedUser: {},
       user: {
