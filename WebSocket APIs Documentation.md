@@ -23,16 +23,34 @@
   - `chat-notification-receive` - Sends a chat notification to the receiver.
   - `msg-receive` - Sends the message text to the receiver's socket.
 
+## `msg-broadcast` Event
+
+- `Listen`
+- **Purpose**: Sends a chat message to all aother sender sockets if he opened the chat from another app.
+- **Payload**:
+  - `message` - Object containing information about the message.
+    - `messageId` - ID of the message.
+    - `senderId` - ID of the message sender.
+    - `receiverId` - ID of the message receiver.
+    - `text` - The content of the message.
+    - `isFromMe` - boolean to know if the message from me or not.
+    - `time` - The time of the message.
+    - `senderUsername` - username of the sender.
+- **Action**: Emits the message text to the receiver's socket.
+
 ## `msg-receive` Event
 
 - `Listen`
 - **Purpose**: Sends a chat message to the receiver's socket.
 - **Payload**:
   - `message` - Object containing information about the message.
-    - `conversationId` - ID of the conversation.
+    - `messageId` - ID of the message.
     - `senderId` - ID of the message sender.
     - `receiverId` - ID of the message receiver.
     - `text` - The content of the message.
+    - `isFromMe` - boolean to know if the message from me or not.
+    - `time` - The time of the message.
+    - `senderUsername` - username of the sender.
 - **Action**: Emits the message text to the receiver's socket.
 
 ## `chat-opened` Event

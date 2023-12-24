@@ -18,15 +18,10 @@ class SocketService {
     type = type.toUpperCase();
     const userRepository = this.AppDataSource.getRepository(User);
 
-    const receiver = this.onlineUsers.get(receiverId);
-
     const sender = await userRepository.findOne({
       select: { name: true, imageUrl: true, username: true },
       where: { userId: senderId },
     });
-
-    const senderSocket = this.onlineUsers.get(senderId);
-    sender.socketId = senderSocket.socketId;
 
     let content = '';
     switch (type) {
@@ -55,10 +50,9 @@ class SocketService {
     );
     await this.AppDataSource.getRepository(Notification).insert(notification);
 
-    if (receiver && sender && receiver.socketId && sender.socketId) {
-      this.io.sockets.sockets
-        .get(sender.socketId)
-        .to(receiver.socketId)
+    if (receiverId && sender) {
+      this.io.sockets
+        .in(`user_${receiverId}_room`)
         .emit('notification-receive', {
           notificationId: notification.notificationId,
           content: notification.content,
@@ -98,9 +92,22 @@ class SocketService {
           socket.handshake.headers.token,
           process.env.JWT_SECRET_KEY,
         );
-        socket.userId = payload.id;
 
-        const userId = payload.id.toString();
+        const user = await AppDataSource.getRepository(User).findOne({
+          where: { userId: payload.id },
+          select: {
+            userId: true,
+            username: true,
+            email: true,
+            name: true,
+          },
+        });
+
+        if (!user) {
+          throw new AppError('User does no longer exist', 401);
+        }
+
+        socket.userData = user ? user : {};
         // if (!this.onlineUsers.has(userId)) {
         //   this.onlineUsers.set(userId, {
         //     socketId: socket.id,
@@ -108,7 +115,7 @@ class SocketService {
         //   });
         // }
 
-        socket.join(`user_${userId}_room`);
+        socket.join(`user_${user.userId}_room`);
 
         next();
       })
@@ -120,7 +127,7 @@ class SocketService {
           async ({ receiverId, conversationId, text, isSeen }) => {
             if (!receiverId || !conversationId || !text)
               throw new AppError('message data are required', 400);
-            const { userId } = socket;
+            const { userId, username } = socket.userData;
             // const receiver = this.onlineUsers.get(receiverId);
 
             const isFound = await AppDataSource.getRepository(
@@ -147,22 +154,36 @@ class SocketService {
               await AppDataSource.getRepository(Message).insert(newMessage);
 
               if (receiverId) {
-                socket
-                  .to(`user_${receiverId}_room`)
-                  .emit('msg-receive', newMessage);
+                socket.to(`user_${receiverId}_room`).emit('msg-receive', {
+                  senderId: newMessage.senderId,
+                  messageId: newMessage.messageId,
+                  isSeen: newMessage.isSeen,
+                  time: newMessage.time,
+                  text: newMessage.text,
+                  senderUsername: username,
+                  isFromMe: false,
+                });
               }
 
               if (userId) {
                 socket.broadcast
                   .to(`user_${userId}_room`)
-                  .emit('msg-broadcast', newMessage);
+                  .emit('msg-broadcast', {
+                    senderId: newMessage.senderId,
+                    messageId: newMessage.messageId,
+                    isSeen: newMessage.isSeen,
+                    time: newMessage.time,
+                    text: newMessage.text,
+                    senderUsername: username,
+                    isFromMe: true,
+                  });
               }
             }
           },
         );
 
         socket.on('mark-notifications-as-seen', async () => {
-          const { userId } = socket;
+          const { userId } = socket.userData;
           await AppDataSource.getRepository(Notification).update(
             { isSeen: false, userId },
             { isSeen: true },
@@ -172,7 +193,7 @@ class SocketService {
         socket.on('chat-opened', async ({ conversationId, contactId }) => {
           if (!conversationId || !contactId)
             throw new AppError('chat data is required', 400);
-          const { userId } = socket;
+          const { userId } = socket.userData;
 
           await AppDataSource.createQueryBuilder()
             .update(Conversation)
@@ -204,7 +225,7 @@ class SocketService {
         socket.on('chat-closed', async ({ contactId, conversationId }) => {
           if (!contactId || !conversationId)
             throw new AppError('chat data are required', 400);
-          const { userId } = socket;
+          const { userId } = socket.userData;
 
           // const receiver = this.onlineUsers.get(contactId);
 
@@ -230,7 +251,7 @@ class SocketService {
 
         socket.on('disconnect', async () => {
           console.log(`Server disconnected from a client`);
-          const { userId } = socket;
+          const { userId } = socket.userData;
 
           if (!userId) return;
           // this.onlineUsers.delete(userId);
