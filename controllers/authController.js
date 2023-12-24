@@ -323,6 +323,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
   }
 
   req.currentUser = user;
+  req.token = token;
   next();
 });
 
@@ -377,6 +378,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
         'isOnline',
       ),
     },
+    token: req.token
   });
 });
 
