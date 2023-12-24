@@ -16,7 +16,6 @@ const User = require('../models/entites/User');
 const { signToken } = require('../controllers/authController');
 const Password = require('../services/Password');
 
-
 jest.mock('../services/Email.js');
 // jest.mock('../dataSource', () => MockAppDataSource);
 
@@ -58,5 +57,10 @@ global.signin = async (email, username) => {
     where: { email },
   });
 
-  return { token: `jwt=${token}`, otp, userId: userData.userId };
+  return {
+    plainToken: token,
+    token: `jwt=${token}`,
+    otp,
+    userId: userData.userId,
+  };
 };
