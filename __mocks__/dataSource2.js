@@ -1,7 +1,7 @@
 // __mocks__/AppDataSource.js
 
 class MockRepository {
-  existReturnValue = false;
+  existReturnValue = true;
 
   insert = jest.fn();
   // exist = jest.fn().mockResolvedValue(this.existReturnValue);

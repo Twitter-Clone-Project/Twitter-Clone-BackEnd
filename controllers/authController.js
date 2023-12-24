@@ -95,7 +95,7 @@ const createAndSendToken = (user, req, res, statusCode) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
     req.body;
-    
+
   const userRepository = AppDataSource.getRepository(User);
 
   // if this email signed but not confirmed remove it
@@ -323,6 +323,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
   }
 
   req.currentUser = user;
+  req.token = token;
   next();
 });
 
@@ -376,6 +377,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
         'isOnline',
       ),
     },
+    token: req.token,
   });
 });
 
