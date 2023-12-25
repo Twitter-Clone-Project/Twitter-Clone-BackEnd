@@ -9,6 +9,7 @@ const Reply = require('../models/entites/Reply');
 const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
+const Block = require('../models/relations/Block');
 
 let usersRes = [];
 let tweetsRes = [];
@@ -99,31 +100,50 @@ async function searchFirstUsers(req) {
   }
 
   const users = await AppDataSource.getRepository(User).find();
+  const blockedUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      userId: currUser.userId,
+    },
+  });
+  const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
+  const blockedByUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      blockedId: currUser.userId,
+    },
+  });
+  const blockedByUsersIds = blockedByUsers.map((user) => user.userId);
   const matchingUsers = users.filter(
     (user) =>
-      user.username.toLowerCase().includes(query.toLowerCase()) ||
-      user.name.toLowerCase().includes(query.toLowerCase()),
+      (user.username.toLowerCase().includes(query.toLowerCase()) ||
+        user.name.toLowerCase().includes(query.toLowerCase())) &&
+      user.userId != currUser.userId &&
+      !blockedUsersIds.includes(user.userId) &&
+      !blockedByUsersIds.includes(user.userId),
   );
 
-  const usersPromises = matchingUsers.map(async (user) => {
-    const userInfo = await getUserInfo(user.userId, currUser.userId);
-    if (user.userId != currUser.userId)
-      return {
-        id: user.userId,
-        email: user.email,
-        screenName: user.name,
-        username: user.username,
-        profileImageURL: user.imageUrl,
-        bio: user.bio,
-        followersCount: user.followersCount,
-        followingCount: user.followingsCount,
-        isFollowed: userInfo.isFollowed,
-        isFollowing: userInfo.isFollowing,
-      };
-  });
-  const usersList = await Promise.all(usersPromises);
-  if (usersList[0] != null) usersRes = usersList;
-  else usersRes = [];
+  let usersList = [];
+  if (matchingUsers.length > 0) {
+    const usersPromises = matchingUsers.map(async (user) => {
+      const userInfo = await getUserInfo(user.userId, currUser.userId);
+      if (user.userId !== currUser.userId) {
+        return {
+          id: user.userId,
+          email: user.email,
+          screenName: user.name,
+          username: user.username,
+          profileImageURL: user.imageUrl,
+          bio: user.bio,
+          followersCount: user.followersCount,
+          followingCount: user.followingsCount,
+          isFollowed: userInfo.isFollowed,
+          isFollowing: userInfo.isFollowing,
+        };
+      }
+    });
+
+    usersList = await Promise.all(usersPromises);
+  }
+  usersRes = usersList;
 }
 
 exports.searchUsers = catchAsync(async (req, res, next) => {
@@ -161,48 +181,67 @@ async function searchFirstTweets(req) {
     )
     .getMany();
 
-  const matchingTweets = tweets.filter((tweet) =>
-    tweet.text.toLowerCase().includes(query.toLowerCase()),
+  const blockedUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      userId: currUserId,
+    },
+  });
+  const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
+  const blockedByUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      blockedId: currUserId,
+    },
+  });
+  const blockedByUsersIds = blockedByUsers.map((user) => user.userId);
+
+  const matchingTweets = tweets.filter(
+    (tweet) =>
+      tweet.text.toLowerCase().includes(query.toLowerCase()) &&
+      !blockedUsersIds.includes(tweet.user.userId) &&
+      !blockedByUsersIds.includes(tweet.user.userId),
   );
 
-  const tweetsPromises = matchingTweets.map(async (tweet) => {
-    const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
-    const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
-    const tweetMedia = await AppDataSource.getRepository(Media).find({
-      where: {
-        tweetId: tweet.tweetId,
-      },
+  let tweetsList = [];
+  if (matchingTweets.length > 0) {
+    const tweetsPromises = matchingTweets.map(async (tweet) => {
+      const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
+      const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
+      const tweetMedia = await AppDataSource.getRepository(Media).find({
+        where: {
+          tweetId: tweet.tweetId,
+        },
+      });
+      const tweetMediaUrls = tweetMedia.map((media) => media.url);
+      return {
+        id: tweet.tweetId,
+        text: tweet.text,
+        createdAt: tweet.time,
+        user: {
+          userId: tweet.user.userId,
+          profileImageURL: tweet.user.imageUrl,
+          screenName: tweet.user.name,
+          username: tweet.user.username,
+          bio: tweet.user.bio,
+          followersCount: tweet.user.followersCount,
+          followingCount: tweet.user.followingsCount,
+          isFollowed: tweeterInfo.isFollowed,
+          isFollowing: tweeterInfo.isFollowing,
+        },
+        attachmentsURL: tweetMediaUrls,
+        isRetweet: false,
+        isLiked: tweetInfo.isLiked,
+        isRetweeted: tweetInfo.isReposted,
+        isReplied: tweetInfo.isReplied,
+        likesCount: tweetInfo.likesCount,
+        retweetsCount: tweetInfo.repostsCount,
+        repliesCount: tweetInfo.repliesCount,
+        retweetedUser: {},
+      };
     });
-    const tweetMediaUrls = tweetMedia.map((media) => media.url);
-    return {
-      id: tweet.tweetId,
-      text: tweet.text,
-      createdAt: tweet.time,
-      user: {
-        userId: tweet.user.userId,
-        profileImageURL: tweet.user.imageUrl,
-        screenName: tweet.user.name,
-        username: tweet.user.username,
-        bio: tweet.user.bio,
-        followersCount: tweet.user.followersCount,
-        followingCount: tweet.user.followingsCount,
-        isFollowed: tweeterInfo.isFollowed,
-        isFollowing: tweeterInfo.isFollowing,
-      },
-      attachmentsURL: tweetMediaUrls,
-      isRetweet: false,
-      isLiked: tweetInfo.isLiked,
-      isRetweeted: tweetInfo.isReposted,
-      isReplied: tweetInfo.isReplied,
-      likesCount: tweetInfo.likesCount,
-      retweetsCount: tweetInfo.repostsCount,
-      repliesCount: tweetInfo.repliesCount,
-      retweetedUser: {},
-    };
-  });
-  let tweetsList = await Promise.all(tweetsPromises);
-  if (tweetsList[0] != null) tweetsRes = tweetsList;
-  else tweetsRes = [];
+    tweetsList = await Promise.all(tweetsPromises);
+  }
+
+  tweetsRes = tweetsList;
 }
 
 exports.searchTweets = catchAsync(async (req, res, next) => {

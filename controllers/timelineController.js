@@ -10,6 +10,8 @@ const Like = require('../models/relations/Like');
 const Repost = require('../models/relations/Repost');
 const Follow = require('../models/relations/Follow');
 const Mention = require('../models/relations/Mention');
+const Block = require('../models/relations/Block');
+const Mute = require('../models/relations/Mute');
 
 let tweetsTotalRes = [];
 let userTweetsTotalRes = [];
@@ -125,6 +127,24 @@ async function getFirstTweets(userId) {
     .where('follow.followerId = :userId', { userId })
     .getMany();
 
+  const mutedUsers = await AppDataSource.getRepository(Mute).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const mutedUsersIds = mutedUsers.map((user) => user.mutedId);
+  const blockedUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
+  const blockedByUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      blockedId: userId,
+    },
+  });
+  const blockedByUsersIds = blockedByUsers.map((user) => user.userId);
   const tweetsPromises = tweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, userId);
     const tweeterInfo = await getUserInfo(tweet.userId, userId);
@@ -135,6 +155,7 @@ async function getFirstTweets(userId) {
     });
     const tweetMediaUrls = tweetMedia.map((media) => media.url);
     tweetTime = new Date(tweet.time + 'UTC');
+
     return {
       id: tweet.tweetId,
       isRetweet: false,
@@ -212,7 +233,23 @@ async function getFirstTweets(userId) {
   });
   const retweetsRes = await Promise.all(retweetsPromises);
 
-  tweetsTotalRes = tweetsRes.concat(retweetsRes);
+  const tweetsTotalResTemp = tweetsRes.concat(retweetsRes);
+  tweetsTotalRes = tweetsTotalResTemp.filter((tweet) => {
+    const isMutedUser =
+      mutedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && mutedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedUser =
+      blockedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && blockedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedByUser =
+      blockedByUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet &&
+        blockedByUsersIds.includes(tweet.retweetedUser.userId));
+
+    return !isMutedUser && !isBlockedUser && !isBlockedByUser;
+  });
   tweetsTotalRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
@@ -270,6 +307,18 @@ async function getFirstUserTweets(username, currUserId) {
     .where('repost.userId = :userId', { userId })
     .getMany();
 
+  const blockedUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
+  const blockedByUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      blockedId: userId,
+    },
+  });
+  const blockedByUsersIds = blockedByUsers.map((user) => user.userId);
   const tweetsPromises = userTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
     const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
@@ -357,7 +406,24 @@ async function getFirstUserTweets(username, currUserId) {
   });
   const retweetsRes = await Promise.all(retweetsPromises);
 
-  userTweetsTotalRes = tweetsRes.concat(retweetsRes);
+  const userTweetsTotalResTemp = tweetsRes.concat(retweetsRes);
+  userTweetsTotalRes = userTweetsTotalResTemp.filter((tweet) => {
+    const isBlockedUser =
+      blockedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && blockedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedByUser =
+      blockedByUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet &&
+        blockedByUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isRetweetedUser =
+      tweet.isRetweet &&
+      tweet.retweetedUser.userId == userId &&
+      tweet.user.userId != userId;
+
+    return !isBlockedUser && !isBlockedByUser && !isRetweetedUser;
+  });
   userTweetsTotalRes.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
   );
@@ -400,7 +466,24 @@ async function getFirstUserMentions(username, currUserId) {
     )
     .where('mention.mentionedId = :userId', { userId })
     .getMany();
-
+  const mutedUsers = await AppDataSource.getRepository(Mute).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const mutedUsersIds = mutedUsers.map((user) => user.mutedId);
+  const blockedUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
+  const blockedByUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      blockedId: userId,
+    },
+  });
+  const blockedByUsersIds = blockedByUsers.map((user) => user.userId);
   const tweetsPromises = userMentionsTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
     const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
@@ -439,7 +522,23 @@ async function getFirstUserMentions(username, currUserId) {
   });
   const tweetsRes = await Promise.all(tweetsPromises);
 
-  userMentionsTotalRes = tweetsRes;
+  const userMentionsTotalResTemp = tweetsRes;
+  userMentionsTotalRes = userMentionsTotalResTemp.filter((tweet) => {
+    const isMutedUser =
+      mutedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && mutedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedUser =
+      blockedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && blockedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedByUser =
+      blockedByUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet &&
+        blockedByUsersIds.includes(tweet.retweetedUser.userId));
+
+    return !isMutedUser && !isBlockedUser && !isBlockedByUser;
+  });
   userMentionsTotalRes.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
   );
@@ -483,6 +582,24 @@ async function getFirstUserLikes(username, currUserId) {
     .where('like.userId = :userId', { userId })
     .getMany();
 
+  const mutedUsers = await AppDataSource.getRepository(Mute).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const mutedUsersIds = mutedUsers.map((user) => user.mutedId);
+  const blockedUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      userId: userId,
+    },
+  });
+  const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
+  const blockedByUsers = await AppDataSource.getRepository(Block).find({
+    where: {
+      blockedId: userId,
+    },
+  });
+  const blockedByUsersIds = blockedByUsers.map((user) => user.userId);
   const tweetsPromises = userLikesTweets.map(async (tweet) => {
     const tweetInfo = await getTweetInfo(tweet.tweetId, currUserId);
     const tweeterInfo = await getUserInfo(tweet.userId, currUserId);
@@ -521,7 +638,23 @@ async function getFirstUserLikes(username, currUserId) {
   });
   const tweetsRes = await Promise.all(tweetsPromises);
 
-  userLikesTotalRes = tweetsRes;
+  const userLikesTotalResTemp = tweetsRes;
+  userLikesTotalRes = userLikesTotalResTemp.filter((tweet) => {
+    const isMutedUser =
+      mutedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && mutedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedUser =
+      blockedUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet && blockedUsersIds.includes(tweet.retweetedUser.userId));
+
+    const isBlockedByUser =
+      blockedByUsersIds.includes(tweet.user.userId) ||
+      (tweet.isRetweet &&
+        blockedByUsersIds.includes(tweet.retweetedUser.userId));
+
+    return !isMutedUser && !isBlockedUser && !isBlockedByUser;
+  });
   userLikesTotalRes.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
   );
