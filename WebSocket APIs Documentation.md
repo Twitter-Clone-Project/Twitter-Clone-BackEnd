@@ -30,6 +30,7 @@
 - **Payload**:
   - `message` - Object containing information about the message.
     - `messageId` - ID of the message.
+    - `conversationId` - ID of the converstion.
     - `senderId` - ID of the message sender.
     - `receiverId` - ID of the message receiver.
     - `text` - The content of the message.
@@ -45,6 +46,7 @@
 - **Payload**:
   - `message` - Object containing information about the message.
     - `messageId` - ID of the message.
+    - `conversationId` - ID of the converstion.
     - `senderId` - ID of the message sender.
     - `receiverId` - ID of the message receiver.
     - `text` - The content of the message.
