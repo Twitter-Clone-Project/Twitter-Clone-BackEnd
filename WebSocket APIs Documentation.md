@@ -22,7 +22,7 @@
   - `msg-receive` - Sends the message text to the receiver's socket.
   - `msg-broadcast` - Sends the message text to the sender's sockets.
 
-## `msg-broadcast` Event
+## `msg-redirect` Event
 
 - `Listen`
 - **Purpose**: Sends a chat message to all aother sender sockets if he opened the chat from another app.

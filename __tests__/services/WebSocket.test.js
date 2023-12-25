@@ -89,17 +89,21 @@ describe('SocketService', () => {
     });
 
     test('receive the message', (done) => {
-      clientSocket2.on('msg-receive', (data) => {
-        expect(data.text).toEqual('hello world');
-        expect(data.isSeen).toEqual(true);
-        done();
+      clientSocket1.emit('chat-opened', {
+        receiverId: userId2,
+        conversationId: conversation.conversationId,
       });
 
       clientSocket1.emit('msg-send', {
         receiverId: userId2,
         conversationId: conversation.conversationId,
         text: 'hello world',
-        isSeen: true,
+      });
+
+      clientSocket2.on('msg-receive', (data) => {
+        expect(data.text).toEqual('hello world');
+        expect(data.isSeen).toEqual(true);
+        done();
       });
     });
   });

@@ -155,7 +155,7 @@ class SocketService {
           }
 
           if (userId) {
-            socket.broadcast.to(`user_${userId}_room`).emit('msg-broadcast', {
+            this.io.sockets.in(`user_${userId}_room`).emit('msg-redirect', {
               senderId: newMessage.senderId,
               messageId: newMessage.messageId,
               conversationId: newMessage.conversationId,
