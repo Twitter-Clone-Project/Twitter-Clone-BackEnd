@@ -137,6 +137,7 @@ class SocketService {
           if (receiver.socketId) {
             socket.to(receiver.socketId).emit('msg-receive', {
               senderId: newMessage.senderId,
+              conversationId: newMessage.conversationId,
               messageId: newMessage.messageId,
               isSeen: newMessage.isSeen,
               time: newMessage.time,
