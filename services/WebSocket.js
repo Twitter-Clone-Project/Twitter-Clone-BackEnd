@@ -192,6 +192,14 @@ class SocketService {
             })
             .execute();
 
+          if (contactId) {
+            socket.to(`user_${contactId}_room`).emit('status-of-contact', {
+              conversationId,
+              inConversation: true,
+              isLeaved: false,
+            });
+          }
+
           await AppDataSource.getRepository(Message).update(
             { conversationId, receiverId: userId },
             { isSeen: true },
@@ -213,6 +221,14 @@ class SocketService {
               conversationId,
             })
             .execute();
+
+          if (contactId) {
+            socket.to(`user_${contactId}_room`).emit('status-of-contact', {
+              conversationId,
+              inConversation: false,
+              isLeaved: false,
+            });
+          }
         });
 
         socket.on('disconnect', async () => {

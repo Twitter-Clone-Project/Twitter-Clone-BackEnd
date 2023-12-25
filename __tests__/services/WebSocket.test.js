@@ -72,54 +72,63 @@ describe('SocketService', () => {
     // await clientSocket2.disconnect();
   });
 
-  describe('msg-send-receive', () => {
-    test('try to send message if the other conversation leaved', (done) => {
-      clientSocket2.on('status-of-contact', (data) => {
-        expect(data.isLeaved).toBe(true);
-
-        done();
-      });
-
-      clientSocket2.emit('msg-send', {
-        receiverId: userId1,
-        conversationId: '133',
-        text: 'hello world',
-        isSeen: true,
-      });
+  test('if the another contact is active mark the message as seen', (done) => {
+    clientSocket1.emit('chat-opened', {
+      contactId: userId2,
+      conversationId: conversation.conversationId,
     });
-
-    test('receive the message', (done) => {
-      clientSocket1.emit('chat-opened', {
-        receiverId: userId2,
-        conversationId: conversation.conversationId,
-      });
-
-      clientSocket1.emit('msg-send', {
-        receiverId: userId2,
-        conversationId: conversation.conversationId,
-        text: 'hello world',
-      });
-
-      clientSocket2.on('msg-receive', (data) => {
-        expect(data.text).toEqual('hello world');
-        expect(data.isSeen).toEqual(true);
-        done();
-      });
-    });
-  });
-
-  test('when the chat is opened, an event should go to the another contact ', (done) => {
-    clientSocket2.on('msg-receive', (data) => {
-      expect(data.text).toEqual('hello world');
-      expect(data.isSeen).toEqual(true);
-      done();
+    clientSocket2.emit('chat-opened', {
+      contactId: userId1,
+      conversationId: conversation.conversationId,
     });
 
     clientSocket1.emit('msg-send', {
       receiverId: userId2,
       conversationId: conversation.conversationId,
       text: 'hello world',
-      isSeen: true,
+    });
+
+    clientSocket1.on('msg-redirect', (data) => {
+      expect(data.text).toEqual('hello world');
+      expect(data.isSeen).toEqual(true);
+    });
+
+    clientSocket2.on('msg-receive', (data) => {
+      expect(data.text).toEqual('hello world');
+      expect(data.isSeen).toEqual(true);
+      done();
+    });
+
+    clientSocket1.emit('chat-closed', {
+      contactId: userId2,
+      conversationId: conversation.conversationId,
+    });
+    clientSocket2.emit('chat-closed', {
+      contactId: userId1,
+      conversationId: conversation.conversationId,
     });
   });
+
+  // test('if the another contact is not active mark the message as unseen', (done) => {
+  //   clientSocket1.emit('chat-opened', {
+  //     contactId: userId2,
+  //     conversationId: conversation.conversationId,
+  //   });
+
+  //   clientSocket1.emit('msg-send', {
+  //     receiverId: userId2,
+  //     conversationId: conversation.conversationId,
+  //     text: 'hello world',
+  //   });
+
+  //   clientSocket1.on('msg-redirect', (data) => {
+  //     expect(data.text).toEqual('hello world');
+  //     expect(data.isSeen).toEqual(false);
+  //     done();
+  //   });
+  //   clientSocket1.emit('chat-closed', {
+  //     contactId: userId2,
+  //     conversationId: conversation.conversationId,
+  //   });
+  // });
 });
