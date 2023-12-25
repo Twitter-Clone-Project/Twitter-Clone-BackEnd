@@ -157,6 +157,7 @@ class SocketService {
                 socket.to(`user_${receiverId}_room`).emit('msg-receive', {
                   senderId: newMessage.senderId,
                   messageId: newMessage.messageId,
+                  conversationId: newMessage.conversationId,
                   isSeen: newMessage.isSeen,
                   time: newMessage.time,
                   text: newMessage.text,
@@ -171,6 +172,7 @@ class SocketService {
                   .emit('msg-broadcast', {
                     senderId: newMessage.senderId,
                     messageId: newMessage.messageId,
+                    conversationId: newMessage.conversationId,
                     isSeen: newMessage.isSeen,
                     time: newMessage.time,
                     text: newMessage.text,
