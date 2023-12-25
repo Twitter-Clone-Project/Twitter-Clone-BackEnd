@@ -108,12 +108,6 @@ class SocketService {
         }
 
         socket.userData = user ? user : {};
-        // if (!this.onlineUsers.has(userId)) {
-        //   this.onlineUsers.set(userId, {
-        //     socketId: socket.id,
-        //     userId,
-        //   });
-        // }
 
         socket.join(`user_${user.userId}_room`);
 
@@ -122,67 +116,57 @@ class SocketService {
       .on('connection', (socket) => {
         console.log('socket connected');
 
-        socket.on(
-          'msg-send',
-          async ({ receiverId, conversationId, text, isSeen }) => {
-            if (!receiverId || !conversationId || !text)
-              throw new AppError('message data are required', 400);
-            const { userId, username } = socket.userData;
-            // const receiver = this.onlineUsers.get(receiverId);
+        socket.on('msg-send', async ({ receiverId, conversationId, text }) => {
+          if (!receiverId || !conversationId || !text)
+            throw new AppError('message data are required', 400);
+          const { userId, username } = socket.userData;
 
-            const isFound = await AppDataSource.getRepository(
-              Conversation,
-            ).exist({
-              where: { conversationId: conversationId },
+          const conversation = await AppDataSource.getRepository(
+            Conversation,
+          ).findOne({
+            where: { conversationId: conversationId },
+            select: { isUsersActive: true },
+          });
+
+          if (!conversation) return;
+
+          let isSeen = false;
+          isSeen = conversation.isUsersActive[`userId_${receiverId}`];
+          const newMessage = new Message(
+            conversationId,
+            userId,
+            receiverId,
+            text,
+            isSeen,
+          );
+          await AppDataSource.getRepository(Message).insert(newMessage);
+
+          if (receiverId) {
+            socket.to(`user_${receiverId}_room`).emit('msg-receive', {
+              senderId: newMessage.senderId,
+              messageId: newMessage.messageId,
+              conversationId: newMessage.conversationId,
+              isSeen: newMessage.isSeen,
+              time: newMessage.time,
+              text: newMessage.text,
+              senderUsername: username,
+              isFromMe: false,
             });
+          }
 
-            const newMessage = new Message(
-              conversationId,
-              userId,
-              receiverId,
-              text,
-              isSeen,
-            );
-
-            if (!isFound) {
-              socket.emit('status-of-contact', {
-                conversationId: conversationId,
-                inConversation: false,
-                isLeaved: true,
-              });
-            } else {
-              await AppDataSource.getRepository(Message).insert(newMessage);
-
-              if (receiverId) {
-                socket.to(`user_${receiverId}_room`).emit('msg-receive', {
-                  senderId: newMessage.senderId,
-                  messageId: newMessage.messageId,
-                  conversationId: newMessage.conversationId,
-                  isSeen: newMessage.isSeen,
-                  time: newMessage.time,
-                  text: newMessage.text,
-                  senderUsername: username,
-                  isFromMe: false,
-                });
-              }
-
-              if (userId) {
-                socket.broadcast
-                  .to(`user_${userId}_room`)
-                  .emit('msg-broadcast', {
-                    senderId: newMessage.senderId,
-                    messageId: newMessage.messageId,
-                    conversationId: newMessage.conversationId,
-                    isSeen: newMessage.isSeen,
-                    time: newMessage.time,
-                    text: newMessage.text,
-                    senderUsername: username,
-                    isFromMe: true,
-                  });
-              }
-            }
-          },
-        );
+          if (userId) {
+            socket.broadcast.to(`user_${userId}_room`).emit('msg-broadcast', {
+              senderId: newMessage.senderId,
+              messageId: newMessage.messageId,
+              conversationId: newMessage.conversationId,
+              isSeen: newMessage.isSeen,
+              time: newMessage.time,
+              text: newMessage.text,
+              senderUsername: username,
+              isFromMe: true,
+            });
+          }
+        });
 
         socket.on('mark-notifications-as-seen', async () => {
           const { userId } = socket.userData;
@@ -208,16 +192,6 @@ class SocketService {
             })
             .execute();
 
-          // const receiver = this.onlineUsers.get(contactId);
-
-          if (contactId) {
-            socket.to(`user_${contactId}_room`).emit('status-of-contact', {
-              conversationId,
-              inConversation: true,
-              isLeaved: false,
-            });
-          }
-
           await AppDataSource.getRepository(Message).update(
             { conversationId, receiverId: userId },
             { isSeen: true },
@@ -228,16 +202,6 @@ class SocketService {
           if (!contactId || !conversationId)
             throw new AppError('chat data are required', 400);
           const { userId } = socket.userData;
-
-          // const receiver = this.onlineUsers.get(contactId);
-
-          if (contactId) {
-            socket.to(`user_${contactId}_room`).emit('status-of-contact', {
-              conversationId,
-              inConversation: false,
-              isLeaved: false,
-            });
-          }
 
           await AppDataSource.createQueryBuilder()
             .update(Conversation)
@@ -256,37 +220,36 @@ class SocketService {
           const { userId } = socket.userData;
 
           if (!userId) return;
-          // this.onlineUsers.delete(userId);
 
-          const conversationRepository =
-            AppDataSource.getRepository(Conversation);
-
-          const activeConversation = await conversationRepository
-            .createQueryBuilder()
+          await AppDataSource.createQueryBuilder()
+            .update(Conversation)
+            .set({
+              isUsersActive: () =>
+                `jsonb_set(isUsersActive, '{userId_${userId}}', 'false')`,
+            })
             .where('"user1Id" = :userId OR "user2Id" = :userId', {
               userId,
             })
-            .andWhere(`"isUsersActive"->>'userId_${userId}' = 'true'`)
-            .getOne();
+            .execute();
 
-          if (activeConversation) {
-            activeConversation.isUsersActive[`userId_${userId}`] = false;
-            await conversationRepository.save(activeConversation);
+          // if (activeConversation) {
+          //   activeConversation.isUsersActive[`userId_${userId}`] = false;
+          //   await conversationRepository.save(activeConversation);
 
-            const contactId =
-              activeConversation.user1Id == userId
-                ? activeConversation.user2Id
-                : activeConversation.user1Id;
+          //   const contactId =
+          //     activeConversation.user1Id == userId
+          //       ? activeConversation.user2Id
+          //       : activeConversation.user1Id;
 
-            // bug: should send it to one only, can solve this by maping each userId with array of sockets and set with each socket an identifier for the window rhat the user connected to it.
-            if (contactId) {
-              socket.to(`user_${contactId}_room`).emit('status-of-contact', {
-                conversationId: activeConversation.conversationId,
-                inConversation: false,
-                isLeaved: false,
-              });
-            }
-          }
+          //   // bug: should send it to one only, can solve this by maping each userId with array of sockets and set with each socket an identifier for the window rhat the user connected to it.
+          //   if (contactId) {
+          //     socket.to(`user_${contactId}_room`).emit('status-of-contact', {
+          //       conversationId: activeConversation.conversationId,
+          //       inConversation: false,
+          //       isLeaved: false,
+          //     });
+          //   }
+          // }
         });
       });
     console.log('WebSocket initialized ✔️');

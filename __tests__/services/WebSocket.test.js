@@ -103,4 +103,19 @@ describe('SocketService', () => {
       });
     });
   });
+
+  test('when the chat is opened, an event should go to the another contact ', (done) => {
+    clientSocket2.on('msg-receive', (data) => {
+      expect(data.text).toEqual('hello world');
+      expect(data.isSeen).toEqual(true);
+      done();
+    });
+
+    clientSocket1.emit('msg-send', {
+      receiverId: userId2,
+      conversationId: conversation.conversationId,
+      text: 'hello world',
+      isSeen: true,
+    });
+  });
 });

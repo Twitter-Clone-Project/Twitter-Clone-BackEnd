@@ -13,15 +13,14 @@
   - `message` - Object containing information about the message.
     - `conversationId` - ID of the conversation.
     - `receiverId` - ID of the message receiver.
-    - `isSeen` - Indicates whether the message is seen.
     - `text` - The content of the message.
 - **Action**:
   - Inserts the new message into the database.
   - Sends a chat notification to the receiver.
   - Emits the message to the receiver's socket.
 - **Emits**:
-  - `chat-notification-receive` - Sends a chat notification to the receiver.
   - `msg-receive` - Sends the message text to the receiver's socket.
+  - `msg-broadcast` - Sends the message text to the sender's sockets.
 
 ## `msg-broadcast` Event
 
@@ -66,7 +65,6 @@
 - **Action**:
   - Updates notifications with `isFromChat` as `true` and `isSeen` as `true` for the specified user.
   - Updates messages with `isSeen` as `true` for the specified conversation and user.
-  - Emits a `status-of-contact` event.
 
 ## `chat-closed` Event
 
@@ -77,7 +75,6 @@
     - `conversationId` - ID of the conversation.
     - `contactId` - ID of the contact in the conversation.
 - **Action**:
-  - Emits a `status-of-contact` event.
 
 ## `status-of-contact` Event
 
@@ -85,7 +82,6 @@
 - **Purpose**: Sends the status of the other contact in a conversation.
 - **Payload**:
   - `status` - Object containing `conversationId`, `isLeaved` and `inConversation`.
-- **Action**: Emits the status of the other contact.
 
 ## `notification-receive` Event
 
