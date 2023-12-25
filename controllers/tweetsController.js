@@ -327,6 +327,18 @@ exports.addLike = catchAsync(async (req, res, next) => {
 
   checkTweet(tweetId, next);
 
+  let isLiked = await AppDataSource.getRepository(Like).findOne({
+    where: {
+      userId: currUserId,
+      tweetId: tweetId,
+    },
+  });
+  if (isLiked) {
+    res.status(400).json({
+      status: false,
+      message: 'user already likes this tweet',
+    });
+  }
   const like = new Like();
   like.userId = currUserId;
   like.tweetId = tweetId;
@@ -609,6 +621,18 @@ exports.retweet = catchAsync(async (req, res, next) => {
 
   checkTweet(tweetId, next);
 
+  let isRetweeted = await AppDataSource.getRepository(Repost).findOne({
+    where: {
+      userId: currUserId,
+      tweetId: tweetId,
+    },
+  });
+  if (isRetweeted) {
+    res.status(400).json({
+      status: false,
+      message: 'user already reposts this tweet',
+    });
+  }
   const repost = new Repost();
   repost.userId = currUserId;
   repost.tweetId = tweetId;
