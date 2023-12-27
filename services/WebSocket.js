@@ -85,9 +85,10 @@ class SocketService {
 
     this.io
       .use(async (socket, next) => {
-        if (!socket.handshake.headers && !socket.handshake.headers.token)
-          throw new AppError('user is not logged in', 401);
-
+        if (!socket.handshake.headers.token) {
+          console.log('Socket is not logged in');
+          return next();
+        }
         const payload = await promisify(jwt.verify)(
           socket.handshake.headers.token,
           process.env.JWT_SECRET_KEY,
@@ -115,6 +116,27 @@ class SocketService {
       })
       .on('connection', (socket) => {
         console.log('socket connected');
+
+        // temp event as a alternative to token
+        socket.on('add-user', async ({ userId }) => {
+          const user = await AppDataSource.getRepository(User).findOne({
+            where: { userId },
+            select: {
+              userId: true,
+              username: true,
+              email: true,
+              name: true,
+            },
+          });
+
+          if (!user) {
+            throw new AppError('User does no longer exist', 401);
+          }
+
+          socket.userData = user ? user : {};
+
+          socket.join(`user_${user.userId}_room`);
+        });
 
         socket.on('msg-send', async ({ receiverId, conversationId, text }) => {
           if (!receiverId || !conversationId || !text)
