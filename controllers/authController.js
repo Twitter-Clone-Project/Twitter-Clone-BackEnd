@@ -312,7 +312,6 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
       'user.userId',
       'user.isConfirmed',
       'user.isOnline',
-      'user.socketId',
     ])
     .from(User, 'user')
     .where('user.userId = :userId', { userId: payload.id })
@@ -378,7 +377,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
         'isOnline',
       ),
     },
-    token: req.token
+    token: req.token,
   });
 });
 
@@ -639,4 +638,4 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports.createAndSendToken = createAndSendToken ;
+module.exports.createAndSendToken = createAndSendToken;

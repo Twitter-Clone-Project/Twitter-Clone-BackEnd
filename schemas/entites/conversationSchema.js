@@ -23,9 +23,10 @@ module.exports = new EntitySchema({
   },
   uniques: [
     {
-      name: 'unique_user_pair',
+      name: 'unique_user_pair1',
       columns: ['user1Id', 'user2Id'],
     },
+    
   ],
   relations: {
     user1: {

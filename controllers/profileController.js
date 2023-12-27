@@ -174,7 +174,7 @@ exports.updateUsername = catchAsync(async (req, res, next) => {
   });
   user.username = newUsername;
 
-  const savedUser = await AppDataSource.getRepository(User).save(user);
+   await AppDataSource.getRepository(User).save(user);
 
   res.status(200).json({
     status: true,
