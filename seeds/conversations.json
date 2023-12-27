@@ -1,0 +1,158 @@
+[
+  {
+    "user1Id": 78,
+    "user2Id": 81,
+    "conversationId": 37,
+    "isUsersActive": { "userId_78": false, "userId_81": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 69,
+    "conversationId": 4,
+    "isUsersActive": { "userId_12": false, "userId_69": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 61,
+    "conversationId": 38,
+    "isUsersActive": { "userId_12": false, "userId_61": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 66,
+    "conversationId": 3,
+    "isUsersActive": { "userId_12": false, "userId_66": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 14,
+    "conversationId": 14,
+    "isUsersActive": { "userId_12": false, "userId_14": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 29,
+    "conversationId": 40,
+    "isUsersActive": { "userId_12": false, "userId_29": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 11,
+    "conversationId": 21,
+    "isUsersActive": { "userId_11": false, "userId_12": false }
+  },
+  {
+    "user1Id": 61,
+    "user2Id": 66,
+    "conversationId": 42,
+    "isUsersActive": { "userId_61": false, "userId_66": false }
+  },
+  {
+    "user1Id": 4,
+    "user2Id": 78,
+    "conversationId": 22,
+    "isUsersActive": { "userId_4": false, "userId_78": false }
+  },
+  {
+    "user1Id": 4,
+    "user2Id": 14,
+    "conversationId": 8,
+    "isUsersActive": { "userId_4": false, "userId_14": false }
+  },
+  {
+    "user1Id": 4,
+    "user2Id": 66,
+    "conversationId": 6,
+    "isUsersActive": { "userId_4": false, "userId_66": false }
+  },
+  {
+    "user1Id": 14,
+    "user2Id": 61,
+    "conversationId": 15,
+    "isUsersActive": { "userId_14": false, "userId_61": false }
+  },
+  {
+    "user1Id": 9,
+    "user2Id": 14,
+    "conversationId": 17,
+    "isUsersActive": { "userId_9": false, "userId_14": false }
+  },
+  {
+    "user1Id": 14,
+    "user2Id": 59,
+    "conversationId": 27,
+    "isUsersActive": { "userId_14": false, "userId_59": false }
+  },
+  {
+    "user1Id": 14,
+    "user2Id": 69,
+    "conversationId": 20,
+    "isUsersActive": { "userId_14": false, "userId_69": false }
+  },
+  {
+    "user1Id": 58,
+    "user2Id": 59,
+    "conversationId": 32,
+    "isUsersActive": { "userId_58": false, "userId_59": false }
+  },
+  {
+    "user1Id": 14,
+    "user2Id": 74,
+    "conversationId": 19,
+    "isUsersActive": { "userId_14": false, "userId_74": false }
+  },
+  {
+    "user1Id": 29,
+    "user2Id": 58,
+    "conversationId": 23,
+    "isUsersActive": { "userId_29": false, "userId_58": false }
+  },
+  {
+    "user1Id": 29,
+    "user2Id": 59,
+    "conversationId": 26,
+    "isUsersActive": { "userId_29": false, "userId_59": false }
+  },
+  {
+    "user1Id": 11,
+    "user2Id": 73,
+    "conversationId": 25,
+    "isUsersActive": { "userId_11": false, "userId_73": false }
+  },
+  {
+    "user1Id": 11,
+    "user2Id": 56,
+    "conversationId": 24,
+    "isUsersActive": { "userId_11": false, "userId_56": false }
+  },
+  {
+    "user1Id": 11,
+    "user2Id": 14,
+    "conversationId": 16,
+    "isUsersActive": { "userId_11": false, "userId_14": false }
+  },
+  {
+    "user1Id": 11,
+    "user2Id": 29,
+    "conversationId": 31,
+    "isUsersActive": { "userId_11": false, "userId_29": false }
+  },
+  {
+    "user1Id": 12,
+    "user2Id": 81,
+    "conversationId": 41,
+    "isUsersActive": { "userId_12": false, "userId_81": false }
+  },
+  {
+    "user1Id": 61,
+    "user2Id": 70,
+    "conversationId": 43,
+    "isUsersActive": { "userId_61": false, "userId_70": false }
+  },
+  {
+    "user1Id": 14,
+    "user2Id": 78,
+    "conversationId": 33,
+    "isUsersActive": { "userId_14": false, "userId_78": false }
+  }
+]
