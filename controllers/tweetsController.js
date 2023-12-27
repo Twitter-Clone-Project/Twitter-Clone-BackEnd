@@ -78,46 +78,80 @@ function getFileType(url) {
   }
 }
 
+/**
+ * Controller for tweets addition
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If tweet is empty and no media is provided.
+ * @throws {AppError} If tweet has more than 4 attachments.
+ * @returns {Object} JSON response with the newly added tweet details.
+ */
 exports.addTweet = catchAsync(async (req, res, next) => {
+  // Extract tweetText, trends, and files (media) from the request.
   let { tweetText } = req.body;
   const { trends } = req.body;
   const files = req.files;
+
+  // Flag to check the validity of media attachments.
   let validMedia = true;
 
+  // Check if no media is provided.
   if (!files || !files.media) {
     validMedia = false;
   }
-  if (!validMedia && (!tweetText || tweetText == '')) {
+
+  // Validate tweetText based on media presence.
+  if (!validMedia && (!tweetText || tweetText === '')) {
     return next(new AppError('tweet can not be empty', 400));
   }
-  if (validMedia && (!tweetText || tweetText == '')) {
+
+  // If validMedia and no tweetText, set tweetText to an empty string.
+  if (validMedia && (!tweetText || tweetText === '')) {
     tweetText = '';
   }
-  if (validMedia && files.media.length > 4)
+
+  // Check if the tweet has more than 4 attachments.
+  if (validMedia && files.media.length > 4) {
     return next(
       new AppError('tweet can not have more than 4 attachments', 400),
     );
+  }
+
+  // Convert trends to an array if it's not already.
   trendsArray = Array.isArray(trends) ? trends : trends ? [trends] : [];
 
+  // Extract userId from the current user in the request.
   const userId = req.currentUser.userId;
-  const tweet = new Tweet();
 
+  // Create a new Tweet instance.
+  const tweet = new Tweet();
   tweet.userId = userId;
   tweet.text = tweetText;
   tweet.time = new Date(Date.now());
 
+  // Save the tweet to the database.
   const savedTweet = await AppDataSource.getRepository(Tweet).save(tweet);
 
+  // Fetch user details from the database.
   const user = await AppDataSource.getRepository(User).findOne({
     where: {
       userId: userId,
     },
   });
+
+  // Initialize an array to store media attachments.
   let attachments = [];
+
+  // If validMedia, upload media attachments and store their URLs.
   if (validMedia) {
     attachments = await uploadMedia(files.media);
   }
-  //add media
+
+  // Iterate over each attachment and save them to the database.
   for (const m of attachments) {
     const media = new Media();
     media.tweetId = savedTweet.tweetId;
@@ -126,14 +160,16 @@ exports.addTweet = catchAsync(async (req, res, next) => {
     const savedMedia = await AppDataSource.getRepository(Media).save(media);
   }
 
-  //add trends
+  // Iterate over trends and handle their addition or increment count.
   for (const trend of trendsArray) {
     const existingTrend = await AppDataSource.getRepository(Trend).findOne({
       where: {
         name: trend,
       },
     });
+
     let newTrend = null;
+
     if (existingTrend) {
       existingTrend.count = BigInt(existingTrend.count) + BigInt(1);
       await AppDataSource.getRepository(Trend).save(existingTrend);
@@ -143,6 +179,7 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       await AppDataSource.getRepository(Trend).save(newTrendLocal);
       newTrend = newTrendLocal;
     }
+
     const support = new Support();
     support.trendId = existingTrend ? existingTrend.trendId : newTrend.trendId;
     support.tweetId = tweet.tweetId;
@@ -150,16 +187,23 @@ exports.addTweet = catchAsync(async (req, res, next) => {
       await AppDataSource.getRepository(Support).save(support);
   }
 
+  // Fetch media attachments associated with the savedTweet.
   const tweetMedia = await AppDataSource.getRepository(Media).find({
     where: {
       tweetId: savedTweet.tweetId,
     },
   });
+
+  // Extract media URLs from the tweetMedia array.
   let tweetMediaUrls = [];
   if (validMedia) {
     tweetMediaUrls = tweetMedia.map((media) => media.url);
   }
+
+  // Convert tweet time to a UTC Date object.
   tweetTime = new Date(savedTweet.time + 'UTC');
+
+  // Send the JSON response with the newly added tweet details.
   res.status(200).json({
     status: true,
     data: {

@@ -83,6 +83,23 @@ describe('POST /api/v1/tweets/add', () => {
       .set('Content-Type', 'multipart/form-data');
     expect(response.status).toEqual(200);
   });
+
+  it('successfully adding non-empty tweet with media', async () => {
+    const email = `testuser_${uuid.v4()}@example.com`;
+    const username = `user_${uuid.v4()}`;
+    const { token } = await global.signin(email, username);
+
+    const mediaContent = Buffer.from('Test media1');
+
+    const response = await request(app)
+      .post('/api/v1/tweets/add')
+      .set('Cookie', token)
+      .field('tweetText', 'tweet test with media')
+      .field('media', mediaContent, { filename: 'test_media1.jpg' })
+      .set('Content-Type', 'multipart/form-data');
+
+    expect(response.status).toEqual(200);
+  });
 });
 
 describe('DELETE /api/v1/tweets/:tweetId/deleteTweet', () => {
@@ -102,7 +119,7 @@ describe('DELETE /api/v1/tweets/:tweetId/deleteTweet', () => {
   });
 
   it('attempt to delete a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '5000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -132,7 +149,7 @@ describe('GET /api/v1/tweets/:tweetId', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to get a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '5000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -162,7 +179,7 @@ describe('GET /api/v1/tweets/:tweetId/media', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to get media of a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '5000000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -192,7 +209,7 @@ describe('POST /api/v1/tweets/:tweetId/addLike', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to add like to a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '50000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -214,7 +231,7 @@ describe('DELETE /api/v1/tweets/:tweetId/deleteLike', () => {
     const username = `user_${uuid.v4()}`;
 
     const { token, tweetId } = await createTestTweet(email, username);
-    await createTestLike(token,tweetId);
+    await createTestLike(token, tweetId);
     const response = await request(app)
       .delete(`/api/v1/tweets/${tweetId}/deleteLike`)
       .set('Cookie', token);
@@ -252,7 +269,7 @@ describe('POST /api/v1/tweets/:tweetId/retweet', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to retweet to a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '50000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -274,7 +291,7 @@ describe('DELETE /api/v1/tweets/:tweetId/deleteRetweet', () => {
     const username = `user_${uuid.v4()}`;
 
     const { token, tweetId } = await createTestTweet(email, username);
-    await createTestRetweet(token,tweetId);
+    await createTestRetweet(token, tweetId);
     const response = await request(app)
       .delete(`/api/v1/tweets/${tweetId}/deleteRetweet`)
       .set('Cookie', token);
@@ -282,7 +299,7 @@ describe('DELETE /api/v1/tweets/:tweetId/deleteRetweet', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to unretweet a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '5000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -316,7 +333,7 @@ describe('POST /api/v1/tweets/:tweetId/addReply', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to add reply to a non-existing tweet ID', async () => {
-    const fakeTweetId = '50000';
+    const fakeTweetId = '5000000';
 
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
@@ -350,7 +367,7 @@ describe('DELETE /api/v1/tweets/:tweetId/deleteReplies/:replyId', () => {
     expect(response.status).toEqual(200);
   });
   it('attempt to delete reply from non-existing tweet ID or replyId', async () => {
-    const fakeReplyId = '50000';
+    const fakeReplyId = '50000000';
     const email = `testuser_${uuid.v4()}@example.com`;
     const username = `user_${uuid.v4()}`;
     const { token, tweetId } = await createTestTweet(email, username);
