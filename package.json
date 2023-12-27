@@ -39,6 +39,7 @@
     "express-formidable": "^1.2.0",
     "express-rate-limit": "^7.1.1",
     "express-validator": "^7.0.1",
+    "faker": "^6.6.6",
     "formidable": "^3.5.1",
     "fs": "^0.0.1-security",
     "google-auth-library": "^9.2.0",
@@ -67,6 +68,7 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "eslint": "^8.52.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.0.0",

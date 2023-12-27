@@ -1,67 +1,399 @@
-{"total": {"lines":{"total":1793,"covered":882,"skipped":0,"pct":49.19},"statements":{"total":1847,"covered":890,"skipped":0,"pct":48.18},"functions":{"total":253,"covered":80,"skipped":0,"pct":31.62},"branches":{"total":425,"covered":94,"skipped":0,"pct":22.11},"branchesTrue":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\app.js": {"lines":{"total":56,"covered":54,"skipped":0,"pct":96.42},"functions":{"total":3,"covered":2,"skipped":0,"pct":66.66},"statements":{"total":56,"covered":54,"skipped":0,"pct":96.42},"branches":{"total":2,"covered":1,"skipped":0,"pct":50}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\dataSource.js": {"lines":{"total":19,"covered":19,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":19,"covered":19,"skipped":0,"pct":100},"branches":{"total":4,"covered":2,"skipped":0,"pct":50}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\authController.js": {"lines":{"total":86,"covered":82,"skipped":0,"pct":95.34},"functions":{"total":18,"covered":17,"skipped":0,"pct":94.44},"statements":{"total":88,"covered":82,"skipped":0,"pct":93.18},"branches":{"total":16,"covered":12,"skipped":0,"pct":75}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\conversationsController.js": {"lines":{"total":62,"covered":12,"skipped":0,"pct":19.35},"functions":{"total":12,"covered":0,"skipped":0,"pct":0},"statements":{"total":62,"covered":12,"skipped":0,"pct":19.35},"branches":{"total":16,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\errorController.js": {"lines":{"total":51,"covered":14,"skipped":0,"pct":27.45},"functions":{"total":9,"covered":2,"skipped":0,"pct":22.22},"statements":{"total":52,"covered":14,"skipped":0,"pct":26.92},"branches":{"total":24,"covered":5,"skipped":0,"pct":20.83}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\interactionsController.js": {"lines":{"total":201,"covered":19,"skipped":0,"pct":9.45},"functions":{"total":21,"covered":0,"skipped":0,"pct":0},"statements":{"total":202,"covered":19,"skipped":0,"pct":9.4},"branches":{"total":60,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\notificationsController.js": {"lines":{"total":12,"covered":11,"skipped":0,"pct":91.66},"functions":{"total":3,"covered":2,"skipped":0,"pct":66.66},"statements":{"total":12,"covered":11,"skipped":0,"pct":91.66},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\profileController.js": {"lines":{"total":129,"covered":21,"skipped":0,"pct":16.27},"functions":{"total":10,"covered":0,"skipped":0,"pct":0},"statements":{"total":129,"covered":21,"skipped":0,"pct":16.27},"branches":{"total":18,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\searchController.js": {"lines":{"total":81,"covered":16,"skipped":0,"pct":19.75},"functions":{"total":15,"covered":0,"skipped":0,"pct":0},"statements":{"total":86,"covered":16,"skipped":0,"pct":18.6},"branches":{"total":22,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\timelineController.js": {"lines":{"total":176,"covered":22,"skipped":0,"pct":12.5},"functions":{"total":41,"covered":0,"skipped":0,"pct":0},"statements":{"total":194,"covered":22,"skipped":0,"pct":11.34},"branches":{"total":56,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\trendsController.js": {"lines":{"total":63,"covered":16,"skipped":0,"pct":25.39},"functions":{"total":10,"covered":0,"skipped":0,"pct":0},"statements":{"total":66,"covered":16,"skipped":0,"pct":24.24},"branches":{"total":4,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\tweetsController.js": {"lines":{"total":271,"covered":173,"skipped":0,"pct":63.83},"functions":{"total":27,"covered":11,"skipped":0,"pct":40.74},"statements":{"total":282,"covered":176,"skipped":0,"pct":62.41},"branches":{"total":84,"covered":47,"skipped":0,"pct":55.95}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\catchAsync.js": {"lines":{"total":2,"covered":2,"skipped":0,"pct":100},"functions":{"total":2,"covered":2,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validateRequest.js": {"lines":{"total":11,"covered":11,"skipped":0,"pct":100},"functions":{"total":2,"covered":2,"skipped":0,"pct":100},"statements":{"total":12,"covered":12,"skipped":0,"pct":100},"branches":{"total":2,"covered":2,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\conversation.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\profile.js": {"lines":{"total":29,"covered":8,"skipped":0,"pct":27.58},"functions":{"total":4,"covered":0,"skipped":0,"pct":0},"statements":{"total":33,"covered":8,"skipped":0,"pct":24.24},"branches":{"total":20,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\tweet.js": {"lines":{"total":14,"covered":5,"skipped":0,"pct":35.71},"functions":{"total":2,"covered":1,"skipped":0,"pct":50},"statements":{"total":16,"covered":6,"skipped":0,"pct":37.5},"branches":{"total":10,"covered":3,"skipped":0,"pct":30}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\user.js": {"lines":{"total":18,"covered":17,"skipped":0,"pct":94.44},"functions":{"total":3,"covered":3,"skipped":0,"pct":100},"statements":{"total":18,"covered":17,"skipped":0,"pct":94.44},"branches":{"total":6,"covered":5,"skipped":0,"pct":83.33}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Conversation.js": {"lines":{"total":6,"covered":6,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":6,"covered":6,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Media.js": {"lines":{"total":4,"covered":4,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":4,"covered":4,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Message.js": {"lines":{"total":7,"covered":7,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":7,"covered":7,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Notification.js": {"lines":{"total":7,"covered":7,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":7,"covered":7,"skipped":0,"pct":100},"branches":{"total":1,"covered":1,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Reply.js": {"lines":{"total":5,"covered":5,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":5,"covered":5,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Trend.js": {"lines":{"total":2,"covered":2,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":2,"covered":2,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Tweet.js": {"lines":{"total":4,"covered":4,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":4,"covered":4,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\User.js": {"lines":{"total":45,"covered":34,"skipped":0,"pct":75.55},"functions":{"total":18,"covered":7,"skipped":0,"pct":38.88},"statements":{"total":45,"covered":34,"skipped":0,"pct":75.55},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Block.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Follow.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Like.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\LikeReply.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Mention.js": {"lines":{"total":4,"covered":4,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":4,"covered":4,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Mute.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Repost.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Support.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\authRouter.js": {"lines":{"total":16,"covered":16,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":16,"covered":16,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\conversationsRouter.js": {"lines":{"total":12,"covered":12,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":12,"covered":12,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\interactionsRouter.js": {"lines":{"total":15,"covered":15,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":15,"covered":15,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\notificationsRouter.js": {"lines":{"total":8,"covered":8,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":8,"covered":8,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\profileRoutes.js": {"lines":{"total":13,"covered":13,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":13,"covered":13,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\searchRouter.js": {"lines":{"total":7,"covered":7,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":7,"covered":7,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\timelineRouter.js": {"lines":{"total":9,"covered":9,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":9,"covered":9,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\trendsRouter.js": {"lines":{"total":7,"covered":7,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":7,"covered":7,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\tweetsRouter.js": {"lines":{"total":21,"covered":21,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":21,"covered":21,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\routes\\usersRouter.js": {"lines":{"total":6,"covered":6,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":6,"covered":6,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\conversationSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\mediaSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\messageSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\notificationSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\replySchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\trendSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\tweetSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\userSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\blockSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\followSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\likeReplySchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\likeSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\mentionSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\muteSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\repostSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\supportSchema.js": {"lines":{"total":3,"covered":3,"skipped":0,"pct":100},"functions":{"total":0,"covered":0,"skipped":0,"pct":100},"statements":{"total":3,"covered":3,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\services\\AppError.js": {"lines":{"total":6,"covered":6,"skipped":0,"pct":100},"functions":{"total":1,"covered":1,"skipped":0,"pct":100},"statements":{"total":6,"covered":6,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\services\\AuthService.js": {"lines":{"total":122,"covered":95,"skipped":0,"pct":77.86},"functions":{"total":14,"covered":12,"skipped":0,"pct":85.71},"statements":{"total":125,"covered":97,"skipped":0,"pct":77.6},"branches":{"total":32,"covered":16,"skipped":0,"pct":50}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\services\\Email.js": {"lines":{"total":16,"covered":4,"skipped":0,"pct":25},"functions":{"total":5,"covered":0,"skipped":0,"pct":0},"statements":{"total":16,"covered":4,"skipped":0,"pct":25},"branches":{"total":3,"covered":0,"skipped":0,"pct":0}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\services\\Password.js": {"lines":{"total":4,"covered":4,"skipped":0,"pct":100},"functions":{"total":2,"covered":2,"skipped":0,"pct":100},"statements":{"total":4,"covered":4,"skipped":0,"pct":100},"branches":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"F:\\MyRepos\\Back-End SW\\Back-End\\services\\WebSocket.js": {"lines":{"total":94,"covered":12,"skipped":0,"pct":12.76},"functions":{"total":16,"covered":1,"skipped":0,"pct":6.25},"statements":{"total":96,"covered":12,"skipped":0,"pct":12.5},"branches":{"total":45,"covered":0,"skipped":0,"pct":0}}
+{
+  "total": {
+    "lines": { "total": 1793, "covered": 882, "skipped": 0, "pct": 49.19 },
+    "statements": { "total": 1847, "covered": 890, "skipped": 0, "pct": 48.18 },
+    "functions": { "total": 253, "covered": 80, "skipped": 0, "pct": 31.62 },
+    "branches": { "total": 425, "covered": 94, "skipped": 0, "pct": 22.11 },
+    "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\app.js": {
+    "lines": { "total": 56, "covered": 54, "skipped": 0, "pct": 96.42 },
+    "functions": { "total": 3, "covered": 2, "skipped": 0, "pct": 66.66 },
+    "statements": { "total": 56, "covered": 54, "skipped": 0, "pct": 96.42 },
+    "branches": { "total": 2, "covered": 1, "skipped": 0, "pct": 50 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\dataSource.js": {
+    "lines": { "total": 19, "covered": 19, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 19, "covered": 19, "skipped": 0, "pct": 100 },
+    "branches": { "total": 4, "covered": 2, "skipped": 0, "pct": 50 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\authController.js": {
+    "lines": { "total": 86, "covered": 82, "skipped": 0, "pct": 95.34 },
+    "functions": { "total": 18, "covered": 17, "skipped": 0, "pct": 94.44 },
+    "statements": { "total": 88, "covered": 82, "skipped": 0, "pct": 93.18 },
+    "branches": { "total": 16, "covered": 12, "skipped": 0, "pct": 75 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\conversationsController.js": {
+    "lines": { "total": 62, "covered": 12, "skipped": 0, "pct": 19.35 },
+    "functions": { "total": 12, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 62, "covered": 12, "skipped": 0, "pct": 19.35 },
+    "branches": { "total": 16, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\errorController.js": {
+    "lines": { "total": 51, "covered": 14, "skipped": 0, "pct": 27.45 },
+    "functions": { "total": 9, "covered": 2, "skipped": 0, "pct": 22.22 },
+    "statements": { "total": 52, "covered": 14, "skipped": 0, "pct": 26.92 },
+    "branches": { "total": 24, "covered": 5, "skipped": 0, "pct": 20.83 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\interactionsController.js": {
+    "lines": { "total": 201, "covered": 19, "skipped": 0, "pct": 9.45 },
+    "functions": { "total": 21, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 202, "covered": 19, "skipped": 0, "pct": 9.4 },
+    "branches": { "total": 60, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\notificationsController.js": {
+    "lines": { "total": 12, "covered": 11, "skipped": 0, "pct": 91.66 },
+    "functions": { "total": 3, "covered": 2, "skipped": 0, "pct": 66.66 },
+    "statements": { "total": 12, "covered": 11, "skipped": 0, "pct": 91.66 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\profileController.js": {
+    "lines": { "total": 129, "covered": 21, "skipped": 0, "pct": 16.27 },
+    "functions": { "total": 10, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 129, "covered": 21, "skipped": 0, "pct": 16.27 },
+    "branches": { "total": 18, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\searchController.js": {
+    "lines": { "total": 81, "covered": 16, "skipped": 0, "pct": 19.75 },
+    "functions": { "total": 15, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 86, "covered": 16, "skipped": 0, "pct": 18.6 },
+    "branches": { "total": 22, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\timelineController.js": {
+    "lines": { "total": 176, "covered": 22, "skipped": 0, "pct": 12.5 },
+    "functions": { "total": 41, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 194, "covered": 22, "skipped": 0, "pct": 11.34 },
+    "branches": { "total": 56, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\trendsController.js": {
+    "lines": { "total": 63, "covered": 16, "skipped": 0, "pct": 25.39 },
+    "functions": { "total": 10, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 66, "covered": 16, "skipped": 0, "pct": 24.24 },
+    "branches": { "total": 4, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\controllers\\tweetsController.js": {
+    "lines": { "total": 271, "covered": 173, "skipped": 0, "pct": 63.83 },
+    "functions": { "total": 27, "covered": 11, "skipped": 0, "pct": 40.74 },
+    "statements": { "total": 282, "covered": 176, "skipped": 0, "pct": 62.41 },
+    "branches": { "total": 84, "covered": 47, "skipped": 0, "pct": 55.95 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\catchAsync.js": {
+    "lines": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
+    "functions": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validateRequest.js": {
+    "lines": { "total": 11, "covered": 11, "skipped": 0, "pct": 100 },
+    "functions": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
+    "statements": { "total": 12, "covered": 12, "skipped": 0, "pct": 100 },
+    "branches": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\conversation.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\profile.js": {
+    "lines": { "total": 29, "covered": 8, "skipped": 0, "pct": 27.58 },
+    "functions": { "total": 4, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 33, "covered": 8, "skipped": 0, "pct": 24.24 },
+    "branches": { "total": 20, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\tweet.js": {
+    "lines": { "total": 14, "covered": 5, "skipped": 0, "pct": 35.71 },
+    "functions": { "total": 2, "covered": 1, "skipped": 0, "pct": 50 },
+    "statements": { "total": 16, "covered": 6, "skipped": 0, "pct": 37.5 },
+    "branches": { "total": 10, "covered": 3, "skipped": 0, "pct": 30 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\middlewares\\validations\\user.js": {
+    "lines": { "total": 18, "covered": 17, "skipped": 0, "pct": 94.44 },
+    "functions": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "statements": { "total": 18, "covered": 17, "skipped": 0, "pct": 94.44 },
+    "branches": { "total": 6, "covered": 5, "skipped": 0, "pct": 83.33 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Conversation.js": {
+    "lines": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Media.js": {
+    "lines": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Message.js": {
+    "lines": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Notification.js": {
+    "lines": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "branches": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Reply.js": {
+    "lines": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Trend.js": {
+    "lines": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\Tweet.js": {
+    "lines": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\entites\\User.js": {
+    "lines": { "total": 45, "covered": 34, "skipped": 0, "pct": 75.55 },
+    "functions": { "total": 18, "covered": 7, "skipped": 0, "pct": 38.88 },
+    "statements": { "total": 45, "covered": 34, "skipped": 0, "pct": 75.55 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Block.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Follow.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Like.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\LikeReply.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Mention.js": {
+    "lines": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Mute.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Repost.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\models\\relations\\Support.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\authRouter.js": {
+    "lines": { "total": 16, "covered": 16, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 16, "covered": 16, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\conversationsRouter.js": {
+    "lines": { "total": 12, "covered": 12, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 12, "covered": 12, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\interactionsRouter.js": {
+    "lines": { "total": 15, "covered": 15, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 15, "covered": 15, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\notificationsRouter.js": {
+    "lines": { "total": 8, "covered": 8, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 8, "covered": 8, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\profileRoutes.js": {
+    "lines": { "total": 13, "covered": 13, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 13, "covered": 13, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\searchRouter.js": {
+    "lines": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\timelineRouter.js": {
+    "lines": { "total": 9, "covered": 9, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 9, "covered": 9, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\trendsRouter.js": {
+    "lines": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\tweetsRouter.js": {
+    "lines": { "total": 21, "covered": 21, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 21, "covered": 21, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\routes\\usersRouter.js": {
+    "lines": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\conversationSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\mediaSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\messageSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\notificationSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\replySchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\trendSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\tweetSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\entites\\userSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\blockSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\followSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\likeReplySchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\likeSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\mentionSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\muteSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\repostSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\schemas\\relations\\supportSchema.js": {
+    "lines": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\services\\AppError.js": {
+    "lines": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\services\\AuthService.js": {
+    "lines": { "total": 122, "covered": 95, "skipped": 0, "pct": 77.86 },
+    "functions": { "total": 14, "covered": 12, "skipped": 0, "pct": 85.71 },
+    "statements": { "total": 125, "covered": 97, "skipped": 0, "pct": 77.6 },
+    "branches": { "total": 32, "covered": 16, "skipped": 0, "pct": 50 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\services\\Email.js": {
+    "lines": { "total": 16, "covered": 4, "skipped": 0, "pct": 25 },
+    "functions": { "total": 5, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 16, "covered": 4, "skipped": 0, "pct": 25 },
+    "branches": { "total": 3, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\services\\Password.js": {
+    "lines": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "functions": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
+    "statements": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "F:\\MyRepos\\Back-End SW\\Back-End\\services\\WebSocket.js": {
+    "lines": { "total": 94, "covered": 12, "skipped": 0, "pct": 12.76 },
+    "functions": { "total": 16, "covered": 1, "skipped": 0, "pct": 6.25 },
+    "statements": { "total": 96, "covered": 12, "skipped": 0, "pct": 12.5 },
+    "branches": { "total": 45, "covered": 0, "skipped": 0, "pct": 0 }
+  }
 }
