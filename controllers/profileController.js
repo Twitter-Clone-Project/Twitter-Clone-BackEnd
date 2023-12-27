@@ -206,8 +206,9 @@ exports.updateEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.confirmUpdateEmail = catchAsync(async (req, res, next) => {
-  const { userRepository, user, newEmail } = res.locals;
+  const { user, newEmail } = res.locals;
 
+  const userRepository = AppDataSource.getRepository(User);
   user.setIsConfirmed(true);
   user.email = newEmail;
   await userRepository.save(user);

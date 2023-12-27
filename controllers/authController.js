@@ -4,16 +4,11 @@
  */
 
 const jwt = require('jsonwebtoken');
-const { OAuth2Client } = require('google-auth-library');
-const { promisify } = require('util');
-const crypto = require('crypto');
-
-const { AppDataSource } = require('../dataSource');
 const catchAsync = require('../middlewares/catchAsync');
 const AppError = require('../services/AppError');
-const Password = require('../services/Password');
-const User = require('../models/entites/User');
-const Email = require('../services/Email');
+const AuthService = require('../services/AuthService');
+
+const authService = new AuthService();
 
 /**
  * Filters object properties based on specified fields.
@@ -92,54 +87,9 @@ const createAndSendToken = (user, req, res, statusCode) => {
  * @param {function} next - The next middleware function
  */
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, username, email, password, dateOfBirth, gRecaptchaResponse } =
-    req.body;
+  const { body } = req;
 
-  const userRepository = AppDataSource.getRepository(User);
-
-  // if this email signed but not confirmed remove it
-  await userRepository.delete({
-    isConfirmed: false,
-    email,
-    username,
-  });
-
-  if (process.env.NODE_ENV === 'production') {
-    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.ReCAPTCHA_SECRET_KEY}&response=${gRecaptchaResponse}`;
-
-    const response = await fetch(verificationUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    if (response.ok) {
-      const result = await response.json();
-      if (!result.success) {
-        return next(new AppError('reCAPTCHA verification failed'));
-      }
-    } else {
-      return next(new AppError('Error in reCAPTCHA verification'));
-    }
-  }
-  const hashedPassword = await Password.hashPassword(password);
-  const user = new User(username, name, email, hashedPassword, dateOfBirth);
-
-  const otp = user.createOTP();
-  await userRepository.insert(user);
-
-  await new Email(user, { otp }).sendConfirmationEmail();
-
-  setTimeout(
-    async () => {
-      await userRepository
-        .createQueryBuilder()
-        .delete()
-        .where('isConfirmed = false AND email = :email', { email: user.email })
-        .execute();
-    },
-    2 * 60 * 1000,
-  );
+  const { user } = await authService.signup(body);
 
   res.status(201).json({
     status: true,
@@ -173,39 +123,9 @@ exports.signup = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.signin = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await AppDataSource.getRepository(User)
-    .createQueryBuilder()
-    .select([
-      'user.username',
-      'user.email',
-      'user.userId',
-      'user.isConfirmed',
-      'user.name',
-      'user.imageUrl',
-      'user.birthDate',
-      'user.website',
-      'user.location',
-      'user.bio',
-      'user.bannerUrl',
-      'user.followingsCount',
-      'user.followersCount',
-      'user.createdAt',
-      'user.isOnline',
-    ])
-    .from(User, 'user')
-    .where('user.email = :email', { email })
-    .addSelect('user.password')
-    .getOne();
+  const { body } = req;
 
-  if (!user) return next(new AppError('No User With Email', 400));
-
-  const isCorrectPassword = await Password.comparePassword(
-    password,
-    user.password,
-  );
-
-  if (!isCorrectPassword) return next(new AppError('Wrong Password', 400));
+  const { user } = await authService.login(body);
 
   createAndSendToken(user, req, res, 200);
 });
@@ -216,48 +136,8 @@ exports.signin = catchAsync(async (req, res, next) => {
  * @param {Object} res - The response object
  */
 exports.signWithGoogle = catchAsync(async (req, res, next) => {
-  const { googleAccessToken } = req.body;
-
-  if (!googleAccessToken) {
-    return next(new AppError('The Google Access Token is required', 400));
-  }
-  const response = await fetch(
-    `https://www.googleapis.com/oauth2/v3/userinfo`,
-    {
-      headers: {
-        Authorization: `Bearer ${googleAccessToken}`,
-      },
-    },
-  );
-
-  const { email, name } = await response.json();
-
-  const existingUser = await AppDataSource.getRepository(User)
-    .createQueryBuilder()
-    .select([
-      'user.username',
-      'user.email',
-      'user.isOnline',
-      'user.userId',
-      'user.isConfirmed',
-      'user.name',
-      'user.imageUrl',
-      'user.birthDate',
-      'user.website',
-      'user.location',
-      'user.bio',
-      'user.bannerUrl',
-      'user.followingsCount',
-      'user.followersCount',
-      'user.createdAt',
-    ])
-    .from(User, 'user')
-    .where('user.email = :email', { email })
-    .getOne();
-
-  if (!existingUser) {
-    return next(new AppError('User not found. Please go to sign up', 404));
-  }
+  const { body } = req;
+  const { existingUser } = await authService.signWithGoogle(body);
 
   createAndSendToken(existingUser, req, res, 200);
 });
@@ -299,27 +179,7 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
     );
   }
 
-  const payload = await promisify(jwt.verify)(
-    token,
-    process.env.JWT_SECRET_KEY,
-  );
-
-  const user = await AppDataSource.getRepository(User)
-    .createQueryBuilder()
-    .select([
-      'user.username',
-      'user.email',
-      'user.userId',
-      'user.isConfirmed',
-      'user.isOnline',
-    ])
-    .from(User, 'user')
-    .where('user.userId = :userId', { userId: payload.id })
-    .getOne();
-
-  if (!user) {
-    return next(new AppError('User does no longer exist', 401));
-  }
+  const { user } = await authService.checkAuth(token);
 
   req.currentUser = user;
   req.token = token;
@@ -333,27 +193,11 @@ exports.requireAuth = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.getMe = catchAsync(async (req, res, next) => {
-  // await socketService.emitNotification(62, req.currentUser.userId, 'Follow');
-  const user = await AppDataSource.getRepository(User).findOne({
-    where: { userId: req.currentUser.userId },
-    select: {
-      userId: true,
-      createdAt: true,
-      isConfirmed: true,
-      isOnline: true,
-      username: true,
-      email: true,
-      name: true,
-      imageUrl: true,
-      birthDate: true,
-      bio: true,
-      location: true,
-      website: true,
-      bannerUrl: true,
-      followingsCount: true,
-      followersCount: true,
-    },
-  });
+  const {
+    currentUser: { userId },
+  } = req;
+
+  const { user } = await authService.currentAuthedUser(userId);
 
   res.status(200).json({
     status: true,
@@ -388,53 +232,11 @@ exports.getMe = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.checkOTP = catchAsync(async (req, res, next) => {
-  const { otp, email, newEmail } = req.body;
-  const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
+  const { body } = req;
+  const { newEmail } = body;
 
-  const userRepository = AppDataSource.getRepository(User);
-  const user = await userRepository.findOne({
-    where: {
-      email: email,
-    },
-    select: {
-      userId: true,
-      isConfirmed: true,
-      otpExpires: true,
-      createdAt: true,
-      otp: true,
-      username: true,
-      isOnline: true,
-      email: true,
-      name: true,
-      imageUrl: true,
-      birthDate: true,
-      bio: true,
-      location: true,
-      website: true,
-      bannerUrl: true,
-      followingsCount: true,
-      followersCount: true,
-    },
-  });
+  const { user } = await authService.checkOTP(body);
 
-  if (!user) {
-    return next(new AppError('User not found', 404));
-  }
-
-  if (user.getOtp() !== hashedOTP) {
-    return next(new AppError('Incorrect OTP', 400));
-  }
-
-  user.setOtp(null);
-  if (new Date() > user.otpExpires) {
-    user.setOtpExpires(null);
-    await userRepository.save(user);
-    return next(new AppError('OTP expired', 400));
-  }
-
-  user.setOtpExpires(null);
-
-  res.locals.userRepository = userRepository;
   res.locals.user = user;
   res.locals.newEmail = newEmail;
   next();
@@ -447,12 +249,11 @@ exports.checkOTP = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.confirmEmail = catchAsync(async (req, res, next) => {
-  const { userRepository, user } = res.locals;
+  const { user } = res.locals;
 
-  user.setIsConfirmed(true);
-  await userRepository.save(user);
+  const { user: userConfirmed } = await authService.confirmUserEmail(user);
 
-  createAndSendToken(user, req, res, 200);
+  createAndSendToken(userConfirmed, req, res, 200);
 });
 
 /**
@@ -462,38 +263,9 @@ exports.confirmEmail = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
-  const { email } = req.body;
+  const { body } = req;
 
-  const user = await AppDataSource.getRepository(User).findOne({
-    where: { email },
-    select: {
-      userId: true,
-      createdAt: true,
-      isConfirmed: true,
-      isOnline: true,
-      username: true,
-      email: true,
-      name: true,
-      imageUrl: true,
-      birthDate: true,
-      bio: true,
-      location: true,
-      website: true,
-      bannerUrl: true,
-      followingsCount: true,
-      followersCount: true,
-    },
-  });
-
-  if (!user) {
-    return next(new AppError('User not found', 404));
-  }
-  const userRepository = AppDataSource.getRepository(User);
-
-  const otp = user.createOTP();
-  await userRepository.save(user);
-
-  await new Email(user, { otp }).sendConfirmationEmail();
+  await authService.sendConfirmationEmail(body);
 
   res.status(200).json({
     status: true,
@@ -508,48 +280,12 @@ exports.resendConfirmationEmail = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.changePassword = catchAsync(async (req, res, next) => {
-  const { currentPassword, newPassword } = req.body;
+  const {
+    currentUser: { userId },
+    body,
+  } = req;
 
-  const userRepository = AppDataSource.getRepository(User);
-
-  const user = await userRepository
-    .createQueryBuilder()
-    .select([
-      'user.username',
-      'user.email',
-      'user.userId',
-      'user.isConfirmed',
-      'user.createdAt',
-      'user.isOnline',
-      'user.name',
-      'user.imageUrl',
-      'user.birthDate',
-      'user.website',
-      'user.location',
-      'user.bio',
-      'user.bannerUrl',
-      'user.followingsCount',
-      'user.followersCount',
-    ])
-    .from(User, 'user')
-    .where('user.userId = :userId', { userId: req.currentUser.userId })
-    .addSelect('user.password')
-    .getOne();
-
-  const checkPassword = await Password.comparePassword(
-    currentPassword,
-    user.password,
-  );
-
-  if (!checkPassword) {
-    return next(new AppError('Your Current Password is Wrong', 400));
-  }
-
-  const hashedPassword = await Password.hashPassword(newPassword);
-  await userRepository.update(
-    { userId: req.currentUser.userId },
-    { password: hashedPassword },
-  );
+  const { user } = await authService.changePassword(body, userId);
 
   createAndSendToken(user, req, res, 200);
 });
@@ -561,30 +297,9 @@ exports.changePassword = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.forgetPassword = catchAsync(async (req, res, next) => {
-  const { email } = req.body;
+  const { body } = req;
 
-  const userRepository = AppDataSource.getRepository(User);
-  const user = await userRepository.findOne({
-    where: { email },
-    select: { email: true, userId: true, name: true },
-  });
-
-  if (!user) {
-    return next(new AppError('No user registered with this email ', 404));
-  }
-
-  const otp = user.createOTP();
-  await userRepository.save(user);
-
-  try {
-    await new Email(user, { otp }).sendConfirmationEmail();
-  } catch (error) {
-    user.setOtp(null);
-    user.setOtpExpires(null);
-    await userRepository.save(user);
-
-    return next(new AppError('Error in sending the reset password email', 400));
-  }
+  await authService.sendConfirmationEmail(body);
 
   res.status(200).json({
     status: true,
@@ -599,42 +314,60 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
  * @param {function} next - The next middleware function
  */
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { newPassword } = req.body;
+  const {
+    currentUser: { email },
+    body,
+  } = req;
 
-  const userRepository = AppDataSource.getRepository(User);
-  const user = await userRepository.findOne({
-    where: { email: req.currentUser.email },
-    select: {
-      userId: true,
-      isConfirmed: true,
-      createdAt: true,
-      username: true,
-      isOnline: true,
-      email: true,
-      name: true,
-      imageUrl: true,
-      birthDate: true,
-      bio: true,
-      location: true,
-      website: true,
-      bannerUrl: true,
-      followingsCount: true,
-      followersCount: true,
-    },
-  });
-
-  if (!user) {
-    return next(new AppError('User not found', 404));
-  }
-
-  const hashedPassword = await Password.hashPassword(newPassword);
-  user.setPassword(hashedPassword);
-
-  await userRepository.save(user);
+  await authService.resetPassword(body, email);
 
   res.status(200).json({
     status: true,
-    message: 'Password reseted  successfully',
+    message: 'Password reseted successfully',
+  });
+});
+
+/**
+ * Middleware function to check if a username already exists in the database.
+ * Responds with a JSON object indicating the status and whether the username is found.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
+exports.isUsernameFound = catchAsync(async (req, res, next) => {
+  const {
+    params: { username },
+  } = req;
+
+  if (!username) return next(new AppError('Enter the username', 400));
+
+  const { isFound } = await authService.isUserFoundByUsername(username);
+
+  res.status(200).json({
+    status: true,
+    data: { isFound },
+  });
+});
+
+/**
+ * Middleware function to check if an email already exists in the database.
+ * Responds with a JSON object indicating the status and whether the email is found.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ */
+exports.isEmailFound = catchAsync(async (req, res, next) => {
+  const {
+    params: { email },
+  } = req;
+
+  if (!email) return next(new AppError('Enter the email', 400));
+
+  const { isFound } = await authService.isUserFoundByEmail(email);
+
+  res.status(200).json({
+    status: true,
+    data: { isFound },
   });
 });
 
