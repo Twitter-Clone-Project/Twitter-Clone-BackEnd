@@ -6,6 +6,15 @@ const Follow = require('../models/relations/Follow');
 
 const { AppDataSource } = require('../dataSource');
 
+
+/**
+ * Middleware function to check if a username already exists in the database.
+ * Responds with a JSON object indicating the status and whether the username is found.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 const getUserConversations = async (userId) => {
   const conversationRepository = AppDataSource.getRepository(Conversation);
 
@@ -144,6 +153,13 @@ const getUserConversations = async (userId) => {
   return conversationDetails;
 };
 
+/**
+ * Fetches and sorts conversations for the current user.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 exports.getConversations = catchAsync(async (req, res, next) => {
   const { currentUser } = req;
 
@@ -166,6 +182,13 @@ exports.getConversations = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves the message history for a specific conversation.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 exports.getConversationHistory = catchAsync(async (req, res, next) => {
   const { conversationId } = req.params;
   const { userId } = req.currentUser;
@@ -203,6 +226,14 @@ exports.getConversationHistory = catchAsync(async (req, res, next) => {
   });
 });
 
+
+/**
+ * Retrieves the count of unseen conversations for the current user.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 exports.getUnseenConversationsCnt = catchAsync(async (req, res, next) => {
   const { userId } = req.currentUser;
   const cnt = await AppDataSource.getRepository(Message)
@@ -220,6 +251,13 @@ exports.getUnseenConversationsCnt = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Initiates a new conversation between the current user and selected users.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 exports.startConversation = catchAsync(async (req, res, next) => {
   const { userIds } = req.body;
   const { userId: myId } = req.currentUser;
@@ -243,6 +281,13 @@ exports.startConversation = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Deletes a conversation identified by the `conversationId`.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 exports.leaveConversation = catchAsync(async (req, res, next) => {
   const { conversationId } = req.body;
   const conversationRepository = AppDataSource.getRepository(Conversation);

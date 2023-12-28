@@ -2,6 +2,14 @@ const catchAsync = require('../middlewares/catchAsync');
 const { AppDataSource } = require('../dataSource');
 const Notification = require('../models/entites/Notification');
 
+
+/**
+ * Retrieves notifications for the current user, ordered by timestamp.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 exports.getNotifications = catchAsync(async (req, res, next) => {
   const { userId } = req.currentUser;
 
@@ -38,6 +46,14 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+/**
+ * Retrieves the count of unseen notifications for the current user.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {function} next - The next middleware function
+ * @returns {void}
+ */
 
 exports.getUnseenNotificationsCnt = catchAsync(async (req, res, next) => {
   const { userId } = req.currentUser;
