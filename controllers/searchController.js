@@ -108,6 +108,7 @@ function isValidSearchQuery(query) {
   return true;
 }
 
+
 async function searchFirstUsers(query, currUser) {
   let usersList = [];
   if (isValidSearchQuery(query)) {
@@ -143,6 +144,7 @@ async function searchFirstUsers(query, currUser) {
             screenName: user.name,
             username: user.username,
             profileImageURL: user.imageUrl,
+            imageUrl: user.imageUrl,
             bio: user.bio,
             followersCount: user.followersCount,
             followingCount: user.followingsCount,
@@ -198,6 +200,7 @@ async function searchFirstTweets(query, currUserId) {
         userId: currUserId,
       },
     });
+
     const blockedUsersIds = blockedUsers.map((user) => user.blockedId);
     const blockedByUsers = await AppDataSource.getRepository(Block).find({
       where: {
@@ -230,6 +233,7 @@ async function searchFirstTweets(query, currUserId) {
           user: {
             userId: tweet.user.userId,
             profileImageURL: tweet.user.imageUrl,
+            imageUrl: tweet.user.imageUrl,
             screenName: tweet.user.name,
             username: tweet.user.username,
             bio: tweet.user.bio,
