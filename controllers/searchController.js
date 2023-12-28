@@ -15,6 +15,16 @@ let usersRes = [];
 let tweetsRes = [];
 const numResultsPerPage = 10;
 
+/**
+ * Retrieves information about a tweet, including like, repost, and reply counts,
+ * as well as the user's interaction status with the tweet (liked, reposted, replied).
+ *
+ * @function
+ * @async
+ * @param {string} tweetId - The ID of the target tweet.
+ * @param {string} userId - The ID of the current user.
+ * @returns {Object} Object containing counts and flags related to the tweet.
+ */
 async function getTweetInfo(tweetId, userId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
@@ -67,6 +77,15 @@ async function getTweetInfo(tweetId, userId) {
   };
 }
 
+/**
+ * Retrieves information about a user's relationship status with the current user.
+ *
+ * @function
+ * @async
+ * @param {string} userId - The ID of the target user.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {Object} Object containing boolean flags indicating whether the current user is followed and following the target user.
+ */
 async function getUserInfo(userId, currUserId) {
   let isFollowed = await AppDataSource.getRepository(Follow).findOne({
     where: {
@@ -91,6 +110,13 @@ async function getUserInfo(userId, currUserId) {
   };
 }
 
+/**
+ * Checks if a search query is valid.
+ *
+ * @function
+ * @param {string} query - The search query to be validated.
+ * @returns {boolean} Returns true if the query is valid, otherwise false.
+ */
 function isValidSearchQuery(query) {
   console.log('query ', query, ' 1');
   if (typeof query !== 'string' || query.trim() === '') {
@@ -108,6 +134,15 @@ function isValidSearchQuery(query) {
   return true;
 }
 
+/**
+ * Searches for users based on a query and current user information.
+ *
+ * @function
+ * @async
+ * @param {string} query - The search query for users.
+ * @param {Object} currUser - The current user object.
+ * @returns {void}
+ */
 async function searchFirstUsers(query, currUser) {
   let usersList = [];
   if (isValidSearchQuery(query)) {
@@ -143,6 +178,7 @@ async function searchFirstUsers(query, currUser) {
             screenName: user.name,
             username: user.username,
             profileImageURL: user.imageUrl,
+            imageURL: user.imageUrl,
             bio: user.bio,
             followersCount: user.followersCount,
             followingCount: user.followingsCount,
@@ -158,6 +194,17 @@ async function searchFirstUsers(query, currUser) {
   usersRes = usersList;
 }
 
+/**
+ * Controller for searching users based on a query.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If the query parameter is missing.
+ * @returns {Object} JSON response with the search results and total count.
+ */
 exports.searchUsers = catchAsync(async (req, res, next) => {
   const { query } = req.query;
   if (!query) {
@@ -180,6 +227,15 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Searches for tweets based on a query and current user information.
+ *
+ * @function
+ * @async
+ * @param {string} query - The search query for tweets.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {void}
+ */
 async function searchFirstTweets(query, currUserId) {
   let tweetsList = [];
   if (isValidSearchQuery(query)) {
@@ -230,6 +286,7 @@ async function searchFirstTweets(query, currUserId) {
           user: {
             userId: tweet.user.userId,
             profileImageURL: tweet.user.imageUrl,
+            imageURL: tweet.user.imageUrl,
             screenName: tweet.user.name,
             username: tweet.user.username,
             bio: tweet.user.bio,
@@ -256,6 +313,17 @@ async function searchFirstTweets(query, currUserId) {
   tweetsRes = tweetsList;
 }
 
+/**
+ * Controller for searching tweets based on a query.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If the query parameter is missing.
+ * @returns {Object} JSON response with the search results and total count.
+ */
 exports.searchTweets = catchAsync(async (req, res, next) => {
   const { query } = req.query;
   if (!query) {

@@ -13,6 +13,13 @@ const Follow = require('../models/relations/Follow');
 
 const numTweetsPerPage = 10;
 
+/**
+ * Retrieves information about the relationship between a user and another user.
+ *
+ * @param {string} userId - The ID of the user to retrieve information about.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {Promise<Object>} A Promise representing the asynchronous operation, resolving to an object with 'isFollowed' and 'isFollowing' properties.
+ */
 async function getUserInfo(userId, currUserId) {
   let isFollowed = await AppDataSource.getRepository(Follow).findOne({
     where: {
@@ -37,6 +44,14 @@ async function getUserInfo(userId, currUserId) {
   };
 }
 
+/**
+ * Retrieves information about a tweet, including the counts of likes, reposts, and replies,
+ * and whether the current user has liked, reposted, or replied to the tweet.
+ *
+ * @param {string} tweetId - The ID of the tweet to retrieve information about.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {Promise<Object>} A Promise representing the asynchronous operation, resolving to an object with 'likesCount', 'repostsCount', 'repliesCount', 'isLiked', 'isReposted', and 'isReplied' properties.
+ */
 async function getTweetInfo(tweetId, currUserId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
@@ -91,6 +106,13 @@ async function getTweetInfo(tweetId, currUserId) {
 
 let totalRes = [];
 
+/**
+ * Retrieves all tweets associated with a specific trend, including both original tweets and retweets.
+ *
+ * @param {string} trendId - The ID of the trend to retrieve tweets for.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {void>} A Promise representing the asynchronous operation, resolving to an array of tweet objects.
+ */
 async function getAllTweets(trendId, currUserId) {
   const tweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
@@ -212,6 +234,16 @@ async function getAllTweets(trendId, currUserId) {
   totalRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
+/**
+ * Retrieves the trending topics.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} A Promise representing the asynchronous operation.
+ *
+ * @throws {AppError} If there's an issue with the database.
+ */
 exports.getTrends = catchAsync(async (req, res, next) => {
   const trends = await AppDataSource.getRepository(Trend)
     .createQueryBuilder('trend')
@@ -225,6 +257,16 @@ exports.getTrends = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves tweets associated with a specific trend and paginates the results.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} A Promise representing the asynchronous operation.
+ *
+ * @throws {AppError} If there's an issue with the database.
+ */
 exports.getTweetsForTrend = catchAsync(async (req, res, next) => {
   const { trendName } = req.params;
   const { pageNum } = req.params;

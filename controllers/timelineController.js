@@ -19,6 +19,16 @@ let userMentionsTotalRes = [];
 let userLikesTotalRes = [];
 const numTweetsPerPage = 10;
 
+/**
+ * Retrieves information about a tweet, including like, repost, and reply counts,
+ * as well as the user's interaction status with the tweet (liked, reposted, replied).
+ *
+ * @function
+ * @async
+ * @param {string} tweetId - The ID of the target tweet.
+ * @param {string} userId - The ID of the current user.
+ * @returns {Object} Object containing counts and flags related to the tweet.
+ */
 async function getTweetInfo(tweetId, userId) {
   const likesCount = await AppDataSource.getRepository(Like).count({
     where: {
@@ -71,6 +81,15 @@ async function getTweetInfo(tweetId, userId) {
   };
 }
 
+/**
+ * Retrieves information about a user's follow status.
+ *
+ * @function
+ * @async
+ * @param {string} userId - The ID of the target user.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {Object} Object containing follow status.
+ */
 async function getUserInfo(userId, currUserId) {
   let isFollowed = await AppDataSource.getRepository(Follow).findOne({
     where: {
@@ -95,6 +114,15 @@ async function getUserInfo(userId, currUserId) {
   };
 }
 
+/**
+ * Retrieves the initial set of tweets for a user, including both original tweets
+ * and retweets from users they follow.
+ *
+ * @function
+ * @async
+ * @param {string} userId - The ID of the target user.
+ * @returns {void}
+ */
 async function getFirstTweets(userId) {
   const tweets = await AppDataSource.getRepository(Tweet)
     .createQueryBuilder('tweet')
@@ -253,6 +281,17 @@ async function getFirstTweets(userId) {
   tweetsTotalRes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
+/**
+ * Controller for retrieving tweets for the authenticated user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If the page number parameter is missing.
+ * @returns {Object} JSON response with the paginated tweets and total count.
+ */
 exports.getTweets = catchAsync(async (req, res, next) => {
   const { pageNum } = req.params;
   const userId = req.currentUser.userId;
@@ -272,6 +311,16 @@ exports.getTweets = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves the initial set of tweets for a specific user, including both original tweets
+ * and retweets from users they follow.
+ *
+ * @function
+ * @async
+ * @param {string} username - The username of the target user.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {void}
+ */
 async function getFirstUserTweets(username, currUserId) {
   const { userId } = await AppDataSource.getRepository(User).findOne({
     where: {
@@ -429,6 +478,17 @@ async function getFirstUserTweets(username, currUserId) {
   );
 }
 
+/**
+ * Controller for retrieving tweets for a specific user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If the page number parameter is missing.
+ * @returns {Object} JSON response with the paginated tweets and total count.
+ */
 exports.getUserTweets = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const { pageNum } = req.params;
@@ -449,6 +509,15 @@ exports.getUserTweets = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves the initial set of tweets mentioning a specific user.
+ *
+ * @function
+ * @async
+ * @param {string} username - The username of the target user.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {void}
+ */
 async function getFirstUserMentions(username, currUserId) {
   const { userId } = await AppDataSource.getRepository(User).findOne({
     where: {
@@ -544,6 +613,17 @@ async function getFirstUserMentions(username, currUserId) {
   );
 }
 
+/**
+ * Controller for retrieving tweets mentioning a specific user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If the page number parameter is missing.
+ * @returns {Object} JSON response with the paginated tweets and total count.
+ */
 exports.getUserMentions = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const { pageNum } = req.params;
@@ -564,6 +644,15 @@ exports.getUserMentions = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves the initial set of tweets liked by a specific user.
+ *
+ * @function
+ * @async
+ * @param {string} username - The username of the target user.
+ * @param {string} currUserId - The ID of the current user.
+ * @returns {void}
+ */
 async function getFirstUserLikes(username, currUserId) {
   const { userId } = await AppDataSource.getRepository(User).findOne({
     where: {
@@ -660,6 +749,17 @@ async function getFirstUserLikes(username, currUserId) {
   );
 }
 
+/**
+ * Controller for retrieving tweets liked by a specific user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {AppError} If the page number parameter is missing.
+ * @returns {Object} JSON response with the paginated tweets and total count.
+ */
 exports.getUserLikes = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const { pageNum } = req.params;

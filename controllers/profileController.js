@@ -14,6 +14,15 @@ const { createAndSendToken } = require('../controllers/authController');
 // Set up multer storage and limits
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+/**
+ * Middleware for handling file uploads for profile and banner photos.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {void}
+ */
 exports.uploadFiles = upload.fields([
   { name: 'profilePhoto' },
   { name: 'bannerPhoto' },
@@ -22,6 +31,13 @@ exports.uploadFiles = upload.fields([
 const defaultBanner =
   'https://kady-twitter-images.s3.amazonaws.com/DefaultBanner.png';
 
+/**
+ * Uploads media files to an S3 bucket.
+ *
+ * @param {Array} mediaArray - An array containing media files.
+ * @returns {Promise<Array>} A Promise that resolves to an array of file locations in the S3 bucket.
+ * @throws {Error} If there's an issue uploading media files.
+ */
 async function uploadMedia(mediaArray) {
   const s3 = new AWS.S3({
     credentials: {
@@ -58,12 +74,26 @@ async function uploadMedia(mediaArray) {
   }
 }
 
+/**
+ * Extracts the key from an S3 object location URL.
+ *
+ * @param {string} location - The URL of the S3 object.
+ * @returns {string} The decoded key of the S3 object.
+ */
 function getKeyFromLocation(location) {
   const url = new URL(location);
   const pathArray = url.pathname.split('/');
   const key = pathArray.slice(1).join('/'); // Join path segments after the first '/'
   return decodeURIComponent(key); // Decoding URI component if needed
 }
+
+/**
+ * Deletes an object from an S3 bucket based on its location URL.
+ *
+ * @param {string} location - The URL of the S3 object.
+ * @returns {Promise<Object>} A Promise that resolves to the S3 deletion response.
+ * @throws {Error} If there's an issue deleting the object from S3.
+ */
 async function deleteFromS3(Location) {
   const s3 = new AWS.S3({
     credentials: {
@@ -88,6 +118,16 @@ async function deleteFromS3(Location) {
   }
 }
 
+/**
+ * Retrieves the profile information of a user based on the provided username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.getUserProfile = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -166,6 +206,16 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Updates the username of the currently logged-in user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.updateUsername = catchAsync(async (req, res, next) => {
   const currUserId = req.currentUser.userId;
   const { newUsername } = req.body;
@@ -183,6 +233,17 @@ exports.updateUsername = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+/**
+ * Updates the email address of the currently logged-in user and sends a confirmation email.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.updateEmail = catchAsync(async (req, res, next) => {
   const currUserId = req.currentUser.userId;
   const { newEmail } = req.body;
@@ -205,6 +266,16 @@ exports.updateEmail = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Handles the confirmation of the updated email and sets the email as confirmed in the user's profile.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.confirmUpdateEmail = catchAsync(async (req, res, next) => {
   const { user, newEmail } = res.locals;
 
@@ -216,6 +287,16 @@ exports.confirmUpdateEmail = catchAsync(async (req, res, next) => {
   createAndSendToken(user, req, res, 200);
 });
 
+/**
+ * Updates the user's profile information, including name, bio, website, location, and profile/banner images.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.updateProfile = catchAsync(async (req, res, next) => {
   const { name, bio, website, location, birthDate, isUpdated } = req.body;
   let image = null;

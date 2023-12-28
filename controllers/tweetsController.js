@@ -21,6 +21,16 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 exports.uploadFiles = upload.fields([{ name: 'media' }]);
 
+/**
+ * Checks if a tweet with the specified tweetId exists in the database.
+ * If not, it throws an AppError.
+ *
+ * @param {string} tweetId - The ID of the tweet to check.
+ * @param {Function} next - The Express next function.
+ * @returns {Promise<void>} A Promise representing the asynchronous operation.
+ *
+ * @throws {AppError} If no tweet exists with the specified tweetId or if there's an issue with the database.
+ */
 async function checkTweet(tweetId, next) {
   const tweet = await AppDataSource.getRepository(Tweet).findOne({
     where: {
@@ -30,6 +40,14 @@ async function checkTweet(tweetId, next) {
   if (!tweet) return next(new AppError('No tweet exists with this id', 400));
 }
 
+/**
+ * Uploads media files to an S3 bucket and returns an array of the file locations.
+ *
+ * @param {Array} mediaArray - An array of media files to upload.
+ * @returns {Promise<Array>} A Promise representing the asynchronous operation, resolving to an array of file locations.
+ *
+ * @throws {Error} If there's an issue with the S3 upload process.
+ */
 async function uploadMedia(mediaArray) {
   const s3 = new AWS.S3({
     credentials: {
@@ -67,6 +85,12 @@ async function uploadMedia(mediaArray) {
   }
 }
 
+/**
+ * Determines the type of a file based on its URL extension.
+ *
+ * @param {string} url - The URL of the file.
+ * @returns {string} The file type ('image', 'video', or 'unknown').
+ */
 function getFileType(url) {
   const extension = url.split('.').pop().toLowerCase();
   if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
@@ -234,6 +258,16 @@ exports.addTweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Deletes a tweet with the specified tweetId.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If there is an error in deleting the tweet or if the tweetId is invalid.
+ */
 exports.deleteTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   checkTweet(tweetId, next);
@@ -255,6 +289,16 @@ exports.deleteTweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves details of a tweet based on the provided tweetId.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If no tweet exists with the specified tweetId or if there's an issue with the database.
+ */
 exports.getTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const currUserId = req.currentUser.userId;
@@ -365,6 +409,16 @@ exports.getTweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Adds a like to the specified tweet by the current user.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.addLike = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const currUserId = req.currentUser.userId;
@@ -421,6 +475,17 @@ exports.deleteLike = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Adds media attachments to the specified tweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist, if there's an issue with the database,
+ *                   or if the tweet already has 4 attachments.
+ */
 exports.addMedia = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   let validMedia = true;
@@ -477,6 +542,16 @@ exports.addMedia = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Retrieves media attachments of the specified tweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
 
@@ -500,6 +575,16 @@ exports.getMediaOfTweet = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Retrieves users who have retweeted the specified tweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const currUserId = req.currentUser.userId;
@@ -560,6 +645,16 @@ exports.getRetweetersOfTweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves users who have liked the specified tweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const currUserId = req.currentUser.userId;
@@ -615,6 +710,16 @@ exports.getLikersOfTweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves replies to the specified tweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
 
@@ -632,11 +737,6 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
     .getMany();
 
   const repliesPromises = replies.map(async (reply) => {
-    // const likesCount = await AppDataSource.getRepository(LikeReply).count({
-    //   where: {
-    //     replyId: reply.replyId,
-    //   },
-    // });
     replyTime = new Date(reply.time + 'UTC');
     return {
       replyId: reply.replyId,
@@ -659,6 +759,16 @@ exports.getRepliesOfTweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retweets the specified tweet by the current user.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.retweet = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const currUserId = req.currentUser.userId;
@@ -688,6 +798,16 @@ exports.retweet = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Adds a reply to the specified tweet by the current user.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If the tweet does not exist or if there's an issue with the database.
+ */
 exports.addReply = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const replyText = req.body.text;
@@ -743,6 +863,16 @@ exports.addReply = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Deletes a reply to the specified tweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If there's an issue with the database or if the reply cannot be deleted.
+ */
 exports.deleteReply = catchAsync(async (req, res, next) => {
   const { tweetId } = req.params;
   const { replyId } = req.params;
@@ -783,6 +913,16 @@ exports.deleteReply = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Deletes a retweet.
+ *
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The Express next function.
+ * @returns {Object} The JSON object of response which returned.
+ *
+ * @throws {AppError} If there's an issue with the database or if the retweet cannot be deleted.
+ */
 exports.deleteRetweet = catchAsync(async (req, res, next) => {
   const { retweetId } = req.params;
   const currUserId = req.currentUser.userId;
