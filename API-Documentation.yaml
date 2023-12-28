@@ -1576,7 +1576,7 @@ paths:
                       type: string
                     username:
                       type: string
-                    imageUrl:
+                    profileImageURL:
                       type: string
                     bio:
                       type: string
@@ -1590,15 +1590,6 @@ paths:
                       type: boolean
         '400':
           description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-        '404':
-          description: Not found
           schema:
             type: object
             properties:
@@ -1720,7 +1711,7 @@ paths:
               description:
                 type: string
                 description: The user's description.
-              imageUrl:
+              profileImageUrl:
                 type: string
                 description: The URL of the updated profile picture.
         '400':
@@ -2491,7 +2482,7 @@ paths:
                     properties:
                       userId:
                         type: integer
-                      imageUrl:
+                      profileImageURL:
                         type: string
                         description: The profile of the user that create the tweet.
                       screenName:
@@ -2618,7 +2609,7 @@ paths:
                     properties:
                       userId:
                         type: integer
-                      imageUrl:
+                      profileImageURL:
                         type: string
                         description: The profile of the user that create the tweet.
                       screenName:
@@ -2718,7 +2709,7 @@ paths:
                     bio:
                       type: string
                       description: The bio of the user that make reply.
-                    imageUrl:
+                    profileImageURL:
                       type: string
                       description: The image of the user that make reply.
         '400':
@@ -2780,7 +2771,7 @@ paths:
                     replyText:
                       type: string
                     createdAt:
-                      type: string
+                      type: '2023-11-27 02:17:25'
                     username:
                       type: string
                       description: The name of the user that make reply.
@@ -2789,7 +2780,7 @@ paths:
                     bio:
                       type: string
                       description: The bio of the user that make reply.
-                    imageUrl:
+                    profileImageURL:
                       type: string
                       description: The image of the user that make reply.
                     followersCount:
@@ -2947,7 +2938,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who retweeted.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
                     user:
@@ -2962,7 +2953,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user that make the tweet.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet .
                     isLiked:
@@ -3135,7 +3126,7 @@ paths:
                     screenName:
                       type: string
                       description: The screen name of the retweeter.
-                    imageUrl:
+                    profileImageURL:
                       type: string
                       description: The profile of the user that retweet.
                     bio:
@@ -3205,7 +3196,7 @@ paths:
                     screenName:
                       type: string
                       description: The screen name of the retweeter.
-                    imageUrl:
+                    profileImageURL:
                       type: string
                       description: The profile of the user that retweet.
                     bio:
@@ -3274,7 +3265,7 @@ paths:
                     properties:
                       userId:
                         type: integer
-                      imageUrl:
+                      profileImageURL:
                         type: string
                         description: The profile of the user that create the tweet.
                       screenName:
@@ -3315,15 +3306,6 @@ paths:
                     type: object
         '400':
           description: Bad request - something went wrong.
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-        '404':
-          description: No tweets found.
           schema:
             type: object
             properties:
@@ -3467,7 +3449,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who retweeted.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
                         bio:
@@ -3497,7 +3479,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who posted the tweet.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet.
                         bio:
@@ -3603,7 +3585,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who retweeted.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
                         bio:
@@ -3633,7 +3615,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who posted the tweet.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet.
                         bio:
@@ -3673,15 +3655,6 @@ paths:
                 type: integer
         '400':
           description: Bad request - something went wrong
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-        '404':
-          description: No tweets found.
           schema:
             type: object
             properties:
@@ -3748,7 +3721,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who retweeted.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
                         bio:
@@ -3778,7 +3751,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who posted the tweet.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet.
                         bio:
@@ -3818,15 +3791,6 @@ paths:
                 type: integer
         '400':
           description: Bad request - something went wrong.
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-        '404':
-          description: No tweets found.
           schema:
             type: object
             properties:
@@ -3893,7 +3857,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who retweeted.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user who retweeted.
                         bio:
@@ -3923,7 +3887,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who posted the tweet.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet.
                         bio:
@@ -3963,15 +3927,6 @@ paths:
                 type: integer
         '400':
           description: Bad request - something went wrong.
-          schema:
-            type: object
-            properties:
-              status:
-                type: boolean
-              message:
-                type: string
-        '404':
-          description: No tweets found.
           schema:
             type: object
             properties:
@@ -4074,7 +4029,7 @@ paths:
                         screenName:
                           type: string
                           description: The screen name of the user who posted the tweet.
-                        imageUrl:
+                        profileImageURL:
                           type: string
                           description: The profile picture of the user that create the tweet .
                     isLiked:

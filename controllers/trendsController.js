@@ -215,6 +215,7 @@ async function getAllTweets(trendId, currUserId) {
 exports.getTrends = catchAsync(async (req, res, next) => {
   const trends = await AppDataSource.getRepository(Trend)
     .createQueryBuilder('trend')
+    .where('trend.count > 0')
     .orderBy('trend.count', 'DESC')
     .select(['trend.trendId', 'trend.name', 'trend.count'])
     .getMany();
