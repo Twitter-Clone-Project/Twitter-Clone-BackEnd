@@ -1,0 +1,43 @@
+[
+  { "tweetId": 1, "trendId": 1 },
+  { "tweetId": 1, "trendId": 2 },
+  { "tweetId": 1, "trendId": 3 },
+  { "tweetId": 2, "trendId": 1 },
+  { "tweetId": 2, "trendId": 2 },
+  { "tweetId": 2, "trendId": 3 },
+
+  { "tweetId": 3, "trendId": 1 },
+  { "tweetId": 3, "trendId": 2 },
+  { "tweetId": 3, "trendId": 3 },
+  { "tweetId": 4, "trendId": 1 },
+  { "tweetId": 4, "trendId": 2 },
+  { "tweetId": 4, "trendId": 3 },
+
+  { "tweetId": 5, "trendId": 1 },
+  { "tweetId": 5, "trendId": 2 },
+  { "tweetId": 5, "trendId": 3 },
+  { "tweetId": 6, "trendId": 1 },
+  { "tweetId": 6, "trendId": 2 },
+  { "tweetId": 6, "trendId": 3 },
+
+  { "tweetId": 14, "trendId": 1 },
+  { "tweetId": 14, "trendId": 2 },
+  { "tweetId": 14, "trendId": 3 },
+  { "tweetId": 15, "trendId": 1 },
+  { "tweetId": 15, "trendId": 2 },
+  { "tweetId": 15, "trendId": 3 },
+
+  { "tweetId": 16, "trendId": 1 },
+  { "tweetId": 16, "trendId": 2 },
+  { "tweetId": 16, "trendId": 3 },
+  { "tweetId": 17, "trendId": 1 },
+  { "tweetId": 17, "trendId": 2 },
+  { "tweetId": 17, "trendId": 3 },
+
+  { "tweetId": 18, "trendId": 1 },
+  { "tweetId": 18, "trendId": 2 },
+  { "tweetId": 18, "trendId": 3 },
+  { "tweetId": 19, "trendId": 1 },
+  { "tweetId": 19, "trendId": 2 },
+  { "tweetId": 19, "trendId": 3 }
+]
