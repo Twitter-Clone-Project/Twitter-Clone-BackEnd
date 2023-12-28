@@ -85,42 +85,41 @@ class SocketService {
 
     this.io
       .use(async (socket, next) => {
-        // if (!socket.handshake.headers.token) {
-        //   console.log('Socket is not logged in');
-        //   return next();
-        // }
+        if (!socket.handshake.headers.token) {
+          console.log('Socket is not logged in');
+          return next();
+        }
 
-        // try {
-        //   const payload = await promisify(jwt.verify)(
-        //     socket.handshake.headers.token,
-        //     process.env.JWT_SECRET_KEY,
-        //   );
+        try {
+          const payload = await promisify(jwt.verify)(
+            socket.handshake.headers.token,
+            process.env.JWT_SECRET_KEY,
+          );
 
-        //   const user = await AppDataSource.getRepository(User).findOne({
-        //     where: { userId: payload.id },
-        //     select: {
-        //       userId: true,
-        //       username: true,
-        //       email: true,
-        //       name: true,
-        //     },
-        //   });
+          const user = await AppDataSource.getRepository(User).findOne({
+            where: { userId: payload.id },
+            select: {
+              userId: true,
+              username: true,
+              email: true,
+              name: true,
+            },
+          });
 
-        //   if (!user) {
-        //     console.log('User does no longer exist');
-        //     return;
-        //   }
+          if (!user) {
+            console.log('User does no longer exist');
+            return;
+          }
 
-        //   socket.userData = user ? user : {};
+          socket.userData = user ? user : {};
 
-        //   socket.join(`user_${user.userId}_room`);
+          socket.join(`user_${user.userId}_room`);
 
-        //   next();
-
-        // } catch (error) {
-        //   console.log(error.message);
-        //   return;
-        // }
+          next();
+        } catch (error) {
+          console.log(error.message);
+          return;
+        }
 
         next();
 
@@ -143,7 +142,8 @@ class SocketService {
           });
 
           if (!user) {
-            throw new AppError('User does no longer exist', 401);
+            console.log('User does no longer exist from add user');
+            return;
           }
 
           socket.userData = user ? user : {};
@@ -154,6 +154,8 @@ class SocketService {
         socket.on('msg-send', async ({ receiverId, conversationId, text }) => {
           if (!receiverId || !conversationId || !text)
             throw new AppError('message data are required', 400);
+
+            if (!socket.userData) return;
           const { userId, username } = socket.userData;
 
           const conversation = await AppDataSource.getRepository(
@@ -204,7 +206,11 @@ class SocketService {
         });
 
         socket.on('mark-notifications-as-seen', async () => {
+
+          if (!socket.userData) return;
           const { userId } = socket.userData;
+
+          
           await AppDataSource.getRepository(Notification).update(
             { isSeen: false, userId },
             { isSeen: true },
@@ -214,6 +220,8 @@ class SocketService {
         socket.on('chat-opened', async ({ conversationId, contactId }) => {
           if (!conversationId || !contactId)
             throw new AppError('chat data is required', 400);
+
+            if (!socket.userData) return;
           const { userId } = socket.userData;
 
           await AppDataSource.createQueryBuilder()
@@ -244,6 +252,8 @@ class SocketService {
         socket.on('chat-closed', async ({ contactId, conversationId }) => {
           if (!contactId || !conversationId)
             throw new AppError('chat data are required', 400);
+
+            if (!socket.userData) return;
           const { userId } = socket.userData;
 
           await AppDataSource.createQueryBuilder()
@@ -268,6 +278,8 @@ class SocketService {
 
         socket.on('disconnect', async () => {
           console.log(`Server disconnected from a client`);
+
+          if (!socket.userData) return;
           const { userId } = socket.userData;
 
           if (!userId) return;
