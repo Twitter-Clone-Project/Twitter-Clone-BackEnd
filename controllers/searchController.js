@@ -114,6 +114,7 @@ async function searchFirstUsers(req) {
         screenName: user.name,
         username: user.username,
         profileImageURL: user.imageUrl,
+        imageUrl: user.imageUrl,
         bio: user.bio,
         followersCount: user.followersCount,
         followingCount: user.followingsCount,
@@ -181,6 +182,7 @@ async function searchFirstTweets(req) {
       user: {
         userId: tweet.user.userId,
         profileImageURL: tweet.user.imageUrl,
+        imageUrl: tweet.user.imageUrl,
         screenName: tweet.user.name,
         username: tweet.user.username,
         bio: tweet.user.bio,
