@@ -1,0 +1,17 @@
+[
+  {
+    "trendId": 1,
+    "count": 12,
+    "name": "#trend1"
+  },
+  {
+    "trendId": 2,
+    "count": 12,
+    "name": "#trend2"
+  },
+  {
+    "trendId": 3,
+    "count": 12,
+    "name": "#trend3"
+  }
+]

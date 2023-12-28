@@ -5,7 +5,10 @@ const uuid = require('uuid');
 describe('GET /api/v1/users/:username/isUsernameFound', () => {
   test('returns 404, username not found', async () => {
     const email = `testuser_${uuid.v4()}@example.com`;
-    await request(app).get('/api/v1/users/7oooda/isEmailFound').expect(404);
+    const { body } = await request(app)
+      .get('/api/v1/users/7oooda/isUsernameFound')
+      .expect(200);
+    expect(body.data.isFound).toBe(false);
   });
 
   test('returns 200, username found', async () => {
@@ -13,17 +16,20 @@ describe('GET /api/v1/users/:username/isUsernameFound', () => {
     const username = `user_${uuid.v4()}`;
 
     await global.signin(email, username);
-    await request(app)
+    const { body } = await request(app)
       .get(`/api/v1/users/${username}/isUsernameFound`)
       .expect(200);
+    expect(body.data.isFound).toBe(true);
   });
 });
 
 describe('GET /api/v1/users/:email/isEmailFound', () => {
   test('returns 404, email not found', async () => {
-    await request(app)
+    const { body } = await request(app)
       .get('/api/v1/users/7oooda@example.com/isEmailFound')
-      .expect(404);
+      .expect(200);
+
+    expect(body.data.isFound).toBe(false);
   });
 
   test('returns 200, email found', async () => {
@@ -32,6 +38,9 @@ describe('GET /api/v1/users/:email/isEmailFound', () => {
 
     await global.signin(email, username);
 
-    await request(app).get(`/api/v1/users/${email}/isEmailFound`).expect(200);
+    const { body } = await request(app)
+      .get(`/api/v1/users/${email}/isEmailFound`)
+      .expect(200);
+    expect(body.data.isFound).toBe(true);
   });
 });

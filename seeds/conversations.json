@@ -1,0 +1,32 @@
+[
+  {
+    "user1Id": 1,
+    "user2Id": 2,
+    "isUsersActive": { "userId_1": false, "userId_2": false }
+  },
+  {
+    "user1Id": 2,
+    "user2Id": 3,
+    "isUsersActive": { "userId_2": false, "userId_3": false }
+  },
+  {
+    "user1Id": 4,
+    "user2Id": 5,
+    "isUsersActive": { "userId_4": false, "userId_5": false }
+  },
+  {
+    "user1Id": 4,
+    "user2Id": 6,
+    "isUsersActive": { "userId_4": false, "userId_6": false }
+  },
+  {
+    "user1Id": 1,
+    "user2Id": 6,
+    "isUsersActive": { "userId_1": false, "userId_6": false }
+  },
+  {
+    "user1Id": 1,
+    "user2Id": 8,
+    "isUsersActive": { "userId_1": false, "userId_8": false }
+  }
+]

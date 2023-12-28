@@ -1,0 +1,34 @@
+[
+  {
+    "conversationId": 1,
+    "senderId": 1,
+    "receiverId": 2,
+    "text": "Hello",
+    "isSeen": true,
+    "time": "2023-12-02T14:53:59.411Z"
+  },
+  {
+    "conversationId": 1,
+    "senderId": 2,
+    "receiverId": 1,
+    "text": "Hello2",
+    "isSeen": true,
+    "time": "2023-12-02T14:53:59.411Z"
+  },
+  {
+    "conversationId": 2,
+    "senderId": 3,
+    "receiverId": 2,
+    "text": "Hello3",
+    "isSeen": true,
+    "time": "2023-12-02T14:53:59.411Z"
+  },
+  {
+    "conversationId": 2,
+    "senderId": 3,
+    "receiverId": 2,
+    "text": "Hello4",
+    "isSeen": true,
+    "time": "2023-12-02T14:53:59.411Z"
+  }
+]

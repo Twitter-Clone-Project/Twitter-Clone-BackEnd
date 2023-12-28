@@ -91,6 +91,7 @@ describe('SocketService', () => {
     clientSocket1.on('msg-redirect', (data) => {
       expect(data.text).toEqual('hello world');
       expect(data.isSeen).toEqual(true);
+      done();
     });
 
     clientSocket2.on('msg-receive', (data) => {
@@ -98,15 +99,7 @@ describe('SocketService', () => {
       expect(data.isSeen).toEqual(true);
       done();
     });
-
-    clientSocket1.emit('chat-closed', {
-      contactId: userId2,
-      conversationId: conversation.conversationId,
-    });
-    clientSocket2.emit('chat-closed', {
-      contactId: userId1,
-      conversationId: conversation.conversationId,
-    });
+    
   });
 
   // test('if the another contact is not active mark the message as unseen', (done) => {
