@@ -6,25 +6,5 @@
   {
     "userId": 1,
     "followerId": 3
-  },
-  {
-    "userId": 1,
-    "followerId": 4
-  },
-  {
-    "userId": 1,
-    "followerId": 5
-  },
-  {
-    "userId": 3,
-    "followerId": 2
-  },
-  {
-    "userId": 5,
-    "followerId": 2
-  },
-  {
-    "userId": 6,
-    "followerId": 2
   }
 ]

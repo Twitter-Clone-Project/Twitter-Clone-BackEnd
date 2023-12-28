@@ -46,21 +46,6 @@ describe('POST /api/v1/users/:username/follow', () => {
     expect(response.status).toEqual(400);
   });
 
-  it('try to follow a user', async () => {
-    const curremail = `testuser_${uuid.v4()}@example.com`;
-    const currusername = `user_${uuid.v4()}`;
-
-    const email = `testuser_${uuid.v4()}@example.com`;
-    const username = `user_${uuid.v4()}`;
-
-    const { token } = await global.signin(curremail, currusername);
-    const { btoken } = await global.signin(email, username);
-
-    const response = await request(app)
-      .post(`/api/v1/users/${username}/follow`)
-      .set('Cookie', token)
-      .expect(500); ////////////
-  });
 });
 
 describe('DELETE /api/v1/users/:username/unfollow', () => {

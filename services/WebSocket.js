@@ -89,30 +89,40 @@ class SocketService {
           console.log('Socket is not logged in');
           return next();
         }
-        const payload = await promisify(jwt.verify)(
-          socket.handshake.headers.token,
-          process.env.JWT_SECRET_KEY,
-        );
 
-        const user = await AppDataSource.getRepository(User).findOne({
-          where: { userId: payload.id },
-          select: {
-            userId: true,
-            username: true,
-            email: true,
-            name: true,
-          },
-        });
+        try {
+          const payload = await promisify(jwt.verify)(
+            socket.handshake.headers.token,
+            process.env.JWT_SECRET_KEY,
+          );
 
-        if (!user) {
-          throw new AppError('User does no longer exist', 401);
+          const user = await AppDataSource.getRepository(User).findOne({
+            where: { userId: payload.id },
+            select: {
+              userId: true,
+              username: true,
+              email: true,
+              name: true,
+            },
+          });
+  
+          if (!user) {
+            throw new AppError('User does no longer exist', 401);
+          }
+  
+          socket.userData = user ? user : {};
+  
+          socket.join(`user_${user.userId}_room`);
+  
+          next();
+          
+        } catch (error) {
+          console.log(error.message);
+          return;
         }
+       
 
-        socket.userData = user ? user : {};
-
-        socket.join(`user_${user.userId}_room`);
-
-        next();
+        
       })
       .on('connection', (socket) => {
         console.log('socket connected');
