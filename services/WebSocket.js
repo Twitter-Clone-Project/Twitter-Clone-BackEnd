@@ -105,24 +105,25 @@ class SocketService {
               name: true,
             },
           });
-  
+
           if (!user) {
-            throw new AppError('User does no longer exist', 401);
+            console.log('User does no longer exist');
+            return;
           }
-  
+
           socket.userData = user ? user : {};
-  
+
           socket.join(`user_${user.userId}_room`);
-  
+
           next();
-          
+
         } catch (error) {
           console.log(error.message);
           return;
         }
-       
 
-        
+
+
       })
       .on('connection', (socket) => {
         console.log('socket connected');
