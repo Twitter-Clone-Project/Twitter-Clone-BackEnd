@@ -14,6 +14,7 @@ module.exports = new EntitySchema({
       type: 'bigint',
     },
     text: {
+      nullable: true,
       type: 'varchar',
       length: 280,
     },
