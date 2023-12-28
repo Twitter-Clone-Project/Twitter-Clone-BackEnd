@@ -3,37 +3,6 @@ const app = require('../../app');
 const uuid = require('uuid');
 const Email = require('../../services/Email');
 
-// describe('GET /api/v1/profile/:username', () => {
-//   jest.setTimeout(100000);
-//   test('try to get a profile data without sign in', async () => {
-//     const username = `user_${uuid.v4()}`;
-//     await request(app).get(`api/v1/profile/${username}`).expect(401);
-//   });
-
-//   test('try to get profile of user with wrong username', async () => {
-//     const email = `testuser_${uuid.v4()}@example.com`;
-//     const username = `user_${uuid.v4()}`;
-
-//     const { token } = await global.signin(email, username);
-//     const fakeusername = `user_${uuid.v4()}`;
-
-//     await request(app)
-//       .get(`api/v1/profile/${fakeusername}`)
-//       .set('Cookie', token)
-//       .expect(404);
-//   });
-
-//   test('try to get profile of user', async () => {
-//     const email = `testuser_${uuid.v4()}@example.com`;
-//     const username = `user_${uuid.v4()}`;
-
-//     const { token } = await global.signin(email, username);
-//     await request(app)
-//       .get(`api/v1/profile/${username}`)
-//       .set('Cookie', token)
-//       .expect(200);
-//   });
-// });
 
 describe('PATCH /api/v1/profile/updateUsername', () => {
   jest.setTimeout(100000);

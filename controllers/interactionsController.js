@@ -8,6 +8,13 @@ const Mute = require('../models/relations/Mute');
 const Block = require('../models/relations/Block');
 const User = require('../models/entites/User');
 
+/**
+ * Filters the specified properties from each object in the array.
+ *
+ * @function
+ * @param {Object[]} result - The array of objects to filter.
+ * @returns {Object[]} - The filtered array of objects.
+ */
 const filterObj = (result) => {
   const newArray = result.map(
     ({
@@ -35,12 +42,28 @@ const filterObj = (result) => {
   return newArray;
 };
 
+/**
+ * Marks the followed users in array1 based on the userId presence in array2.
+ *
+ * @function
+ * @param {Object[]} array1 - The array of users to mark.
+ * @param {Object[]} array2 - The array of followed users.
+ * @returns {Object[]} - The array of users with the 'isFollowed' property marked.
+ */
 function markFollowedUsers(array1, array2) {
   return array1.map((user1) => {
     const isFollowed = array2.some((user2) => user2.userId === user1.userId);
     return { ...user1, isFollowed };
   });
 }
+/**
+ * Marks the following users in array1 based on the followerId presence in array2.
+ *
+ * @function
+ * @param {Object[]} array1 - The array of users to mark.
+ * @param {Object[]} array2 - The array of following users.
+ * @returns {Object[]} - The array of users with the 'isFollowing' property marked.
+ */
 function markFollowingUsers(array1, array2) {
   return array1.map((user1) => {
     const isFollowing = array2.some(
@@ -49,6 +72,17 @@ function markFollowingUsers(array1, array2) {
     return { ...user1, isFollowing };
   });
 }
+
+/**
+ * Retrieves the list of followers for a given user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.getListOfFollowers = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const user = await AppDataSource.getRepository(User).findOne({
@@ -103,6 +137,16 @@ exports.getListOfFollowers = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Retrieves the list of users that the specified user is following.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.getListOfFollowings = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const user = await AppDataSource.getRepository(User).findOne({
@@ -159,6 +203,16 @@ exports.getListOfFollowings = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Follows the user specified by the username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.follow = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -242,6 +296,16 @@ exports.follow = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Unfollows the user specified by the username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.unFollow = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -338,6 +402,16 @@ exports.unFollow = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Mutes the user specified by the username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.mute = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -401,6 +475,16 @@ exports.mute = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Unmutes the user specified by the username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.unmute = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -456,6 +540,17 @@ exports.unmute = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+/**
+ * Retrieves the list of users that the current user has muted.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.getListOfMutes = catchAsync(async (req, res, next) => {
   const currUserId = req.currentUser.userId;
 
@@ -497,6 +592,17 @@ exports.getListOfMutes = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+/**
+ * Blocks the user specified by the username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.block = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -640,6 +746,16 @@ exports.block = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Unblocks the user specified by the username.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.unblock = catchAsync(async (req, res, next) => {
   const { username } = req.params;
   const currUserId = req.currentUser.userId;
@@ -696,6 +812,16 @@ exports.unblock = catchAsync(async (req, res, next) => {
   }
 });
 
+/**
+ * Gets the list of users blocked by the current user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {function} next - Express next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves when the function completes.
+ */
 exports.getListOfBlocks = catchAsync(async (req, res, next) => {
   const currUserId = req.currentUser.userId;
 
