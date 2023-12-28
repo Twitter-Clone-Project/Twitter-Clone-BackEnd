@@ -135,6 +135,7 @@ const getUserConversations = async (userId) => {
               text: lastMessage.text,
               timestamp: lastMessage.time,
               isSeen: lastMessage.isSeen,
+              isFromMe: lastMessage.senderId === userId,
             }
           : null,
       };
@@ -170,7 +171,7 @@ exports.getConversationHistory = catchAsync(async (req, res, next) => {
   const { userId } = req.currentUser;
 
   if (!conversationId)
-    return next(new AppError('No Conversation with that id', 400));
+    return next(new AppError('Conversation id is required ', 400));
 
   const messages = await AppDataSource.getRepository(Message).find({
     select: {
@@ -226,7 +227,10 @@ exports.startConversation = catchAsync(async (req, res, next) => {
 
   let newConversations = [];
   for (const userId of userIds) {
-    const newConversation = new Conversation(userId, parseInt(myId));
+    const newConversation = new Conversation(
+      Math.min(userId, parseInt(myId)),
+      Math.max(parseInt(myId), userId),
+    );
 
     await conversationRepository.save(newConversation);
 

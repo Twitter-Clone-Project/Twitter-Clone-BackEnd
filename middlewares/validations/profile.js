@@ -12,7 +12,19 @@ exports.updateUsernameValidationRules = [
 exports.updateEmailValidationRules = [
   body('newEmail').isEmail().withMessage('Invalid email address'),
 ];
+const validateBirthDate = (value) => {
+  const currentDate = new Date();
+  const minBirthDate = new Date();
+  minBirthDate.setFullYear(currentDate.getFullYear() - 13);
 
+  if (!value || new Date(value) > minBirthDate) {
+    throw new Error(
+      'Birth date must be at least 13 years ago from the current date',
+    );
+  }
+
+  return true;
+};
 exports.updateProfileValidationRules = [
   body('name')
     .optional()
@@ -23,7 +35,8 @@ exports.updateProfileValidationRules = [
   body('birthDate')
     .optional()
     .isDate({ format: 'YYYY-MM-DD' })
-    .withMessage('Invalid date format. Use YYYY-MM-DD'),
+    .withMessage('Invalid date format. Use YYYY-MM-DD')
+    .custom(validateBirthDate),
   body('bio').optional().isString().withMessage('Bio must String'),
   body('website')
     .optional()
@@ -94,4 +107,15 @@ exports.imagesValidation = [
       }
       return true;
     }),
+];
+
+exports.otpWithEmailValidationRules = [
+  body('email').toLowerCase().isEmail().withMessage('Invalid email address'),
+  body('newEmail').toLowerCase().isEmail().withMessage('Invalid email address'),
+  body('otp')
+    .matches(/^[a-z0-9]+$/)
+    .isLength({ min: 8, max: 8 })
+    .not()
+    .isEmpty()
+    .withMessage('Invalid OTP'),
 ];

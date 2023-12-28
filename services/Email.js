@@ -91,4 +91,7 @@ module.exports = class Email {
   async sendConfirmationEmail() {
     await this.sendEmail('confirmEmail', 'Confirm your email on X');
   }
+  async sendConfirmationUpdateEmail() {
+    await this.sendEmail('updateEmail', 'Confirm your email on X');
+  }
 };

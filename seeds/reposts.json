@@ -1,0 +1,20 @@
+[
+  { "userId": 1, "tweetId": 1 },
+  { "userId": 2, "tweetId": 2 },
+  { "userId": 3, "tweetId": 10 },
+  { "userId": 4, "tweetId": 20 },
+  { "userId": 5, "tweetId": 50 },
+  { "userId": 6, "tweetId": 22 },
+  { "userId": 7, "tweetId": 2 },
+  { "userId": 8, "tweetId": 8 },
+  { "userId": 9, "tweetId": 7 },
+  { "userId": 1, "tweetId": 14 },
+  { "userId": 2, "tweetId": 15 },
+  { "userId": 3, "tweetId": 45 },
+  { "userId": 4, "tweetId": 52 },
+  { "userId": 5, "tweetId": 10 },
+  { "userId": 6, "tweetId": 1 },
+  { "userId": 7, "tweetId": 10 },
+  { "userId": 8, "tweetId": 2 },
+  { "userId": 9, "tweetId": 2 }
+]

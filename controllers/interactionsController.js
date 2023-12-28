@@ -169,6 +169,34 @@ exports.follow = catchAsync(async (req, res, next) => {
     },
   });
   if (user) {
+    let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: user.userId,
+        followerId: currUserId,
+      },
+    });
+    isFollowed = !!isFollowed;
+    if (isFollowed) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant follow this user twice ',
+      });
+      return;
+    }
+    let isBlocked = await AppDataSource.getRepository(Block).findOne({
+      where: {
+        userId: currUserId,
+        blockedId: user.userId,
+      },
+    });
+    isBlocked = !!isBlocked;
+    if (isBlocked) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant follow this user',
+      });
+      return;
+    }
     if (currUserId == user.userId) {
       res.status(400).json({
         status: false,
@@ -224,6 +252,20 @@ exports.unFollow = catchAsync(async (req, res, next) => {
     },
   });
   if (user) {
+    let isFollowed = await AppDataSource.getRepository(Follow).findOne({
+      where: {
+        userId: user.userId,
+        followerId: currUserId,
+      },
+    });
+    isFollowed = !!isFollowed;
+    if (!isFollowed) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant unfollow this user you dont follow him ',
+      });
+      return;
+    }
     if (currUserId == user.userId) {
       res.status(400).json({
         status: false,
@@ -231,6 +273,7 @@ exports.unFollow = catchAsync(async (req, res, next) => {
       });
       return;
     }
+
     if (BigInt(user.followersCount) - BigInt(1) >= 0) {
       user.followersCount = BigInt(user.followersCount) - BigInt(1);
     } else {
@@ -305,6 +348,35 @@ exports.mute = catchAsync(async (req, res, next) => {
     },
   });
   if (user) {
+    let isBlocked = await AppDataSource.getRepository(Block).findOne({
+      where: {
+        userId: currUserId,
+        blockedId: user.userId,
+      },
+    });
+    isBlocked = !!isBlocked;
+    if (isBlocked) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant mute this user ',
+      });
+      return;
+    }
+    let isMuted = await AppDataSource.getRepository(Mute).findOne({
+      where: {
+        userId: currUserId,
+        mutedId: user.userId,
+      },
+    });
+    isMuted = !!isMuted;
+    if (isMuted) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant mute this user twice ',
+      });
+      return;
+    }
+
     if (currUserId == user.userId) {
       res.status(400).json({
         status: false,
@@ -339,6 +411,20 @@ exports.unmute = catchAsync(async (req, res, next) => {
     },
   });
   if (user) {
+    let isMuted = await AppDataSource.getRepository(Mute).findOne({
+      where: {
+        userId: currUserId,
+        mutedId: user.userId,
+      },
+    });
+    isMuted = !!isMuted;
+    if (!isMuted) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant unmute this user twice ',
+      });
+      return;
+    }
     if (currUserId == user.userId) {
       res.status(400).json({
         status: false,
@@ -421,6 +507,20 @@ exports.block = catchAsync(async (req, res, next) => {
     },
   });
   if (user) {
+    let isBlocked = await AppDataSource.getRepository(Block).findOne({
+      where: {
+        userId: currUserId,
+        blockedId: user.userId,
+      },
+    });
+    isBlocked = !!isBlocked;
+    if (isBlocked) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant block this user twice ',
+      });
+      return;
+    }
     if (currUserId == user.userId) {
       res.status(400).json({
         status: false,
@@ -550,6 +650,20 @@ exports.unblock = catchAsync(async (req, res, next) => {
     },
   });
   if (user) {
+    let isBlocked = await AppDataSource.getRepository(Block).findOne({
+      where: {
+        userId: currUserId,
+        blockedId: user.userId,
+      },
+    });
+    isBlocked = !!isBlocked;
+    if (!isBlocked) {
+      res.status(400).json({
+        status: false,
+        message: 'Cant unblock this user twice ',
+      });
+      return;
+    }
     if (currUserId == user.userId) {
       res.status(400).json({
         status: false,
