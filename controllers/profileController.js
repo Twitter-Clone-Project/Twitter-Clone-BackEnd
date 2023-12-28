@@ -9,7 +9,7 @@ const Follow = require('../models/relations/Follow');
 const Mute = require('../models/relations/Mute');
 const Block = require('../models/relations/Block');
 const Email = require('../services/Email');
-const {createAndSendToken} = require('../controllers/authController');
+const { createAndSendToken } = require('../controllers/authController');
 
 // Set up multer storage and limits
 const storage = multer.memoryStorage();
@@ -174,7 +174,7 @@ exports.updateUsername = catchAsync(async (req, res, next) => {
   });
   user.username = newUsername;
 
-   await AppDataSource.getRepository(User).save(user);
+  await AppDataSource.getRepository(User).save(user);
 
   res.status(200).json({
     status: true,
@@ -231,8 +231,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   });
 
   if (image) {
-
-    if(user.imageUrl){
+    if (user.imageUrl) {
       await deleteFromS3(user.imageUrl);
     }
     const imageUrl = await uploadMedia([image[0]]);
@@ -283,42 +282,40 @@ exports.rawanusers = catchAsync(async (req, res, next) => {
   const user = await AppDataSource.getRepository(User).findOne({
     where: { email: email },
   });
-  if(email){
-  user.followersCount = 0;
-  user.followingsCount = 0;
-  user.isConfirmed = true;
+  if (email) {
+    user.followersCount = 0;
+    user.followingsCount = 0;
+    user.isConfirmed = true;
 
-  const savedUser = await AppDataSource.getRepository(User).save(user);
+    const savedUser = await AppDataSource.getRepository(User).save(user);
 
-  const result2 = await AppDataSource.getRepository(Follow)
-    .createQueryBuilder()
-    .delete()
-    .from(Follow)
-    .where('followerId = :userId or userId = :followerId', {
-      followerId: user.userId,
-      userId: user.userId,
-    })
-    .execute();
-  console.log(result2.affected);
+    const result2 = await AppDataSource.getRepository(Follow)
+      .createQueryBuilder()
+      .delete()
+      .from(Follow)
+      .where('followerId = :userId or userId = :followerId', {
+        followerId: user.userId,
+        userId: user.userId,
+      })
+      .execute();
+    console.log(result2.affected);
 
-  res.status(200).json({
-    status: true,
-    data: {
-      userId: savedUser.userId,
-      username: savedUser.username,
-      isConfirmed: savedUser.isConfirmed,
-      email: savedUser.email,
-      name: savedUser.name,
-      followersCount: savedUser.followersCount,
-      followingsCount: savedUser.followingsCount,
-    },
-  });
-}else {
-  es.status(404).json({
-    status: false,
-    message: "email not found",
-  });
-}
+    res.status(200).json({
+      status: true,
+      data: {
+        userId: savedUser.userId,
+        username: savedUser.username,
+        isConfirmed: savedUser.isConfirmed,
+        email: savedUser.email,
+        name: savedUser.name,
+        followersCount: savedUser.followersCount,
+        followingsCount: savedUser.followingsCount,
+      },
+    });
+  } else {
+    es.status(404).json({
+      status: false,
+      message: 'email not found',
+    });
+  }
 });
-
-
