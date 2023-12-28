@@ -1,7 +1,6 @@
 const request = require('supertest');
 const app = require('../../app');
 const uuid = require('uuid');
-const Email = require('../../services/Email');
 
 async function createTestUser() {
   const anotherEmail = `testuser_${uuid.v4()}@example.com`;
