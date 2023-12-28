@@ -85,42 +85,44 @@ class SocketService {
 
     this.io
       .use(async (socket, next) => {
-        if (!socket.handshake.headers.token) {
-          console.log('Socket is not logged in');
-          return next();
-        }
+        // if (!socket.handshake.headers.token) {
+        //   console.log('Socket is not logged in');
+        //   return next();
+        // }
 
-        try {
-          const payload = await promisify(jwt.verify)(
-            socket.handshake.headers.token,
-            process.env.JWT_SECRET_KEY,
-          );
+        // try {
+        //   const payload = await promisify(jwt.verify)(
+        //     socket.handshake.headers.token,
+        //     process.env.JWT_SECRET_KEY,
+        //   );
 
-          const user = await AppDataSource.getRepository(User).findOne({
-            where: { userId: payload.id },
-            select: {
-              userId: true,
-              username: true,
-              email: true,
-              name: true,
-            },
-          });
+        //   const user = await AppDataSource.getRepository(User).findOne({
+        //     where: { userId: payload.id },
+        //     select: {
+        //       userId: true,
+        //       username: true,
+        //       email: true,
+        //       name: true,
+        //     },
+        //   });
 
-          if (!user) {
-            console.log('User does no longer exist');
-            return;
-          }
+        //   if (!user) {
+        //     console.log('User does no longer exist');
+        //     return;
+        //   }
 
-          socket.userData = user ? user : {};
+        //   socket.userData = user ? user : {};
 
-          socket.join(`user_${user.userId}_room`);
+        //   socket.join(`user_${user.userId}_room`);
 
-          next();
+        //   next();
 
-        } catch (error) {
-          console.log(error.message);
-          return;
-        }
+        // } catch (error) {
+        //   console.log(error.message);
+        //   return;
+        // }
+
+        next();
 
 
 
