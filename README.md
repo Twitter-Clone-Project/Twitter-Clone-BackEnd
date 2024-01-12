@@ -6,10 +6,28 @@ X-Clone Backend is a scalable backend repository for building X (tweeter) APIs. 
 
 ## 🧑🏼‍💻 Tech Stack
 
-- NodeJS
-- ExpressJs
-- PostgreSQL
-- TypeORM
+![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=ffffff)
+
+![Nodejs](https://img.shields.io/badge/-Nodejs-339933?style=flat&logo=Node.js&logoColor=ffffff)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=flat&logo=express&logoColor=%2361DAFB)
+
+![TypeORM](https://img.shields.io/badge/-TypeORM-E83524?style=flat&logo=typeorm&logoColor=ffffff)
+![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=flat&logo=postgresql)
+
+![Docker](https://img.shields.io/badge/-Docker-black?style=flat&logo=docker)
+![Jenkins](https://img.shields.io/badge/-Jenkins-D24939?style=flat&logo=jenkins&logoColor=ffffff)
+
+![Socket.IO](https://img.shields.io/badge/-Socket.IO-010101?style=flat&logo=socket.io&logoColor=ffffff)
+![Event-Driven Programming](https://img.shields.io/badge/Event--Driven%20Programming-FF69B4?style=flat&logo=eventbrite&logoColor=white)
+
+![Jest](https://img.shields.io/badge/-jest-%23C21325?style=flat&logo=jest&logoColor=white)
+![SuperTest](https://img.shields.io/badge/SuperTest-3178C6?style=flat&logo=node.js&logoColor=white)
+
+ ![JWT](https://img.shields.io/badge/JWT-black?style=flat&logo=JSON%20web%20tokens)
+ ![Google reCAPTCHA](https://img.shields.io/badge/Google%20reCAPTCHA-4285F4?style=flat&logoColor=white)
+ ![OAuth](https://img.shields.io/badge/OAuth-2.0-4A90E2?style=flat&logo=oauth&logoColor=white)
+ ![AWS](https://img.shields.io/badge/-Amazon%20Web%20Services-232F3E?style=flat&logo=amazon-aws&logoColor=ffffff)
+
 
 ## APIs Documentation
 
