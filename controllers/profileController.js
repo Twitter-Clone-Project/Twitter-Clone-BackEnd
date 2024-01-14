@@ -97,8 +97,8 @@ function getKeyFromLocation(location) {
 async function deleteFromS3(Location) {
   const s3 = new AWS.S3({
     credentials: {
-      accessKeyId: 'AKIAWK2IJRF55BVEYPX4',
-      secretAccessKey: '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',
+      accessKeyId: '',
+      secretAccessKey: '',
     },
   });
   const keyName = getKeyFromLocation(Location);
