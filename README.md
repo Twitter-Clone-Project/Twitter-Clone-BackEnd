@@ -5,7 +5,7 @@
 
 <div align="center">
     <h1 align='center'>⚡️<i>Twitter Clone</i>⚡️</h1>
-    <p>Amazing Twitter clone - a microblogging site that enables users to share brief messages and engage in real-time conversations.</p>
+    <p>Amazing Twitter clone - It's a microblogging site that enables users to share brief messages and engage in real-time conversations.</p>
 </div>
 
 <div align="center">
@@ -22,8 +22,8 @@
 <h2 style="display:inline">📝 Table of Contents</h2>
 </summary>
 
- - [🚀 OverView](#-overview)
-- [⛏️ Tech Stack](#-Tech-Stack)
+- [🚀 OverView](#-overview)
+- [⛏️ Tech Stack](#-tech-stack)
 - [🔥 Getting started](#-get-started)
 - [📄 API Documentation](#-API-Documentation)
 - [📷 Features](#-features)
