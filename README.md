@@ -23,7 +23,7 @@
 </summary>
 
 - [🚀 OverView](#-overview)
-- [⛏️ Tech Stack](#tech-stack)
+- [⛏️ Tech Stack](#-tech-stack)
 - [🔥 Getting started](#-get-started)
 - [📄 API Documentation](#-API-Documentation)
 - [📷 Features](#-features)
