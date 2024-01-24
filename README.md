@@ -1,8 +1,47 @@
-![image](https://github.com/Twitter-Clone-Project/Back-End/assets/94763036/f4fbb928-9e3f-4faf-aa22-52107e415257)
+<div align="center">
+<img src="https://www.linearity.io/blog/content/images/2023/09/Twitter-Template-cover---new-X.png" alt="Artboard-1-transparent-1" border="0" >
+<h1/>
+</div>
 
-# X-Clone Backend
+<div align="center">
+    <h1 align='center'>⚡️<i>Twitter clone</i>⚡️</h1>
+    <p>Amazing Twitter clone - a microblogging site that enables users to share brief messages and engage in real-time conversations.</p>
+</div>
 
-X-Clone Backend is a scalable backend repository for building X (tweeter) APIs. It provides a solid foundation for developing features like user authentication, post creation, following/follower relationships, notifications, and more.
+<div align="center">
+
+[![GitHub contributors](https://img.shields.io/github/contributors/Twitter-Clone-Project/Twitter-Clone-BackEnd)](https://github.com/Twitter-Clone-Project/Twitter-Clone-BackEnd/contributors)
+[![GitHub issues](https://img.shields.io/github/issues/Twitter-Clone-Project/Twitter-Clone-BackEnd)](https://github.com/Twitter-Clone-Project/Twitter-Clone-BackEnd/issues)
+[![GitHub forks](https://img.shields.io/github/forks/Twitter-Clone-Project/Twitter-Clone-BackEnd)](https://github.com/Twitter-Clone-Project/Backend/network)
+[![GitHub stars](https://img.shields.io/github/stars/Twitter-Clone-Project/Twitter-Clone-BackEnd)](https://github.com/Twitter-Clone-Project/Backend/stargazers)
+
+</div>
+
+<details open="open">
+<summary>
+<h2 style="display:inline">📝 Table of Contents</h2>
+</summary>
+ 
+- [⛏️ Tech Stack](#-Tech-Stack)
+- [🏁 Getting started](#getting-started)
+- [🏁 Description](#Description)
+- [📷 Features](#features)
+- [🏁 API Documentation](#API-Documentation)
+- [🏁 Function Documentation](#Function-Documentation)
+- [✍️ Contributors](#contributors)
+- [🔒 License](#license)
+  
+</details>
+
+<hr>
+
+## 🚀 Overview
+> This website was implemented for the Software Engineering Course @ Cairo University Faculty of Engineering.
+
+> It is developed using Node.js for the backend, PostgreSQL for the database, React for the frontend, and AWS for deployment.
+  
+> The Twitter Clone project aims to replicate the core features and functionalities of the popular social media platform, Twitter. This web application provides users with a platform to share short messages, engage with other users through likes, retweets, and comments, and stay updated on the latest trends and activities.
+<hr>
 
 ## 🧑🏼‍💻 Tech Stack
 
@@ -28,61 +67,9 @@ X-Clone Backend is a scalable backend repository for building X (tweeter) APIs. 
  ![OAuth](https://img.shields.io/badge/OAuth-2.0-4A90E2?style=flat&logo=oauth&logoColor=white)
  ![AWS](https://img.shields.io/badge/-Amazon%20Web%20Services-232F3E?style=flat&logo=amazon-aws&logoColor=ffffff)
 
-
-## APIs Documentation
-
-File API-Documentation.yaml in the repo, this is a yaml coded-documentation. Untill we upload the documentation on swaagerHub($$), you can see the GUI by opening [swagger editor](https://editor-next.swagger.io/) online, then paste the code in it.
-
-You can also see postman documentation with test exambles [here](https://documenter.getpostman.com/view/23936176/2s9YXe8jiV)
-
-## Project MVC Architecture
-
-- Model (M):
-  The Model represents the data layer and business logic.
-  The Model is responsible for interacting with the PostgreSQL database, which includes querying, updating, and managing data.
-  It encapsulates the logic related to database connections, data validation, and data manipulation, similar to the previous explanation.
-
-- No View (V):
-  In a RESTful API context, there's typically no dedicated View component for rendering HTML or other content. Instead, the View is represented by the data that the API returns in JSON format.
-
-- Controller (C):
-  The Controller remains the intermediary between the Model and client requests, but it's adapted to handle API endpoints.
-  It handles incoming HTTP requests from clients, such as GET, POST, PUT, or DELETE requests, and determines how to respond with JSON data.
-  The Controller interacts with the Model to retrieve or update data, prepares the data for JSON responses, and sends those responses to clients.
-
-#### Simplified flow of how MVC can work with our RESTful APIs:
-
-1. A client makes an HTTP request to the server, such as a GET request to fetch data from the database through an API endpoint.
-2. The Controller receives the request, identifies the requested action, and interacts with the Model.
-3. The Model communicates with the PostgreSQL database to retrieve the requested data.
-4. The Model returns the data to the Controller.
-5. The Controller prepares a JSON response with the data received from the Model.
-6. The Controller sends the JSON response back to the client as an HTTP response.
-7. The client application (e.g., a web or mobile frontend) receives and processes the JSON data for display or further use.
-
 <hr>
 
-## Design Patterns
-
-1. MVC (Model-View-Controller): Which is a fundamental architectural pattern. It helps separate concerns and maintain code organization.
-2. Factory Method Pattern: This pattern abstracts the creation of objects, providing flexibility in object creation. We will make a factory controller that is a generic controller handling common CRUD operations. Based on the calling entity, it will decide which one.
-3. Singleton Pattern: For certain resources or components that should have a single instance throughout the application's lifecycle, such as a database connection pool or a configuration manager.
-4. Middleware Pattern: In Express.js, Middleware allows you to process requests and responses in a sequential manner.
-5. Observer Pattern: In chat (Socket.io), the server acts as the observable subject, and connected clients (users) act as observers. When a user sends a message, the server notifies all users in the same chat room (observers) by broadcasting the message. This decouples the sender from the receivers, allowing real-time communication and updates in a chat room.
-6. Decorator Pattern: For adding additional functionality or security checks to the authentication process without modifying the core authentication code. This is particularly helpful when applying multiple layers of authentication, authorization checks, or other security-related features to user authentication.
-7. Strategy Pattern: The selection of some code strategy is determined based on the current environment.
-8. SOLID Principles:
-
-- Single Responsibility Principle (SRP):
-  In our project, the SRP encourages each module to have a single responsibility. For example, controllers in your MVC structure should be responsible for handling user requests and responding with data, while models should focus on data manipulation and database interactions. This separation of concerns ensures that each component has a clear, distinct purpose.
-- Open-Closed Principle (OCP):
-  The OCP suggests that our code should be open for extension but closed for modification. When we need to add new features or endpoints, we can do so by extending your existing controllers or services without modifying the core implementation. This can be achieved by adhering to the principles of route separation, middleware usage, and service encapsulation.
-- Dependency Inversion Principle (DIP):
-  The DIP encourages the use of dependency injection to decouple high-level modules (controllers, routes) from low-level modules (services, models). By injecting dependencies through constructor injection or by using a dependency injection container, you can invert the control of dependencies and achieve more modular and testable code.
-
-<hr>
-
-## Run Locally
+## 🔥 Get Started
 
 1. Clone the project
 
@@ -114,7 +101,420 @@ You can also see postman documentation with test exambles [here](https://documen
   npm run start:prod
 ```
 
-## Authors
+<hr>
+
+## 📄 API Documentation
+
+> File API-Documentation.yaml in the repo, this is a yaml coded-documentation. Untill we upload the documentation on swaagerHub($$), you can see the GUI by opening [swagger editor](https://editor-next.swagger.io/) online, then paste the code in it.
+
+> You can also see postman documentation with test exambles [here](https://documenter.getpostman.com/view/23936176/2s9YXe8jiV)
+
+> Here is the Socket.io events [documentaion](https://github.com/Twitter-Clone-Project/Twitter-Clone-BackEnd/blob/main/WebSocket%20APIs%20Documentation.md)
+<hr>
+
+## 📸 Features 
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>🔒 User Authentication</em></strong></h4>
+</summary>
+ 
+1. **Sign Up:**
+   - Allows users to create a new account in the application.
+
+2. **Sign In:**
+   - Enables users to sign in to their accounts.
+
+3. **Sign In/Up with Google:**
+   - Provides the option to sign in or sign up using Google credentials.
+
+4. **Get Me:**
+   - Retrieves information about the authenticated user.
+
+5. **Sign Out:**
+   - Logs the user out from the application.
+
+6. **Resend Confirmation Email:**
+   - Resends the confirmation email to the user for account verification.
+
+7. **Verify Email:**
+   - Confirms the email of the user after receiving the verification email.
+
+8. **Update Password:**
+   - Allows users to update their password.
+
+9. **Forget Password:**
+   - Initiates the process of resetting the password by sending an email.
+
+10. **Reset Password:**
+    - Completes the password reset process.
+
+11. **Check Username Availability:**
+    - Determines if a given username is already registered.
+
+12. **Check Email Availability:**
+    - Checks if a given email is already registered.
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>🙍‍♂️ User Profile</em></strong></h4>
+</summary>
+
+1. **Update Username:**
+   - Allows users to change their username.
+
+2. **Update Email:**
+   - Permits users to update their email address.
+
+3. **Update Banner:**
+   - Adds a banner to the user's profile.
+
+4. **Delete Banner:**
+   - Removes the banner picture from the user's profile.
+
+5. **Update Profile Picture:**
+   - Updates the user's profile picture.
+
+6. **Delete Profile Picture:**
+   - Deletes the user's profile picture.
+
+7. **Update Profile:**
+   - Updates various aspects of the user's profile.
+
+8. **Get User Profile:**
+   - Retrieves the profile information of a specific user.
+   
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>👨‍💻 User Interactions</em></strong></h4>
+</summary>
+
+1. **Get Followers:**
+   - Retrieves a list of followers for a specific user.
+
+2. **Get Followings:**
+   - Retrieves a list of users followed by a specific user.
+
+3. **Follow User:**
+   - Allows a user to follow another user.
+
+4. **Unfollow User:**
+   - Allows a user to unfollow another user.
+
+5. **Mute User:**
+   - Mutes a specific user.
+
+6. **Unmute User:**
+   - Unmutes a previously muted user.
+
+7. **Get Muted Users:**
+   - Retrieves a list of users muted by the authenticated user.
+
+8. **Block User:**
+   - Blocks a specific user.
+
+9. **Unblock User:**
+   - Unblocks a previously blocked user.
+
+10. **Get Blocked Users:**
+    - Retrieves a list of users blocked by the authenticated user.
+
+ 
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>📤 Tweets</em></strong></h4>
+</summary>
+
+1. **Add Tweet:**
+   - Allows users to post a new tweet.
+
+2. **Delete Tweet:**
+   - Deletes a tweet based on its tweetId.
+
+3. **Get Tweet Info:**
+   - Retrieves information about a specific tweet.
+
+4. **Get Replies to Tweet:**
+   - Retrieves replies to a specific tweet.
+
+5. **Add Reply to Tweet:**
+   - Allows users to add a reply to a tweet.
+
+6. **Delete Reply from Tweet:**
+   - Deletes a reply from a tweet.
+
+7. **Add Retweet:**
+   - Allows users to retweet a tweet.
+
+8. **Delete Retweet:**
+   - Deletes a retweet.
+
+9. **Like Tweet:**
+   - Allows users to like a tweet.
+
+10. **Unlike Tweet:**
+    - Removes a like from a tweet.
+
+11. **Get Retweeters:**
+    - Retrieves a list of users who retweeted a specific tweet.
+
+12. **Get Likers:**
+    - Retrieves a list of users who liked a specific tweet.
+
+13. **Add Media to Tweet:**
+    - Allows users to add media (e.g., images) to a tweet.
+
+14. **Get Media from Tweet:**
+    - Retrieves media (e.g., images) associated with a tweet.
+ 
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>⏲️ Timeline</em></strong></h4>
+</summary>
+
+1. **Get Home Timeline:**
+   - Retrieves a list of tweets on the home page of the user.
+
+2. **Get User Tweets:**
+   - Retrieves tweets posted by a specific user.
+
+3. **Get Mentioned Tweets:**
+   - Retrieves tweets where the user is mentioned.
+
+4. **Get Liked Tweets:**
+   - Retrieves tweets liked by a specific user.
+
+## Trends
+1. **Get Available Trends:**
+   - Retrieves a list of available trends.
+
+2. **Get Trend Tweets:**
+   - Retrieves tweets associated with a specific trend.
+ 
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>🔎 Search</em></strong></h4>
+</summary>
+
+1. **Search Users:**
+   - Searches for users based on their username or screen name.
+
+2. **Search Tweets:**
+   - Searches for tweets based on a provided string.
+ 
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>🗨️ Chats</em></strong></h4>
+</summary>
+
+1. **Real-Time Chat:**
+   - Allows users to send and receive messages in real-time, ensuring instant communication.
+
+2. **Synchronized Chat Across Devices:**
+   - Ensures that the chat history and messages are synchronized seamlessly when a user accesses the application from multiple devices.
+
+3. **Start Conversation:**
+   - Users can initiate new conversations with other users.
+
+4. **Leave Conversation:**
+   - Provides the functionality for users to leave a conversation.
+
+5. **Unseen Conversations Count:**
+   - Retrieves the number of unseen conversations to notify users of new messages.
+
+6. **View Messages in a Conversation:**
+   - Users can view the messages within a specific conversation.
+
+7. **Send Messages:**
+   - Allows users to send messages to others within a conversation.
+
+8. **Seen and Sent Feature:**
+   - Indicates whether a message has been seen by the recipient and provides information about when a message was sent.
+
+9. **Delete Messages:**
+   - Users can delete their messages within a conversation.
+ 
+</details>
+
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>🔔 Notifications</em></strong></h4>
+</summary>
+
+1. **Real-Time Notifications:**
+   - Users receive notifications in real-time for events such as new followers.
+
+2. **Unseen Notifications Count:**
+   - Provides the count of unseen notifications to inform users about new activities.
+
+3. **View Notifications:**
+   - Users can view a list of their notifications, including details about the activities that triggered them.
+
+4. **Seen Feature:**
+   - Tracks whether a user has seen a particular notification.
+ 
+</details>
+<hr>
+
+## 📁 File Structure
+<details>
+<summary>
+<h4 style="display:inline"> 📂 File Tree</h4>
+</summary>
+
+ ```plaintext
+project-root
+│
+├── tests
+│   ├── routes
+│   │   ├── authRouter.test.js
+│   │   ├── conversationsRouter.test.js
+│   │   ├── interactions.test.js
+│   │   ├── notificationsRouter.test.js
+│   │   ├── profile.test.js
+│   │   ├── searchRouter.test.js
+│   │   ├── timelineRouter.test.js
+│   │   └── tweetsRouter.test.js
+│   ├── services
+│   │   └── WebSocket.oldtest.js
+├── controllers
+│   ├── authController.js
+│   ├── conversationsController.js
+│   ├── errorController.js
+│   ├── interactionsController.js
+│   ├── notificationsController.js
+│   ├── profileController.js
+│   ├── searchController.js
+│   ├── timelineController.js
+│   ├── trendsController.js
+│   └── tweetsController.js
+├── middlewares
+│   ├── validations
+│   │   ├── conversation.js
+│   │   ├── profile.js
+│   │   ├── tweet.js
+│   │   └── user.js
+│   ├── catchAsync.js
+│   └── validateRequest.js
+├── models
+│   ├── entities
+│   │   ├── Conversation.js
+│   │   ├── Media.js
+│   │   ├── Message.js
+│   │   ├── Notification.js
+│   │   ├── Reply.js
+│   │   ├── Trend.js
+│   │   ├── Tweet.js
+│   │   └── User.js
+│   ├── relations
+│   │   ├── Block.js
+│   │   ├── Follow.js
+│   │   ├── Like.js
+│   │   ├── LikeReply.js
+│   │   ├── Mention.js
+│   │   ├── Mute.js
+│   │   ├── Repost.js
+│   │   └── Support.js
+├── routes
+│   │   ├── authRouter.js
+│   │   ├── conversationsRouter.js
+│   │   ├── interactionsRouter.js
+│   │   ├── notificationsRouter.js
+│   │   ├── profileRoutes.js
+│   │   ├── searchRouter.js
+│   │   ├── timelineRouter.js
+│   │   ├── trendsRouter.js
+│   │   └── tweetsRouter.js
+├── schemas
+│   ├── entities
+│   │   ├── conversationSchema.js
+│   │   ├── mediaSchema.js
+│   │   ├── messageSchema.js
+│   │   ├── notificationSchema.js
+│   │   ├── replySchema.js
+│   │   ├── trendSchema.js
+│   │   ├── tweetSchema.js
+│   │   └── userSchema.js
+│   ├── relations
+│   │   ├── blockSchema.js
+│   │   ├── followSchema.js
+│   │   ├── likeReplySchema.js
+│   │   ├── likeSchema.js
+│   │   ├── mentionSchema.js
+│   │   ├── muteSchema.js
+│   │   ├── repostSchema.js
+│   │   └── supportSchema.js
+├── seeds
+│   ├── blocks.json
+│   ├── conversations.json
+│   ├── follows.json
+│   ├── likes.json
+│   ├── media.json
+│   ├── messages.json
+│   ├── mutes.json
+│   ├── notifications.json
+│   ├── replies.json
+│   ├── reposts.json
+│   ├── seeds.js
+│   ├── supports.json
+│   ├── trends.json
+│   ├── tweets.json
+│   └── users.json
+├── services
+│   ├── AppError.js
+│   ├── AuthService.js
+│   ├── Email.js
+│   ├── Password.js
+│   └── WebSocket.js
+├── test
+│     └── setup.js
+├── views/emails
+│   ├── _style.pug
+│   ├── baseEmail.pug
+│   ├── confirmEmail.pug
+│   └── updateEmail.pug
+├── .env.template
+├── .eslintrc.json
+├── .gitignore
+├── .prettierrc
+├── API-Documentation.yaml
+├── Dockerfile
+├── README.md
+├── WebSocket APIs Documentation.md
+├── app.js
+├── dataSource.js
+├── dataSource2test.js
+├── package-lock.json
+├── package.json
+└── server.js
+```
+ </details>
+
+<hr>
+
+
+
+
+
+## 👨‍💻 Authors
 
 - Mahmoud Yahia [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/mahmoud-yahia-882144219/)
 - Mohamed Yaser [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/mohamed-yasser-952280226/)
