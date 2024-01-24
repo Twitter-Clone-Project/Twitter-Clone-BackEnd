@@ -27,6 +27,7 @@
 - [🔥 Getting started](#-get-started)
 - [📄 API Documentation](#-API-Documentation)
 - [📷 Features](#-features)
+- [📁 File Structure](#-file-structure)
 - [👨‍💻 Authors](#-authors)
   
 </details>
@@ -39,6 +40,7 @@
 > It is developed using Node.js for the backend, PostgreSQL for the database, React for the frontend, and AWS for deployment.
   
 > The Twitter Clone project aims to replicate the core features and functionalities of the popular social media platform, Twitter. This web application provides users with a platform to share short messages, engage with other users through likes, retweets, and comments, and stay updated on the latest trends and activities.
+
 <hr>
 
 ## ⛏️ Tech Stack
@@ -108,6 +110,7 @@
 > You can also see postman documentation with test exambles [here](https://documenter.getpostman.com/view/23936176/2s9YXe8jiV)
 
 > Here is the Socket.io events [documentaion](https://github.com/Twitter-Clone-Project/Twitter-Clone-BackEnd/blob/main/WebSocket%20APIs%20Documentation.md)
+
 <hr>
 
 ## 📸 Features 
@@ -292,8 +295,15 @@
 
 4. **Get Liked Tweets:**
    - Retrieves tweets liked by a specific user.
+ 
+</details>
 
-## Trends
+<details>
+<summary>
+<h4 style="display:inline">
+<strong><em>📈 Trends</em></strong></h4>
+</summary>
+
 1. **Get Available Trends:**
    - Retrieves a list of available trends.
 
@@ -301,6 +311,7 @@
    - Retrieves tweets associated with a specific trend.
  
 </details>
+
 
 <details>
 <summary>
