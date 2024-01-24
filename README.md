@@ -4,7 +4,7 @@
 </div>
 
 <div align="center">
-    <h1 align='center'>⚡️<i>Twitter clone</i>⚡️</h1>
+    <h1 align='center'>⚡️<i>Twitter Clone</i>⚡️</h1>
     <p>Amazing Twitter clone - a microblogging site that enables users to share brief messages and engage in real-time conversations.</p>
 </div>
 
@@ -21,15 +21,13 @@
 <summary>
 <h2 style="display:inline">📝 Table of Contents</h2>
 </summary>
- 
+
+ - [🚀 OverView](#-overview)
 - [⛏️ Tech Stack](#-Tech-Stack)
-- [🏁 Getting started](#getting-started)
-- [🏁 Description](#Description)
-- [📷 Features](#features)
-- [🏁 API Documentation](#API-Documentation)
-- [🏁 Function Documentation](#Function-Documentation)
-- [✍️ Contributors](#contributors)
-- [🔒 License](#license)
+- [🔥 Getting started](#-get-started)
+- [📄 API Documentation](#-API-Documentation)
+- [📷 Features](#-features)
+- [👨‍💻 Authors](#-authors)
   
 </details>
 
@@ -43,7 +41,7 @@
 > The Twitter Clone project aims to replicate the core features and functionalities of the popular social media platform, Twitter. This web application provides users with a platform to share short messages, engage with other users through likes, retweets, and comments, and stay updated on the latest trends and activities.
 <hr>
 
-## 🧑🏼‍💻 Tech Stack
+## ⛏️ Tech Stack
 
 ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=ffffff)
 
